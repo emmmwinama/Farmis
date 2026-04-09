@@ -1,0 +1,472 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+
+  farms           Farm[]
+  activities      FarmActivity[]
+  subscription    Subscription?
+  isActive        Boolean        @default(true)
+  activationToken String?        @unique
+  teamMemberships TeamMember[]
+}
+
+model Farm {
+  id        String   @id @default(cuid())
+  name      String
+  location  String
+  createdAt DateTime @default(now())
+  userId    String
+
+  user             User              @relation(fields: [userId], references: [id])
+  fields           Field[]
+  employees        Employee[]
+  transactions     Transaction[]
+  overheadExpenses OverheadExpense[]
+  teamMembers      TeamMember[]
+  ownerId          String? // for enterprise: who owns this farm
+  inventory        InventoryItem[]
+}
+
+model Field {
+  id               String   @id @default(cuid())
+  name             String
+  totalArea        Float
+  cultivatableArea Float
+  soilType         String
+  locationLat      Float?
+  locationLng      Float?
+  boundaryPoints   Json?
+  notes            String?
+  createdAt        DateTime @default(now())
+  farmId           String
+
+  farm         Farm           @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  cropFields   CropField[]
+  activities   FarmActivity[]
+  transactions Transaction[]
+}
+
+model CropType {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  isCustom Boolean @default(false)
+
+  cropFields CropField[]
+}
+
+model CropField {
+  id                  String   @id @default(cuid())
+  variety             String
+  areaPlanted         Float
+  season              String
+  plantingDate        DateTime
+  expectedHarvestDate DateTime
+  status              String   @default("Active")
+  createdAt           DateTime @default(now())
+  fieldId             String
+  cropTypeId          String
+
+  field          Field           @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  cropType       CropType        @relation(fields: [cropTypeId], references: [id])
+  activities     FarmActivity[]
+  yields         HarvestYield[]
+  transactions   Transaction[]
+  // inventory    InventoryItem[]
+  inventoryItems InventoryItem[]
+}
+
+model Employee {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  payRate     Float
+  payRateUnit String
+  phone       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  farmId      String
+
+  farm           Farm             @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  labourRecords  ActivityLabour[]
+  responsibleFor FarmActivity[]   @relation("ResponsibleEmployee")
+}
+
+model FarmActivity {
+  id                    String   @id @default(cuid())
+  activityType          String
+  date                  DateTime
+  notes                 String?
+  createdAt             DateTime @default(now())
+  fieldId               String
+  cropFieldId           String?
+  responsibleEmployeeId String?
+  createdById           String
+
+  field               Field               @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  cropField           CropField?          @relation(fields: [cropFieldId], references: [id])
+  responsibleEmployee Employee?           @relation("ResponsibleEmployee", fields: [responsibleEmployeeId], references: [id])
+  createdBy           User                @relation(fields: [createdById], references: [id])
+  labourRecords       ActivityLabour[]
+  inputs              ActivityInput[]
+  otherCosts          ActivityOtherCost[]
+}
+
+model ActivityLabour {
+  id          String @id @default(cuid())
+  hoursWorked Float  @default(0)
+  daysWorked  Float  @default(0)
+  totalCost   Float
+  activityId  String
+  employeeId  String
+
+  activity FarmActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  employee Employee     @relation(fields: [employeeId], references: [id])
+}
+
+model ActivityInput {
+  id         String @id @default(cuid())
+  inputName  String
+  category   String
+  quantity   Float
+  unit       String
+  unitCost   Float
+  totalCost  Float
+  activityId String
+
+  activity FarmActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
+
+model ActivityOtherCost {
+  id          String @id @default(cuid())
+  description String
+  amount      Float
+  activityId  String
+
+  activity FarmActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  type        String
+  category    String
+  amount      Float
+  date        DateTime
+  description String
+  createdAt   DateTime @default(now())
+  farmId      String
+  season      String?
+  fieldId     String?
+  cropFieldId String?
+
+  field     Field?     @relation(fields: [fieldId], references: [id])
+  cropField CropField? @relation(fields: [cropFieldId], references: [id])
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  inventoryItemId String?
+  saleLinks       InventorySaleLink[]
+
+  inventorySales InventorySale[]
+  harvestYieldId String? // direct link to harvest for crop sales transactions
+  harvestYield   HarvestYield?   @relation(fields: [harvestYieldId], references: [id])
+}
+
+model OverheadExpense {
+  id          String   @id @default(cuid())
+  farmId      String
+  description String
+  category    String // Salary, Rent, Utilities, Insurance, Loan, Other
+  amount      Float
+  date        DateTime
+  recurring   Boolean  @default(false)
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}
+
+model HarvestYield {
+  id          String   @id @default(cuid())
+  cropFieldId String
+  harvestDate DateTime
+  quantity    Float
+  unit        String // kg, bags, tonnes, crates
+  unitWeight  Float? // e.g. 1 bag = 50kg
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  cropField      CropField       @relation(fields: [cropFieldId], references: [id], onDelete: Cascade)
+  inventoryItems InventoryItem[]
+  transactions   Transaction[]
+}
+
+model SubscriptionTier {
+  id           String   @id @default(cuid())
+  name         String // Free, Standard, Enterprise
+  description  String
+  priceMonthly Float
+  priceAnnual  Float?
+  isActive     Boolean  @default(true)
+  isPublic     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  isFeatured Boolean @default(false)
+  sortOrder  Int     @default(0)
+
+  // Limits (-1 = unlimited)
+  maxFields       Int @default(1)
+  maxCrops        Int @default(1)
+  maxActivities   Int @default(10)
+  maxTransactions Int @default(5)
+  maxEmployees    Int @default(1)
+  maxFarms        Int @default(1)
+  maxTeamMembers  Int @default(1)
+
+  // Features (flags)
+  seasonAnalytics       Boolean @default(false)
+  yieldSuggestions      Boolean @default(false)
+  costPerHectare        Boolean @default(false)
+  payrollTracking       Boolean @default(false)
+  multipleFarms         Boolean @default(false)
+  teamAccounts          Boolean @default(false)
+  customReports         Boolean @default(false)
+  apiAccess             Boolean @default(false)
+  dataRetentionLifetime Boolean @default(true)
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  tierId          String
+  status          String    @default("active") // active, expired, suspended, trial
+  billingCycle    String    @default("monthly") // monthly, annual
+  startDate       DateTime  @default(now())
+  endDate         DateTime?
+  trialEndsAt     DateTime?
+  createdAt       DateTime  @default(now())
+  activationToken String?   @unique
+  activatedAt     DateTime?
+  notes           String?
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier     SubscriptionTier @relation(fields: [tierId], references: [id])
+  payments Payment[]
+}
+
+model Payment {
+  id               String    @id @default(cuid())
+  subscriptionId   String
+  amount           Float
+  currency         String    @default("MWK")
+  status           String // paid, pending, failed, refunded
+  method           String // cash, mobile_money, bank_transfer, card
+  reference        String?
+  notes            String?
+  paidAt           DateTime?
+  createdAt        DateTime  @default(now())
+  createdByAdminId String?
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  password     String
+  name         String
+  isSuperAdmin Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  lastLoginAt  DateTime?
+}
+
+// CMS content management
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique // hero_title, hero_subtitle, contact_email, etc.
+  value     String   @db.Text
+  type      String   @default("text") // text, image_url, boolean, json
+  group     String   @default("general") // hero, features, contact, social
+  label     String // Human readable label for admin
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+// Contact form submissions
+model ContactSubmission {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  message   String    @db.Text
+  status    String    @default("new") // new, read, replied, archived
+  notes     String?   @db.Text
+  createdAt DateTime  @default(now())
+  repliedAt DateTime?
+}
+
+// Demo booking requests
+model DemoBooking {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  farm      String
+  message   String?   @db.Text
+  status    String    @default("pending") // pending, confirmed, completed, cancelled
+  notes     String?   @db.Text
+  bookedFor DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// Testimonials managed by admin
+model Testimonial {
+  id        String   @id @default(cuid())
+  quote     String   @db.Text
+  name      String
+  role      String
+  initials  String
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// Multi-user: team members on enterprise farms
+model TeamMember {
+  id          String   @id @default(cuid())
+  farmId      String
+  userId      String
+  role        String // owner, manager, agronomist, accountant, viewer
+  permissions Json // {fields:true, crops:true, activities:true, finance:false, ...}
+  inviteEmail String?
+  inviteToken String?  @unique
+  status      String   @default("active") // active, invited, suspended
+  createdAt   DateTime @default(now())
+  invitedBy   String?
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CmsPage {
+  id        String   @id @default(cuid())
+  slug      String   @unique // about, blog, privacy, terms, security, careers, press, changelog, roadmap
+  title     String
+  content   String   @db.LongText
+  isPublic  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}
+
+model CmsFeature {
+  id          String  @id @default(cuid())
+  icon        String
+  title       String
+  description String  @db.Text
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+}
+
+model CmsMedia {
+  id        String   @id @default(cuid())
+  key       String   @unique // hero_image, hero_video, demo_image, etc.
+  url       String
+  type      String // image, video
+  label     String
+  updatedAt DateTime @updatedAt
+}
+
+// model InventoryItem {
+//   id             String   @id @default(cuid())
+//   farmId         String
+//   cropFieldId    String? // if from harvest
+//   harvestYieldId String? // if from harvest
+//   name           String
+//   category       String // crop, input, equipment, other
+//   quantity       Float
+//   unit           String
+//   unitWeight     Float? // for bags etc
+//   quantityKg     Float // always normalised to kg for crops
+//   season         String?
+//   fieldName      String?
+//   cropName       String?
+//   notes          String?
+//   source         String   @default("manual") // harvest, manual
+//   createdAt      DateTime @default(now())
+//   updatedAt      DateTime @updatedAt
+//
+//   farm         Farm                @relation(fields: [farmId], references: [id], onDelete: Cascade)
+//   cropField    CropField?          @relation(fields: [cropFieldId], references: [id])
+//   harvestYield HarvestYield?       @relation(fields: [harvestYieldId], references: [id])
+//   saleLinks    InventorySaleLink[]
+// }
+
+// Add to schema.prisma
+
+model InventoryItem {
+  id             String   @id @default(cuid())
+  farmId         String
+  name           String
+  category       String // crop_harvest, seed, fertiliser, chemical, equipment, other
+  unit           String // kg, bags, tonnes, litres, units
+  quantity       Float    @default(0)
+  unitWeight     Float? // for bags — weight per bag in kg
+  season         String?
+  cropFieldId    String? // if from a harvest
+  harvestYieldId String? // source harvest record
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  farm               Farm                @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  cropField          CropField?          @relation(fields: [cropFieldId], references: [id])
+  harvestYield       HarvestYield?       @relation(fields: [harvestYieldId], references: [id])
+  sales              InventorySale[]
+  inventorySaleLinks InventorySaleLink[]
+}
+
+model InventorySale {
+  id              String   @id @default(cuid())
+  inventoryItemId String
+  transactionId   String? // linked finance transaction
+  quantitySold    Float
+  unit            String
+  pricePerUnit    Float
+  totalAmount     Float
+  buyerName       String?
+  saleDate        DateTime
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  transaction   Transaction?  @relation(fields: [transactionId], references: [id])
+}
+
+model InventorySaleLink {
+  id              String   @id @default(cuid())
+  inventoryItemId String
+  transactionId   String
+  quantitySold    Float
+  unit            String
+  revenueAmount   Float
+  createdAt       DateTime @default(now())
+
+  inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  transaction   Transaction   @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+}
