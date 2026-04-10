@@ -34,5 +34,12 @@ export const authOptions: NextAuthOptions = {
             if (token && session.user) session.user.id = token.id as string;
             return session;
         },
+        // ADD THIS CALLBACK
+        async redirect({ url, baseUrl }) {
+            if (url.startsWith("/")) return `${baseUrl}${url}`;
+            else if (new URL(url).origin === baseUrl) return url;
+            return baseUrl + "/dashboard";
+        },
     },
+    secret: process.env.NEXTAUTH_SECRET,
 };

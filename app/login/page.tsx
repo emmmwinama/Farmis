@@ -16,12 +16,26 @@ export default function LoginPage() {
         e.preventDefault();
         setLoading(true);
         setError("");
-        const result = await signIn("credentials", { email, password, redirect: false });
-        if (result?.error) {
-            setError("Invalid email or password");
+
+        try {
+            const result = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                setError("Invalid email or password");
+                setLoading(false);
+            } else if (result?.ok) {
+                // Add a small delay to ensure session is created
+                setTimeout(() => {
+                    router.push("/dashboard");
+                }, 100);
+            }
+        } catch (err) {
+            setError("An error occurred. Please try again.");
             setLoading(false);
-        } else {
-            router.push("/dashboard");
         }
     };
 
