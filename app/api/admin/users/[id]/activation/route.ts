@@ -14,6 +14,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
         data: { activationToken: token },
     });
 
-    const activationLink = `${process.env.NEXTAUTH_URL}/activate?token=${token}`;
+    const activationLink = `https://farmis-gamma.vercel.app/activate?token=${token}`;
+    // const activationLink = `${process.env.NEXTAUTH_URL}/activate?token=${token}`;
     return NextResponse.json({ activationLink });
 }
