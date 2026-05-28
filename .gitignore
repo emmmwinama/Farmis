@@ -9,8 +9,8 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-#.env
-#/prisma/schema.prisma
+.env
+/prisma/schema.prisma
 # testing
 /coverage
 
