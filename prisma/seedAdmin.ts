@@ -221,6 +221,78 @@ async function main() {
     await prisma.subscriptionTier.update({ where: { id: "tier_enterprise" }, data: { sortOrder: 3, isFeatured: false } });
 
     console.log("CMS features, media, pages and tier updates seeded.");
+
+
+    // ADMARC Farm Gate Prices (2024/25 season)
+    const marketPrices = [
+        // Maize
+        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 350, priceMax: 550, priceAvg: 450, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Maize", variety: "White", unit: "bag50", priceMin: 17500, priceMax: 27500, priceAvg: 22500, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Maize", variety: "White", unit: "tonne", priceMin: 350000, priceMax: 550000, priceAvg: 450000, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 380, priceMax: 580, priceAvg: 480, market: "Lilongwe Market", region: "Central", season: "2024/25" },
+        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 360, priceMax: 560, priceAvg: 460, market: "Blantyre Market", region: "Southern", season: "2024/25" },
+        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 370, priceMax: 570, priceAvg: 470, market: "Mzuzu Market", region: "Northern", season: "2024/25" },
+
+        // Tobacco
+        { cropName: "Tobacco", variety: "Burley", unit: "kg", priceMin: 2800, priceMax: 5500, priceAvg: 4200, market: "Auction Floors", region: "National", season: "2024/25" },
+        { cropName: "Tobacco", variety: "NASCHO", unit: "kg", priceMin: 3200, priceMax: 6000, priceAvg: 4800, market: "Auction Floors", region: "National", season: "2024/25" },
+
+        // Soya beans
+        { cropName: "Soya", variety: "Nasoko", unit: "kg", priceMin: 800, priceMax: 1200, priceAvg: 1000, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Soya", variety: "Nasoko", unit: "bag50", priceMin: 40000, priceMax: 60000, priceAvg: 50000, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Soya", variety: "Nasoko", unit: "kg", priceMin: 850, priceMax: 1300, priceAvg: 1050, market: "Lilongwe Market", region: "Central", season: "2024/25" },
+        { cropName: "Soya", variety: "Nasoko", unit: "kg", priceMin: 820, priceMax: 1250, priceAvg: 1020, market: "Blantyre Market", region: "Southern", season: "2024/25" },
+
+        // Groundnuts
+        { cropName: "Groundnuts", variety: "CG7", unit: "kg", priceMin: 1500, priceMax: 2800, priceAvg: 2100, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Groundnuts", variety: "CG7", unit: "bag50", priceMin: 75000, priceMax: 140000, priceAvg: 105000, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Groundnuts", variety: "CG7", unit: "kg", priceMin: 1600, priceMax: 3000, priceAvg: 2200, market: "Lilongwe Market", region: "Central", season: "2024/25" },
+
+        // Rice
+        { cropName: "Rice", variety: "Kilombero", unit: "kg", priceMin: 900, priceMax: 1500, priceAvg: 1200, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Rice", variety: "Kilombero", unit: "bag50", priceMin: 45000, priceMax: 75000, priceAvg: 60000, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Rice", variety: "Kilombero", unit: "kg", priceMin: 950, priceMax: 1600, priceAvg: 1250, market: "Blantyre Market", region: "Southern", season: "2024/25" },
+
+        // Beans
+        { cropName: "Beans", variety: "Napilira", unit: "kg", priceMin: 1200, priceMax: 2000, priceAvg: 1600, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Beans", variety: "Napilira", unit: "bag50", priceMin: 60000, priceMax: 100000, priceAvg: 80000, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Beans", variety: "Napilira", unit: "kg", priceMin: 1300, priceMax: 2200, priceAvg: 1700, market: "Lilongwe Market", region: "Central", season: "2024/25" },
+
+        // Cotton
+        { cropName: "Cotton", variety: "Chureza", unit: "kg", priceMin: 850, priceMax: 1400, priceAvg: 1150, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Cotton", variety: "Chureza", unit: "kg", priceMin: 900, priceMax: 1500, priceAvg: 1200, market: "Blantyre Market", region: "Southern", season: "2024/25" },
+
+        // Sweet potato
+        { cropName: "Sweet Potato", variety: "Zondeni", unit: "kg", priceMin: 250, priceMax: 500, priceAvg: 380, market: "Lilongwe Market", region: "Central", season: "2024/25" },
+        { cropName: "Sweet Potato", variety: "Zondeni", unit: "kg", priceMin: 280, priceMax: 520, priceAvg: 400, market: "Blantyre Market", region: "Southern", season: "2024/25" },
+
+        // Cassava
+        { cropName: "Cassava", variety: "Manyokola", unit: "kg", priceMin: 180, priceMax: 350, priceAvg: 270, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Cassava", variety: "Manyokola", unit: "kg", priceMin: 200, priceMax: 380, priceAvg: 290, market: "Lilongwe Market", region: "Central", season: "2024/25" },
+
+        // Sunflower
+        { cropName: "Sunflower", variety: "Local", unit: "kg", priceMin: 700, priceMax: 1200, priceAvg: 950, market: "ADMARC", region: "National", season: "2024/25" },
+        { cropName: "Sunflower", variety: "Local", unit: "kg", priceMin: 750, priceMax: 1300, priceAvg: 1000, market: "Lilongwe Market", region: "Central", season: "2024/25" },
+
+        // Previous season for comparison
+        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 280, priceMax: 420, priceAvg: 350, market: "ADMARC", region: "National", season: "2023/24" },
+        { cropName: "Soya", variety: "Nasoko", unit: "kg", priceMin: 650, priceMax: 950, priceAvg: 800, market: "ADMARC", region: "National", season: "2023/24" },
+        { cropName: "Groundnuts", variety: "CG7", unit: "kg", priceMin: 1200, priceMax: 2200, priceAvg: 1700, market: "ADMARC", region: "National", season: "2023/24" },
+        { cropName: "Tobacco", variety: "Burley", unit: "kg", priceMin: 2200, priceMax: 4500, priceAvg: 3500, market: "Auction Floors", region: "National", season: "2023/24" },
+        { cropName: "Beans", variety: "Napilira", unit: "kg", priceMin: 950, priceMax: 1600, priceAvg: 1300, market: "ADMARC", region: "National", season: "2023/24" },
+        { cropName: "Rice", variety: "Kilombero", unit: "kg", priceMin: 750, priceMax: 1200, priceAvg: 980, market: "ADMARC", region: "National", season: "2023/24" },
+    ];
+
+    for (const price of marketPrices) {
+        const existing = await prisma.marketPrice.findFirst({
+            where: { cropName: price.cropName, unit: price.unit, market: price.market, season: price.season },
+        });
+        if (!existing) {
+            await prisma.marketPrice.create({ data: { ...price, source: "ADMARC" } });
+        }
+    }
+
+    console.log("Market prices seeded.");
 }
 
 main()

@@ -10,7 +10,7 @@ generator client {
 datasource db {
   provider = "mysql"
   // url      = env("DATABASE_URL")
-  url      = "mysql://root:anUEjPWaxuUGAsppnbGcMwYmcIMCxCdm@mainline.proxy.rlwy.net:56635/railway"
+  url      = "mysql://root:@localhost:3306/farmio"
 }
 
 model User {
@@ -24,9 +24,11 @@ model User {
   farms           Farm[]
   activities      FarmActivity[]
   subscription    Subscription?
-  isActive        Boolean        @default(true)
-  activationToken String?        @unique
+  isActive        Boolean           @default(true)
+  activationToken String?           @unique
   teamMemberships TeamMember[]
+  creditScores    FarmCreditScore[]
+  notifications   Notification[]
 }
 
 model Farm {
@@ -44,6 +46,17 @@ model Farm {
   teamMembers      TeamMember[]
   ownerId          String? // for enterprise: who owns this farm
   inventory        InventoryItem[]
+  creditScores     FarmCreditScore[]
+  weatherCache     WeatherCache?
+  documents        FarmDocument[]
+
+  livestockTypes    LivestockType[]
+  animals           Animal[]
+  animalExpenses    AnimalExpense[]
+  animalProductions AnimalProduction[]
+
+  boundaries FieldBoundary[]
+  markers    FarmMarker[]
 }
 
 model Field {
@@ -63,6 +76,8 @@ model Field {
   cropFields   CropField[]
   activities   FarmActivity[]
   transactions Transaction[]
+  boundary     FieldBoundary?
+  zones        FieldZone[]
 }
 
 model CropType {
@@ -291,13 +306,14 @@ model Payment {
 }
 
 model AdminUser {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  password     String
-  name         String
-  isSuperAdmin Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  lastLoginAt  DateTime?
+  id            String         @id @default(cuid())
+  email         String         @unique
+  password      String
+  name          String
+  isSuperAdmin  Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  lastLoginAt   DateTime?
+  notifications Notification[]
 }
 
 // CMS content management
@@ -470,4 +486,233 @@ model InventorySaleLink {
 
   inventoryItem InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
   transaction   Transaction   @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+}
+
+model MarketPrice {
+  id         String   @id @default(cuid())
+  cropName   String
+  variety    String?
+  unit       String
+  priceMin   Float
+  priceMax   Float
+  priceAvg   Float
+  market     String
+  region     String
+  currency   String   @default("MWK")
+  season     String?
+  recordedAt DateTime @default(now())
+  source     String   @default("ADMARC")
+  isActive   Boolean  @default(true)
+}
+
+model FarmCreditScore {
+  id          String   @id @default(cuid())
+  userId      String
+  farmId      String
+  score       Int
+  grade       String
+  factors     Json
+  generatedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}
+
+model WeatherCache {
+  id       String   @id @default(cuid())
+  farmId   String   @unique
+  data     Json
+  cachedAt DateTime @default(now())
+  farm     Farm     @relation(fields: [farmId], references: [id])
+}
+
+model FarmDocument {
+  id         String   @id @default(cuid())
+  farmId     String
+  name       String
+  type       String // deed, certificate, receipt, contract, other
+  url        String
+  size       Int?
+  linkedTo   String? // activity ID, transaction ID, etc.
+  linkedType String? // activity, transaction, crop
+  notes      String?
+  uploadedAt DateTime @default(now())
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  farmId    String
+  type      String // harvest_due, no_activity, low_inventory, price_alert
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id])
+  adminUserId String?
+}
+
+model LivestockType {
+  id       String   @id @default(cuid())
+  farmId   String
+  name     String
+  category String
+  icon     String   @default("🐄")
+  farm     Farm     @relation(fields: [farmId], references: [id])
+  animals  Animal[]
+}
+
+model Animal {
+  id              String    @id @default(cuid())
+  farmId          String
+  livestockTypeId String
+  tag             String?
+  name            String?
+  group           String?
+  sex             String    @default("Unknown")
+  birthDate       DateTime?
+  acquisitionDate DateTime  @default(now())
+  acquisitionType String    @default("Born on farm")
+  acquisitionCost Float?
+  status          String    @default("Active")
+  breed           String?
+  colour          String?
+  weight          Float?
+  notes           String?
+  parentId        String?
+  createdAt       DateTime  @default(now())
+
+  farm          Farm               @relation(fields: [farmId], references: [id])
+  livestockType LivestockType      @relation(fields: [livestockTypeId], references: [id])
+  healthRecords AnimalHealth[]
+  productions   AnimalProduction[]
+  weightRecords AnimalWeight[]
+  expenses      AnimalExpense[]
+  sales         AnimalSale[]
+  parent        Animal?            @relation("ParentChild", fields: [parentId], references: [id])
+  offsprings    Animal[]           @relation("ParentChild")
+}
+
+model AnimalHealth {
+  id           String    @id @default(cuid())
+  animalId     String
+  farmId       String
+  type         String
+  description  String
+  veterinarian String?
+  cost         Float     @default(0)
+  date         DateTime
+  nextDueDate  DateTime?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  animal       Animal    @relation(fields: [animalId], references: [id], onDelete: Cascade)
+}
+
+model AnimalProduction {
+  id           String   @id @default(cuid())
+  animalId     String?
+  farmId       String
+  type         String
+  quantity     Float
+  unit         String
+  date         DateTime
+  pricePerUnit Float?
+  totalValue   Float?
+  notes        String?
+  createdAt    DateTime @default(now())
+  animal       Animal?  @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  farm         Farm     @relation(fields: [farmId], references: [id])
+}
+
+model AnimalWeight {
+  id       String   @id @default(cuid())
+  animalId String
+  weight   Float
+  unit     String   @default("kg")
+  date     DateTime
+  notes    String?
+  animal   Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
+}
+
+model AnimalExpense {
+  id          String   @id @default(cuid())
+  animalId    String?
+  farmId      String
+  category    String
+  description String
+  amount      Float
+  date        DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+  animal      Animal?  @relation(fields: [animalId], references: [id])
+  farm        Farm     @relation(fields: [farmId], references: [id])
+}
+
+model AnimalSale {
+  id           String   @id @default(cuid())
+  animalId     String
+  farmId       String
+  saleDate     DateTime
+  quantity     Int      @default(1)
+  weightAtSale Float?
+  pricePerKg   Float?
+  totalAmount  Float
+  buyer        String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  animal       Animal   @relation(fields: [animalId], references: [id])
+}
+
+model FieldBoundary {
+  id          String   @id @default(cuid())
+  fieldId     String   @unique
+  farmId      String
+  geoJson     Json // GeoJSON polygon
+  areaHa      Float? // calculated area in hectares
+  centroidLat Float?
+  centroidLng Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  field Field       @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  farm  Farm        @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  zones FieldZone[]
+}
+
+model FieldZone {
+  id          String   @id @default(cuid())
+  boundaryId  String
+  fieldId     String
+  farmId      String
+  name        String
+  type        String // crop, soil, infrastructure, empty
+  cropFieldId String? // link to crop record
+  geoJson     Json
+  areaHa      Float?
+  colour      String?
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  boundary FieldBoundary @relation(fields: [boundaryId], references: [id], onDelete: Cascade)
+  field    Field         @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+}
+
+model FarmMarker {
+  id        String   @id @default(cuid())
+  farmId    String
+  fieldId   String?
+  type      String // borehole, irrigation, shed, road, gate, other
+  label     String
+  lat       Float
+  lng       Float
+  notes     String?
+  icon      String?
+  createdAt DateTime @default(now())
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
 }
