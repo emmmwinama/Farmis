@@ -1,335 +1,170 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-    Plus, Loader2, Trash2, Pencil, X, Check,
-    TrendingUp, TrendingDown, Filter, BarChart2,
-    Building2,
-} from "lucide-react";
-import Link from "next/link";
+import { Plus, Loader2, X, Check, Pencil, Trash2, Wallet, TrendingUp, TrendingDown } from "lucide-react";
 
-const INCOME_CATEGORIES = [
-    "Crop Sales", "Livestock Sales", "Equipment Hire",
-    "Grants & Subsidies", "Insurance Payout", "Other Income",
-];
+const INCOME_CATEGORIES = ["Crop sales", "Livestock sales", "Grant", "Loan", "Other income"];
+const EXPENSE_CATEGORIES = ["Seeds", "Fertiliser", "Chemicals", "Equipment", "Fuel", "Transport", "Labour", "Land rent", "Loan repayment", "Other expense"];
+const OVERHEAD_CATEGORIES = ["Electricity", "Water", "Insurance", "Admin", "Marketing", "Other overhead"];
 
-const EXPENSE_CATEGORIES = [
-    "Seeds", "Fertilizer", "Chemicals & Pesticides", "Labour",
-    "Equipment & Machinery", "Fuel & Transport", "Irrigation",
-    "Land Preparation", "Storage", "Insurance",
-    "Loan Repayment", "Utilities", "Other Expense",
-];
-
-const OVERHEAD_CATEGORIES = [
-    "Employee Salary", "Rent & Lease", "Utilities",
-    "Insurance", "Loan Repayment", "Equipment Maintenance",
-    "Administration", "Other Overhead",
-];
-
-function fmt(n: number) {
-    return new Intl.NumberFormat("en-MW").format(Math.round(n));
-}
-
+function fmt(n: number) { return new Intl.NumberFormat("en-MW").format(Math.round(n)); }
 function formatDate(d: string) {
-    return new Date(d).toLocaleDateString("en-GB", {
-        day: "numeric", month: "short", year: "numeric",
-    });
+    return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-const emptyTxForm = {
-    type: "Income",
-    category: "Crop Sales",
-    amount: "",
-    date: new Date().toISOString().split("T")[0],
-    description: "",
+const emptyTx = {
+    type: "Income", category: "Crop sales", amount: "", date: new Date().toISOString().split("T")[0],
+    description: "", season: "", fieldId: "", cropFieldId: "", harvestYieldId: "",
 };
 
-const emptyOverheadForm = {
-    description: "",
-    category: "Employee Salary",
-    amount: "",
-    date: new Date().toISOString().split("T")[0],
-    recurring: false,
-    notes: "",
+const emptyOverhead = {
+    description: "", category: "Admin", amount: "",
+    date: new Date().toISOString().split("T")[0], recurring: false, notes: "",
 };
 
 export default function FinancePage() {
-    const [tab, setTab] = useState<"transactions" | "overhead" | "activity">("transactions");
-    const [txData, setTxData] = useState<any>(null);
+    const [data, setData] = useState<any>(null);
     const [overhead, setOverhead] = useState<any[]>([]);
-    const [activityCosts, setActivityCosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
-    // Transaction form
+    const [tab, setTab] = useState<"transactions" | "overhead">("transactions");
     const [showTxForm, setShowTxForm] = useState(false);
-    const [editingTx, setEditingTx] = useState<any>(null);
-    const [txForm, setTxForm] = useState(emptyTxForm);
-
-    // Overhead form
     const [showOhForm, setShowOhForm] = useState(false);
+    const [editingTx, setEditingTx] = useState<any>(null);
     const [editingOh, setEditingOh] = useState<any>(null);
-    const [ohForm, setOhForm] = useState(emptyOverheadForm);
-
+    const [txForm, setTxForm] = useState({ ...emptyTx });
+    const [ohForm, setOhForm] = useState({ ...emptyOverhead });
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
     const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [showStats, setShowStats] = useState(false);
     const [typeFilter, setTypeFilter] = useState("All");
-    const [fromDate, setFromDate] = useState("");
-    const [toDate, setToDate] = useState("");
+    const [seasonFilter, setSeasonFilter] = useState("All");
 
-    const loadAll = () => {
+    const load = () => {
         setLoading(true);
+        const params = new URLSearchParams();
+        if (typeFilter !== "All") params.set("type", typeFilter);
+        if (seasonFilter !== "All") params.set("season", seasonFilter);
         Promise.all([
-            fetch("/api/finance").then((r) => r.json()),
+            fetch(`/api/finance?${params.toString()}`).then((r) => r.json()),
             fetch("/api/overhead").then((r) => r.json()),
-            fetch("/api/reports").then((r) => r.json()),
-        ]).then(([tx, oh, rep]) => {
-            setTxData(tx);
-            setOverhead(oh);
-            setActivityCosts(rep.cropFieldDetail ?? []);
-            setLoading(false);
-        });
+        ]).then(([f, o]) => { setData(f); setOverhead(o); setLoading(false); });
     };
 
-    useEffect(() => { loadAll(); }, []);
+    useEffect(() => { load(); }, [typeFilter, seasonFilter]);
 
-    // Totals
-    const totalIncome = txData?.income ?? 0;
-    const totalTxExpense = txData?.expense ?? 0;
-    const totalOverhead = overhead.reduce((s: number, o: any) => s + o.amount, 0);
-    const totalActivityCost = activityCosts.reduce((s: number, c: any) => s + c.total, 0);
-    const totalExpense = totalTxExpense + totalOverhead + totalActivityCost;
-    const net = totalIncome - totalExpense;
+    const setTx = (k: string, v: any) => setTxForm((f) => ({ ...f, [k]: v }));
+    const setOh = (k: string, v: any) => setOhForm((f) => ({ ...f, [k]: v }));
 
-    // Transaction handlers
-    const openAddTx = () => { setEditingTx(null); setTxForm(emptyTxForm); setError(""); setShowTxForm(true); };
+    const openAddTx = () => { setEditingTx(null); setTxForm({ ...emptyTx }); setError(""); setShowTxForm(true); };
     const openEditTx = (tx: any) => {
         setEditingTx(tx);
-        setTxForm({ type: tx.type, category: tx.category, amount: tx.amount.toString(), date: new Date(tx.date).toISOString().split("T")[0], description: tx.description });
+        setTxForm({
+            type: tx.type, category: tx.category, amount: tx.amount.toString(),
+            date: new Date(tx.date).toISOString().split("T")[0],
+            description: tx.description, season: tx.season ?? "",
+            fieldId: tx.fieldId ?? "", cropFieldId: tx.cropFieldId ?? "",
+            harvestYieldId: tx.harvestYieldId ?? "",
+        });
         setError(""); setShowTxForm(true);
     };
-    const closeTxForm = () => { setShowTxForm(false); setEditingTx(null); };
-    const setTx = (k: string, v: string) => setTxForm((f) => ({ ...f, [k]: v }));
+    const openAddOh = () => { setEditingOh(null); setOhForm({ ...emptyOverhead }); setError(""); setShowOhForm(true); };
+    const openEditOh = (oh: any) => {
+        setEditingOh(oh);
+        setOhForm({
+            description: oh.description, category: oh.category, amount: oh.amount.toString(),
+            date: new Date(oh.date).toISOString().split("T")[0],
+            recurring: oh.recurring, notes: oh.notes ?? "",
+        });
+        setError(""); setShowOhForm(true);
+    };
 
     const handleTxSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); setSaving(true); setError("");
         const url = editingTx ? `/api/finance/${editingTx.id}` : "/api/finance";
-        const res = await fetch(url, { method: editingTx ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(txForm) });
+        const method = editingTx ? "PATCH" : "POST";
+        const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(txForm) });
         const d = await res.json();
-        if (!res.ok) { setError(d.error); setSaving(false); } else { closeTxForm(); loadAll(); }
+        if (!res.ok) { setError(d.error); setSaving(false); } else { setShowTxForm(false); load(); }
     };
-
-    const handleTxDelete = async (id: string) => {
-        if (!confirm("Delete this transaction?")) return;
-        setDeletingId(id);
-        await fetch(`/api/finance/${id}`, { method: "DELETE" });
-        setDeletingId(null); loadAll();
-    };
-
-    // Overhead handlers
-    const openAddOh = () => { setEditingOh(null); setOhForm(emptyOverheadForm); setError(""); setShowOhForm(true); };
-    const openEditOh = (oh: any) => {
-        setEditingOh(oh);
-        setOhForm({ description: oh.description, category: oh.category, amount: oh.amount.toString(), date: new Date(oh.date).toISOString().split("T")[0], recurring: oh.recurring, notes: oh.notes ?? "" });
-        setError(""); setShowOhForm(true);
-    };
-    const closeOhForm = () => { setShowOhForm(false); setEditingOh(null); };
-    const setOh = (k: string, v: any) => setOhForm((f) => ({ ...f, [k]: v }));
 
     const handleOhSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); setSaving(true); setError("");
         const url = editingOh ? `/api/overhead/${editingOh.id}` : "/api/overhead";
-        const res = await fetch(url, { method: editingOh ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(ohForm) });
+        const method = editingOh ? "PATCH" : "POST";
+        const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(ohForm) });
         const d = await res.json();
-        if (!res.ok) { setError(d.error); setSaving(false); } else { closeOhForm(); loadAll(); }
+        if (!res.ok) { setError(d.error); setSaving(false); } else { setShowOhForm(false); load(); }
     };
 
-    const handleOhDelete = async (id: string) => {
+    const handleDeleteTx = async (id: string) => {
+        if (!confirm("Delete this transaction?")) return;
+        setDeletingId(id);
+        await fetch(`/api/finance/${id}`, { method: "DELETE" });
+        setDeletingId(null); load();
+    };
+
+    const handleDeleteOh = async (id: string) => {
         if (!confirm("Delete this overhead expense?")) return;
         setDeletingId(id);
         await fetch(`/api/overhead/${id}`, { method: "DELETE" });
-        setDeletingId(null); loadAll();
+        setDeletingId(null); load();
     };
 
-    const filteredTx = (txData?.transactions ?? []).filter((t: any) => {
-        if (typeFilter !== "All" && t.type !== typeFilter) return false;
-        if (fromDate && new Date(t.date) < new Date(fromDate)) return false;
-        if (toDate && new Date(t.date) > new Date(toDate)) return false;
-        return true;
-    });
+    const transactions = data?.transactions ?? [];
+    const netPositive = (data?.net ?? 0) >= 0;
+    const totalOverheadCost = overhead.reduce((s, o) => s + o.amount, 0);
 
-    const maxBar = Math.max(...(txData?.byMonth ?? []).map((m: any) => Math.max(m.income, m.expense)), 1);
-
-    if (loading) return <div className="flex justify-center py-20"><Loader2 size={24} className="animate-spin text-slate-400" /></div>;
+    const categories = txForm.type === "Income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
     return (
         <div className="p-8 max-w-6xl mx-auto">
 
-            {/* Header */}
             <div className="flex items-start justify-between mb-8">
                 <div>
-                    <h1 className="text-2xl font-medium text-slate-900">Finance</h1>
-                    <p className="text-slate-400 text-sm mt-1">Track income, expenses and farm profitability</p>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Finance</h1>
+                    <p className="text-slate-400 text-sm mt-1">Track income, expenses and overhead costs</p>
                 </div>
-                <div className="flex gap-2">
-                    <Link
-                        href="/dashboard/reports"
-                        className="flex items-center gap-2 h-10 px-4 border border-slate-200 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors"
-                    >
-                        Reports
-                    </Link>
-                    <button
-                        onClick={tab === "overhead" ? openAddOh : openAddTx}
-                        className="flex items-center gap-2 h-10 px-4 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-colors"
-                    >
-                        <Plus size={16} /> Add {tab === "overhead" ? "overhead" : "transaction"}
-                    </button>
-                </div>
+                <button onClick={tab === "transactions" ? openAddTx : openAddOh}
+                        className="flex items-center gap-2 h-10 px-5 bg-[#1a3d1f] text-white text-sm font-bold rounded-xl hover:bg-[#2d5c35] transition-colors hover:shadow-lg hover:shadow-[#1a3d1f]/20">
+                    <Plus size={16} /> Add {tab === "transactions" ? "transaction" : "overhead"}
+                </button>
             </div>
 
             {/* Summary cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                        <TrendingUp size={15} className="text-green-600" />
-                        <p className="text-xs uppercase tracking-wide text-slate-400 font-medium">Income</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {[
+                    { label: "Income", value: `MWK ${fmt(data?.income ?? 0)}`, color: "text-green-600 dark:text-green-400", icon: TrendingUp, iconColor: "text-green-500" },
+                    { label: "Expenses", value: `MWK ${fmt(data?.expense ?? 0)}`, color: "text-red-500", icon: TrendingDown, iconColor: "text-red-500" },
+                    { label: "Overhead", value: `MWK ${fmt(totalOverheadCost)}`, color: "text-orange-500 dark:text-orange-400", icon: Wallet, iconColor: "text-orange-500" },
+                    { label: "Net", value: `MWK ${fmt(Math.abs(data?.net ?? 0))}`, color: netPositive ? "text-blue-600 dark:text-blue-400" : "text-red-500", icon: netPositive ? TrendingUp : TrendingDown, iconColor: netPositive ? "text-blue-500" : "text-red-500" },
+                ].map(({ label, value, color, icon: Icon, iconColor }) => (
+                    <div key={label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-sm transition-all">
+                        <div className="flex items-center justify-between mb-3">
+                            <p className="text-xs text-slate-400 uppercase tracking-wide font-semibold">{label}</p>
+                            <Icon size={16} className={iconColor} />
+                        </div>
+                        <p className={`text-2xl font-black ${color}`}>{value}</p>
                     </div>
-                    <p className="text-2xl font-medium text-green-700">MWK {fmt(totalIncome)}</p>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                        <TrendingDown size={15} className="text-red-500" />
-                        <p className="text-xs uppercase tracking-wide text-slate-400 font-medium">Activity costs</p>
-                    </div>
-                    <p className="text-2xl font-medium text-red-600">MWK {fmt(totalActivityCost)}</p>
-                    <p className="text-xs text-slate-400 mt-1">from {activityCosts.length} crop records</p>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                        <Building2 size={15} className="text-orange-500" />
-                        <p className="text-xs uppercase tracking-wide text-slate-400 font-medium">Overhead</p>
-                    </div>
-                    <p className="text-2xl font-medium text-orange-600">MWK {fmt(totalOverhead)}</p>
-                    <p className="text-xs text-slate-400 mt-1">{overhead.length} expenses</p>
-                </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                    <p className="text-xs uppercase tracking-wide text-slate-400 font-medium mb-3">Net balance</p>
-                    <p className={`text-2xl font-medium ${net >= 0 ? "text-green-700" : "text-red-600"}`}>
-                        MWK {fmt(net)}
-                    </p>
-                    <p className="text-xs text-slate-400 mt-1">income minus all costs</p>
-                </div>
+                ))}
             </div>
 
-            {/* Analytics toggle */}
-            <button
-                onClick={() => setShowStats(!showStats)}
-                className={`flex items-center gap-2 h-9 px-4 rounded-xl text-sm font-medium border transition-colors mb-4 ${
-                    showStats ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
-                }`}
-            >
-                <BarChart2 size={14} /> Analytics
-            </button>
-
-            {/* Analytics panel */}
-            {showStats && txData && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-
-                    {/* Monthly chart */}
-                    <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                        <h3 className="text-sm font-medium text-slate-900 mb-5">Monthly overview</h3>
-                        {txData.byMonth.length === 0 ? (
-                            <p className="text-xs text-slate-400 text-center py-8">No data yet</p>
-                        ) : (
-                            <>
-                                <div className="flex items-end gap-2 h-36 mb-2">
-                                    {txData.byMonth.slice(-8).map((m: any, i: number) => (
-                                        <div key={`${m.month}-${i}`} className="flex-1 flex flex-col items-center gap-0.5">
-                                            <div className="w-full flex gap-0.5 items-end" style={{ height: "110px" }}>
-                                                <div className="flex-1 bg-green-200 rounded-t" style={{ height: `${(m.income / maxBar) * 100}%`, minHeight: m.income > 0 ? "2px" : "0" }} />
-                                                <div className="flex-1 bg-red-200 rounded-t" style={{ height: `${(m.expense / maxBar) * 100}%`, minHeight: m.expense > 0 ? "2px" : "0" }} />
-                                            </div>
-                                            <span className="text-slate-400 text-center leading-tight" style={{ fontSize: "9px" }}>{m.month}</span>
-                                        </div>
-                                    ))}
+            {/* Season breakdown */}
+            {(data?.bySeason?.length ?? 0) > 0 && (
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 mb-6">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4">By season</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {data.bySeason.map((s: any) => (
+                            <div key={s.season} className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4">
+                                <p className="text-sm font-bold text-slate-900 dark:text-white mb-2">{s.season}</p>
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-green-600 dark:text-green-400 font-semibold">+MWK {fmt(s.income)}</span>
+                                    <span className="text-red-500 font-semibold">-MWK {fmt(s.expense)}</span>
+                                    <span className={`font-bold ${s.net >= 0 ? "text-blue-600 dark:text-blue-400" : "text-red-500"}`}>
+                    {s.net >= 0 ? "+" : ""}MWK {fmt(s.net)}
+                  </span>
                                 </div>
-                                <div className="flex gap-4">
-                                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 bg-green-200 rounded-sm" /><span className="text-xs text-slate-400">Income</span></div>
-                                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 bg-red-200 rounded-sm" /><span className="text-xs text-slate-400">Expense</span></div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Cost breakdown */}
-                    <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                        <h3 className="text-sm font-medium text-slate-900 mb-4">Cost breakdown</h3>
-                        <div className="flex flex-col gap-3">
-                            {[
-                                { label: "Activity costs", value: totalActivityCost, color: "bg-red-400" },
-                                { label: "Overhead expenses", value: totalOverhead, color: "bg-orange-400" },
-                                { label: "Other expenses", value: totalTxExpense, color: "bg-amber-400" },
-                            ].map(({ label, value, color }) => {
-                                const pct = totalExpense > 0 ? (value / totalExpense) * 100 : 0;
-                                return (
-                                    <div key={label}>
-                                        <div className="flex justify-between text-xs mb-1">
-                                            <span className="text-slate-600">{label}</span>
-                                            <span className="text-slate-900 font-medium">MWK {fmt(value)} ({pct.toFixed(0)}%)</span>
-                                        </div>
-                                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                                            <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* By category */}
-                    <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                        <h3 className="text-sm font-medium text-slate-900 mb-4">By category</h3>
-                        {txData.byCategory.length === 0 ? (
-                            <p className="text-xs text-slate-400 text-center py-4">No data yet</p>
-                        ) : (
-                            <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
-                                {txData.byCategory.map((c: any, i: number) => (
-                                    <div key={`${c.category}-${i}`} className="flex items-center justify-between gap-3">
-                                        <div className="flex items-center gap-2 min-w-0">
-                                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${c.type === "Income" ? "bg-green-500" : "bg-red-400"}`} />
-                                            <span className="text-xs text-slate-600 truncate">{c.category}</span>
-                                        </div>
-                                        <span className={`text-xs font-medium flex-shrink-0 ${c.type === "Income" ? "text-green-700" : "text-red-600"}`}>
-                      MWK {fmt(c.total)}
-                    </span>
-                                    </div>
-                                ))}
                             </div>
-                        )}
-                    </div>
-
-                    {/* Activity cost by crop */}
-                    <div className="bg-white border border-slate-200 rounded-2xl p-5">
-                        <h3 className="text-sm font-medium text-slate-900 mb-4">Activity cost by crop</h3>
-                        {activityCosts.length === 0 ? (
-                            <p className="text-xs text-slate-400 text-center py-4">No activity costs yet</p>
-                        ) : (
-                            <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
-                                {activityCosts.sort((a: any, b: any) => b.total - a.total).slice(0, 8).map((c: any, i: number) => (
-                                    <div key={`${c.id}-${i}`} className="flex items-center justify-between gap-3">
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-medium text-slate-900 truncate">{c.cropName} — {c.fieldName}</p>
-                                            <p className="text-xs text-slate-400">{c.season} · {c.areaPlanted} ha</p>
-                                        </div>
-                                        <div className="text-right flex-shrink-0">
-                                            <p className="text-xs font-medium text-slate-900">MWK {fmt(c.total)}</p>
-                                            <p className="text-xs text-slate-400">MWK {fmt(c.costPerHectare)}/ha</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                        ))}
                     </div>
                 </div>
             )}
@@ -337,173 +172,78 @@ export default function FinancePage() {
             {/* Tabs */}
             <div className="flex gap-2 mb-6">
                 {[
-                    { key: "transactions", label: "Transactions" },
-                    { key: "overhead", label: "Overhead expenses" },
-                    { key: "activity", label: "Activity costs" },
+                    { key: "transactions", label: `Transactions (${transactions.length})` },
+                    { key: "overhead", label: `Overhead (${overhead.length})` },
                 ].map(({ key, label }) => (
-                    <button
-                        key={key}
-                        onClick={() => setTab(key as any)}
-                        className={`h-9 px-4 rounded-xl text-sm font-medium transition-colors ${
-                            tab === key
-                                ? "bg-slate-900 text-white"
-                                : "bg-white border border-slate-200 text-slate-500 hover:border-slate-300"
-                        }`}
-                    >
+                    <button key={key} onClick={() => setTab(key as any)}
+                            className={`h-9 px-5 rounded-xl text-sm font-bold transition-colors ${
+                                tab === key ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900" : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400"
+                            }`}>
                         {label}
                     </button>
                 ))}
             </div>
 
-            {/* Transaction tab */}
+            {/* Filters for transactions */}
             {tab === "transactions" && (
-                <>
-                    <div className="flex items-center gap-3 mb-4 flex-wrap">
-                        <div className="flex gap-2">
-                            {["All", "Income", "Expense"].map((t) => (
-                                <button
-                                    key={t}
-                                    onClick={() => setTypeFilter(t)}
-                                    className={`h-8 px-4 rounded-xl text-sm font-medium transition-colors ${
-                                        typeFilter === t ? "bg-slate-900 text-white" : "border border-slate-200 text-slate-500 hover:border-slate-300"
-                                    }`}
-                                >
-                                    {t}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-8 px-3 text-xs bg-white border border-slate-200 rounded-xl outline-none focus:border-slate-400" />
-                            <span className="text-slate-400 text-xs">to</span>
-                            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-8 px-3 text-xs bg-white border border-slate-200 rounded-xl outline-none focus:border-slate-400" />
-                        </div>
+                <div className="flex flex-wrap gap-3 mb-4">
+                    <div className="flex gap-2">
+                        {["All", "Income", "Expense"].map((t) => (
+                            <button key={t} onClick={() => setTypeFilter(t)}
+                                    className={`h-8 px-4 rounded-xl text-xs font-bold transition-colors ${
+                                        typeFilter === t
+                                            ? t === "Income" ? "bg-green-600 text-white" : t === "Expense" ? "bg-red-500 text-white" : "bg-slate-900 dark:bg-white text-white dark:text-slate-900"
+                                            : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500"
+                                    }`}>
+                                {t}
+                            </button>
+                        ))}
                     </div>
-
-                    {filteredTx.length === 0 ? (
-                        <div className="bg-white border border-slate-200 rounded-2xl p-16 text-center">
-                            <p className="text-4xl mb-4">💰</p>
-                            <p className="text-slate-900 font-medium mb-1">No transactions yet</p>
-                            <p className="text-slate-400 text-sm mb-6">Record income and expenses to track your farm finances</p>
-                            <button onClick={openAddTx} className="inline-flex items-center gap-2 h-10 px-5 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-colors">
-                                <Plus size={16} /> Add transaction
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                            <div className="flex flex-col divide-y divide-slate-100">
-                                {filteredTx.map((tx: any) => (
-                                    <div key={tx.id} className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors">
-                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${tx.type === "Income" ? "bg-green-50" : "bg-red-50"}`}>
-                                            {tx.type === "Income" ? <TrendingUp size={16} className="text-green-600" /> : <TrendingDown size={16} className="text-red-500" />}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium text-slate-900">{tx.description}</p>
-                                            <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-slate-400">{tx.category}</span>
-                                                <span className="text-slate-200 text-xs">·</span>
-                                                <span className="text-xs text-slate-400">{formatDate(tx.date)}</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <p className={`text-sm font-medium ${tx.type === "Income" ? "text-green-700" : "text-red-600"}`}>
-                                                {tx.type === "Income" ? "+" : "-"}MWK {fmt(tx.amount)}
-                                            </p>
-                                            <button onClick={() => openEditTx(tx)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"><Pencil size={14} /></button>
-                                            <button onClick={() => handleTxDelete(tx.id)} disabled={deletingId === tx.id} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors">
-                                                {deletingId === tx.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </>
+                    <select value={seasonFilter} onChange={(e) => setSeasonFilter(e.target.value)}
+                            className="h-8 px-3 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none text-slate-700 dark:text-slate-300">
+                        <option value="All">All seasons</option>
+                        {(data?.allSeasons ?? []).map((s: string) => <option key={s}>{s}</option>)}
+                    </select>
+                </div>
             )}
 
-            {/* Overhead tab */}
-            {tab === "overhead" && (
-                <>
-                    {overhead.length === 0 ? (
-                        <div className="bg-white border border-slate-200 rounded-2xl p-16 text-center">
-                            <p className="text-4xl mb-4">🏢</p>
-                            <p className="text-slate-900 font-medium mb-1">No overhead expenses</p>
-                            <p className="text-slate-400 text-sm mb-6">Track salaries, rent, utilities and other fixed costs</p>
-                            <button onClick={openAddOh} className="inline-flex items-center gap-2 h-10 px-5 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-colors">
-                                <Plus size={16} /> Add overhead expense
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                            <div className="flex flex-col divide-y divide-slate-100">
-                                {overhead.map((oh: any) => (
-                                    <div key={oh.id} className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors">
-                                        <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
-                                            <Building2 size={16} className="text-orange-500" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                <p className="text-sm font-medium text-slate-900">{oh.description}</p>
-                                                {oh.recurring && <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-lg">Recurring</span>}
-                                            </div>
-                                            <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-xs text-slate-400">{oh.category}</span>
-                                                <span className="text-slate-200 text-xs">·</span>
-                                                <span className="text-xs text-slate-400">{formatDate(oh.date)}</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <p className="text-sm font-medium text-orange-600">-MWK {fmt(oh.amount)}</p>
-                                            <button onClick={() => openEditOh(oh)} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"><Pencil size={14} /></button>
-                                            <button onClick={() => handleOhDelete(oh.id)} disabled={deletingId === oh.id} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors">
-                                                {deletingId === oh.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </>
-            )}
-
-            {/* Activity costs tab */}
-            {tab === "activity" && (
-                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                    {activityCosts.length === 0 ? (
+            {loading ? (
+                <div className="flex justify-center py-12"><Loader2 size={24} className="animate-spin text-slate-400" /></div>
+            ) : tab === "transactions" ? (
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+                    {transactions.length === 0 ? (
                         <div className="p-16 text-center">
-                            <p className="text-4xl mb-4">🌱</p>
-                            <p className="text-slate-900 font-medium mb-1">No activity costs yet</p>
-                            <p className="text-slate-400 text-sm">Log activities with labour and inputs to see costs here</p>
+                            <Wallet size={32} className="text-slate-300 mx-auto mb-3" />
+                            <p className="font-bold text-slate-900 dark:text-white mb-1">No transactions yet</p>
+                            <p className="text-sm text-slate-400">Add your first transaction to start tracking finances</p>
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-5 gap-0 px-5 py-3 border-b border-slate-100 bg-slate-50">
-                                {["Crop", "Field / Season", "Area", "Cost", "Cost/ha"].map((h) => (
-                                    <p key={h} className="text-xs font-medium text-slate-400 uppercase tracking-wide">{h}</p>
+                            <div className="grid grid-cols-6 px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800">
+                                {["Description", "Category", "Season", "Linked to", "Date", "Amount"].map((h) => (
+                                    <p key={h} className="text-xs font-bold text-slate-400 uppercase tracking-wide">{h}</p>
                                 ))}
                             </div>
-                            <div className="flex flex-col divide-y divide-slate-50">
-                                {activityCosts.sort((a: any, b: any) => b.total - a.total).map((c: any, i: number) => (
-                                    <div key={`${c.id}-${i}`} className="grid grid-cols-5 gap-0 px-5 py-3.5 hover:bg-slate-50 transition-colors">
+                            <div className="divide-y divide-slate-50 dark:divide-slate-800">
+                                {transactions.map((tx: any) => (
+                                    <div key={tx.id} className="group grid grid-cols-6 px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors items-center">
                                         <div>
-                                            <p className="text-sm font-medium text-slate-900">{c.cropName}</p>
-                                            <p className="text-xs text-slate-400">{c.variety}</p>
+                                            <p className="text-sm font-semibold text-slate-900 dark:text-white">{tx.description}</p>
                                         </div>
-                                        <div>
-                                            <p className="text-sm text-slate-900">{c.fieldName}</p>
-                                            <p className="text-xs text-slate-400">{c.season}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-slate-900">{c.areaPlanted} ha</p>
-                                            <p className="text-xs text-slate-400">{c.activityCount} activities</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-red-600">MWK {fmt(c.total)}</p>
-                                            <p className="text-xs text-slate-400">L:{fmt(c.labour)} I:{fmt(c.inputs)}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-slate-900">MWK {fmt(c.costPerHectare)}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">{tx.category}</p>
+                                        <p className="text-xs text-slate-400">{tx.season ?? "—"}</p>
+                                        <p className="text-xs text-slate-400">{tx.cropName ?? tx.fieldName ?? "General"}</p>
+                                        <p className="text-xs text-slate-400">{formatDate(tx.date)}</p>
+                                        <div className="flex items-center justify-between">
+                                            <p className={`text-sm font-bold ${tx.type === "Income" ? "text-green-600 dark:text-green-400" : "text-red-500"}`}>
+                                                {tx.type === "Income" ? "+" : "-"}MWK {fmt(tx.amount)}
+                                            </p>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => openEditTx(tx)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 transition-colors"><Pencil size={12} /></button>
+                                                <button onClick={() => handleDeleteTx(tx.id)} disabled={deletingId === tx.id} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors">
+                                                    {deletingId === tx.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -511,55 +251,116 @@ export default function FinancePage() {
                         </>
                     )}
                 </div>
+            ) : (
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+                    {overhead.length === 0 ? (
+                        <div className="p-16 text-center">
+                            <Wallet size={32} className="text-slate-300 mx-auto mb-3" />
+                            <p className="font-bold text-slate-900 dark:text-white mb-1">No overhead expenses</p>
+                            <p className="text-sm text-slate-400">Track recurring costs like electricity and insurance</p>
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-slate-50 dark:divide-slate-800">
+                            {overhead.map((oh: any) => (
+                                <div key={oh.id} className="group flex items-center justify-between px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-white">{oh.description}</p>
+                                        <p className="text-xs text-slate-400">{oh.category} · {formatDate(oh.date)}{oh.recurring ? " · Recurring" : ""}</p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <p className="text-sm font-bold text-red-500">MWK {fmt(oh.amount)}</p>
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onClick={() => openEditOh(oh)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 transition-colors"><Pencil size={12} /></button>
+                                            <button onClick={() => handleDeleteOh(oh.id)} disabled={deletingId === oh.id} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors">
+                                                {deletingId === oh.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             )}
 
-            {/* Transaction form */}
+            {/* Transaction Form */}
             {showTxForm && (
                 <div className="fixed inset-0 z-50 flex">
-                    <div className="flex-1 bg-black/20" onClick={closeTxForm} />
-                    <div className="w-full max-w-md bg-white h-full overflow-y-auto shadow-xl flex flex-col">
-                        <div className="flex items-center justify-between p-6 border-b border-slate-100">
-                            <h2 className="text-base font-medium text-slate-900">{editingTx ? "Edit transaction" : "Add transaction"}</h2>
-                            <button onClick={closeTxForm} className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors"><X size={18} /></button>
+                    <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={() => setShowTxForm(false)} />
+                    <div className="w-full max-w-md bg-white dark:bg-slate-900 h-full overflow-y-auto shadow-2xl flex flex-col">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-base font-bold text-slate-900 dark:text-white">{editingTx ? "Edit transaction" : "Add transaction"}</h2>
+                            <button onClick={() => setShowTxForm(false)} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"><X size={18} /></button>
                         </div>
-                        <form onSubmit={handleTxSubmit} className="flex-1 p-6 flex flex-col gap-5">
-                            <div>
-                                <label className="text-sm text-slate-500 mb-1.5 block">Type</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {["Income", "Expense"].map((t) => (
-                                        <button key={t} type="button"
-                                                onClick={() => { setTx("type", t); setTx("category", t === "Income" ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]); }}
-                                                className={`h-12 rounded-xl text-sm font-medium transition-colors border ${txForm.type === t ? t === "Income" ? "bg-green-50 border-green-200 text-green-800" : "bg-red-50 border-red-200 text-red-800" : "border-slate-200 text-slate-500 hover:bg-slate-50"}`}
-                                        >
-                                            {t === "Income" ? "↑ Income" : "↓ Expense"}
-                                        </button>
-                                    ))}
-                                </div>
+                        <form onSubmit={handleTxSubmit} className="flex-1 p-6 flex flex-col gap-4">
+
+                            <div className="flex gap-2">
+                                {["Income", "Expense"].map((t) => (
+                                    <button key={t} type="button" onClick={() => { setTx("type", t); setTx("category", t === "Income" ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]); }}
+                                            className={`flex-1 h-11 rounded-xl text-sm font-bold transition-colors ${
+                                                txForm.type === t
+                                                    ? t === "Income" ? "bg-green-600 text-white" : "bg-red-500 text-white"
+                                                    : "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500"
+                                            }`}>
+                                        {t}
+                                    </button>
+                                ))}
                             </div>
+
                             <div>
-                                <label className="text-sm text-slate-500 mb-1.5 block">Category</label>
-                                <select value={txForm.category} onChange={(e) => setTx("category", e.target.value)} className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400">
-                                    {(txForm.type === "Income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((c) => <option key={c}>{c}</option>)}
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Category</label>
+                                <select value={txForm.category} onChange={(e) => setTx("category", e.target.value)}
+                                        className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white">
+                                    {categories.map((c) => <option key={c}>{c}</option>)}
                                 </select>
                             </div>
+
                             <div>
-                                <label className="text-sm text-slate-500 mb-1.5 block">Description</label>
-                                <input value={txForm.description} onChange={(e) => setTx("description", e.target.value)} placeholder="e.g. Sold 50 bags of maize" required className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400" />
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Description</label>
+                                <input value={txForm.description} onChange={(e) => setTx("description", e.target.value)} placeholder="What is this for?" required
+                                       className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white" />
                             </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-sm text-slate-500 mb-1.5 block">Amount (MWK)</label>
-                                    <input type="number" step="1" min="0" value={txForm.amount} onChange={(e) => setTx("amount", e.target.value)} placeholder="0" required className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400" />
+                                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Amount (MWK)</label>
+                                    <input type="number" step="1" min="0" value={txForm.amount} onChange={(e) => setTx("amount", e.target.value)} placeholder="0" required
+                                           className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white" />
                                 </div>
                                 <div>
-                                    <label className="text-sm text-slate-500 mb-1.5 block">Date</label>
-                                    <input type="date" value={txForm.date} onChange={(e) => setTx("date", e.target.value)} required className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400" />
+                                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Date</label>
+                                    <input type="date" value={txForm.date} onChange={(e) => setTx("date", e.target.value)} required
+                                           className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white" />
                                 </div>
                             </div>
-                            {error && <p className="text-sm text-red-500 bg-red-50 px-4 py-3 rounded-xl">{error}</p>}
+
+                            <div>
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Season (optional)</label>
+                                <select value={txForm.season} onChange={(e) => setTx("season", e.target.value)}
+                                        className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white">
+                                    <option value="">General — not season-specific</option>
+                                    {(data?.allSeasons ?? []).map((s: string) => <option key={s}>{s}</option>)}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Link to crop (optional)</label>
+                                <select value={txForm.cropFieldId} onChange={(e) => setTx("cropFieldId", e.target.value)}
+                                        className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white">
+                                    <option value="">Not linked to a specific crop</option>
+                                    {(data?.allCropFields ?? []).map((c: any) => (
+                                        <option key={c.id} value={c.id}>{c.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {error && <p className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-4 py-3 rounded-xl">{error}</p>}
+
                             <div className="flex gap-3 mt-auto pt-4">
-                                <button type="button" onClick={closeTxForm} className="flex-1 h-12 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors">Cancel</button>
-                                <button type="submit" disabled={saving} className="flex-1 h-12 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                                <button type="button" onClick={() => setShowTxForm(false)}
+                                        className="flex-1 h-12 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+                                <button type="submit" disabled={saving}
+                                        className="flex-1 h-12 bg-[#1a3d1f] text-white text-sm font-bold rounded-xl hover:bg-[#2d5c35] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                                     {saving ? <><Loader2 size={15} className="animate-spin" /> Saving...</> : <><Check size={15} /> {editingTx ? "Update" : "Save"}</>}
                                 </button>
                             </div>
@@ -568,54 +369,56 @@ export default function FinancePage() {
                 </div>
             )}
 
-            {/* Overhead form */}
+            {/* Overhead Form */}
             {showOhForm && (
                 <div className="fixed inset-0 z-50 flex">
-                    <div className="flex-1 bg-black/20" onClick={closeOhForm} />
-                    <div className="w-full max-w-md bg-white h-full overflow-y-auto shadow-xl flex flex-col">
-                        <div className="flex items-center justify-between p-6 border-b border-slate-100">
-                            <h2 className="text-base font-medium text-slate-900">{editingOh ? "Edit overhead" : "Add overhead expense"}</h2>
-                            <button onClick={closeOhForm} className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors"><X size={18} /></button>
+                    <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={() => setShowOhForm(false)} />
+                    <div className="w-full max-w-md bg-white dark:bg-slate-900 h-full overflow-y-auto shadow-2xl flex flex-col">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
+                            <h2 className="text-base font-bold text-slate-900 dark:text-white">{editingOh ? "Edit overhead" : "Add overhead expense"}</h2>
+                            <button onClick={() => setShowOhForm(false)} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400"><X size={18} /></button>
                         </div>
-                        <form onSubmit={handleOhSubmit} className="flex-1 p-6 flex flex-col gap-5">
+                        <form onSubmit={handleOhSubmit} className="flex-1 p-6 flex flex-col gap-4">
                             <div>
-                                <label className="text-sm text-slate-500 mb-1.5 block">Category</label>
-                                <select value={ohForm.category} onChange={(e) => setOh("category", e.target.value)} className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400">
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Description</label>
+                                <input value={ohForm.description} onChange={(e) => setOh("description", e.target.value)} placeholder="e.g. Electricity bill" required
+                                       className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white" />
+                            </div>
+                            <div>
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Category</label>
+                                <select value={ohForm.category} onChange={(e) => setOh("category", e.target.value)}
+                                        className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white">
                                     {OVERHEAD_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                                 </select>
                             </div>
-                            <div>
-                                <label className="text-sm text-slate-500 mb-1.5 block">Description</label>
-                                <input value={ohForm.description} onChange={(e) => setOh("description", e.target.value)} placeholder="e.g. John Banda monthly salary" required className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400" />
-                            </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-sm text-slate-500 mb-1.5 block">Amount (MWK)</label>
-                                    <input type="number" step="1" min="0" value={ohForm.amount} onChange={(e) => setOh("amount", e.target.value)} placeholder="0" required className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400" />
+                                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Amount (MWK)</label>
+                                    <input type="number" step="1" min="0" value={ohForm.amount} onChange={(e) => setOh("amount", e.target.value)} placeholder="0" required
+                                           className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white" />
                                 </div>
                                 <div>
-                                    <label className="text-sm text-slate-500 mb-1.5 block">Date</label>
-                                    <input type="date" value={ohForm.date} onChange={(e) => setOh("date", e.target.value)} required className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400" />
+                                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Date</label>
+                                    <input type="date" value={ohForm.date} onChange={(e) => setOh("date", e.target.value)} required
+                                           className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] text-slate-900 dark:text-white" />
                                 </div>
                             </div>
-                            <div>
-                                <label className="text-sm text-slate-500 mb-1.5 block">Notes <span className="text-slate-300">(optional)</span></label>
-                                <input value={ohForm.notes} onChange={(e) => setOh("notes", e.target.value)} placeholder="Any notes..." className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400" />
-                            </div>
-                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
                                 <div>
-                                    <p className="text-sm font-medium text-slate-900">Recurring expense</p>
-                                    <p className="text-xs text-slate-400 mt-0.5">Mark if this repeats monthly</p>
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Recurring expense</p>
+                                    <p className="text-xs text-slate-400">Repeats every month</p>
                                 </div>
                                 <button type="button" onClick={() => setOh("recurring", !ohForm.recurring)}
-                                        className={`w-11 h-6 rounded-full transition-colors relative ${ohForm.recurring ? "bg-slate-900" : "bg-slate-200"}`}>
-                                    <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform ${ohForm.recurring ? "translate-x-6" : "translate-x-1"}`} />
+                                        className={`w-10 h-5 rounded-full transition-colors relative ${ohForm.recurring ? "bg-[#1a3d1f]" : "bg-slate-300 dark:bg-slate-600"}`}>
+                                    <div className={`w-3.5 h-3.5 bg-white rounded-full absolute top-0.5 transition-transform ${ohForm.recurring ? "translate-x-5" : "translate-x-0.5"}`} />
                                 </button>
                             </div>
-                            {error && <p className="text-sm text-red-500 bg-red-50 px-4 py-3 rounded-xl">{error}</p>}
+                            {error && <p className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-4 py-3 rounded-xl">{error}</p>}
                             <div className="flex gap-3 mt-auto pt-4">
-                                <button type="button" onClick={closeOhForm} className="flex-1 h-12 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors">Cancel</button>
-                                <button type="submit" disabled={saving} className="flex-1 h-12 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                                <button type="button" onClick={() => setShowOhForm(false)}
+                                        className="flex-1 h-12 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+                                <button type="submit" disabled={saving}
+                                        className="flex-1 h-12 bg-[#1a3d1f] text-white text-sm font-bold rounded-xl hover:bg-[#2d5c35] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                                     {saving ? <><Loader2 size={15} className="animate-spin" /> Saving...</> : <><Check size={15} /> {editingOh ? "Update" : "Save"}</>}
                                 </button>
                             </div>

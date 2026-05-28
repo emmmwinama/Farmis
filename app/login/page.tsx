@@ -4,11 +4,13 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -16,84 +18,143 @@ export default function LoginPage() {
         e.preventDefault();
         setLoading(true);
         setError("");
-
-        try {
-            const result = await signIn("credentials", {
-                email,
-                password,
-                redirect: false,
-            });
-
-            if (result?.error) {
-                setError("Invalid email or password");
-                setLoading(false);
-            } else if (result?.ok) {
-                // Add a small delay to ensure session is created
-                setTimeout(() => {
-                    router.push("/dashboard");
-                }, 100);
-            }
-        } catch (err) {
-            setError("An error occurred. Please try again.");
+        const result = await signIn("credentials", {
+            email,
+            password,
+            redirect: false,
+        });
+        if (result?.error) {
+            setError("Invalid email or password");
             setLoading(false);
+        } else {
+            router.push("/dashboard");
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-            <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-10">
+        <div className="min-h-screen flex">
+            {/* Left — form */}
+            <div className="flex-1 flex items-center justify-center px-8 bg-white dark:bg-slate-950">
+                <div className="w-full max-w-sm">
+                    {/* Logo */}
+                    <div className="flex items-center gap-2.5 mb-10">
+                        <div className="w-9 h-9 bg-[#1a3d1f] rounded-xl flex items-center justify-center">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <polygon points="9,2 16,14 2,14" fill="#2d6a35"/>
+                                <polygon points="9,5 14,14 4,14" fill="#3d8c47"/>
+                                <polygon points="9,8 12,14 6,14" fill="#52b85e"/>
+                                <rect x="7.5" y="11" width="3" height="5" rx="1" fill="#1a3d1f"/>
+                            </svg>
+                        </div>
+                        <span className="font-bold text-xl text-slate-900 dark:text-white tracking-tight">farmio</span>
+                    </div>
 
-                <div className="mb-10">
-                    <h1 className="text-3xl font-medium text-slate-900">🌾 Farmio</h1>
-                    <p className="text-slate-500 mt-1 text-base">Sign in to continue</p>
+                    <div className="mb-8">
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Welcome back</h1>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Sign in to manage your farm</p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        <div>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">
+                                Email address
+                            </label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="you@farm.com"
+                                required
+                                className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:border-[#3d8c47] focus:ring-2 focus:ring-[#3d8c47]/10 transition-all text-slate-900 dark:text-white placeholder-slate-400"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    className="w-full h-12 px-4 pr-12 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:border-[#3d8c47] focus:ring-2 focus:ring-[#3d8c47]/10 transition-all text-slate-900 dark:text-white"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                                >
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 text-red-600 dark:text-red-400 text-sm px-4 py-3 rounded-xl">
+                                {error}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full h-12 bg-[#1a3d1f] hover:bg-[#2d5c35] text-white text-sm font-bold rounded-xl transition-all hover:shadow-lg hover:shadow-[#1a3d1f]/20 disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+                        >
+                            {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in...</> : "Sign in"}
+                        </button>
+                    </form>
+
+                    <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
+                        Don&apos;t have an account?{" "}
+                        <Link href="/register" className="text-[#1a3d1f] dark:text-[#7dd68a] font-semibold hover:underline">
+                            Create one free
+                        </Link>
+                    </p>
+                </div>
+            </div>
+
+            {/* Right — visual */}
+            <div className="hidden lg:flex flex-1 relative bg-[#1a3d1f] items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 opacity-20">
+                    {Array.from({ length: 6 }).map((_, row) =>
+                        Array.from({ length: 8 }).map((_, col) => (
+                            <div
+                                key={`${row}-${col}`}
+                                className="absolute w-32 h-32 rounded-full border border-white/30"
+                                style={{
+                                    left: `${col * 14 - 5}%`,
+                                    top: `${row * 18 - 5}%`,
+                                }}
+                            />
+                        ))
+                    )}
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="space-y-2">
-                        <label className="text-sm text-slate-500" htmlFor="email">Email</label>
-                        <input
-                            id="email"
-                            type="email"
-                            placeholder="you@example.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="w-full h-14 px-4 text-base bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400 transition-colors"
-                        />
+                <div className="relative z-10 text-center px-12">
+                    <div className="text-7xl mb-6">🌾</div>
+                    <h2 className="text-3xl font-bold text-white mb-4 leading-tight">
+                        Manage your farm<br />like a business
+                    </h2>
+                    <p className="text-[#7dd68a] leading-relaxed max-w-sm">
+                        Track fields, crops, activities, yields and finances — all powered by AI insights built for African agriculture.
+                    </p>
+
+                    <div className="mt-10 grid grid-cols-3 gap-4">
+                        {[
+                            { value: "500+", label: "Farms" },
+                            { value: "12K+", label: "Hectares" },
+                            { value: "98%", label: "Uptime" },
+                        ].map(({ value, label }) => (
+                            <div key={label} className="bg-white/10 rounded-2xl p-4">
+                                <p className="text-2xl font-bold text-white">{value}</p>
+                                <p className="text-xs text-[#7dd68a] mt-1">{label}</p>
+                            </div>
+                        ))}
                     </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm text-slate-500" htmlFor="password">Password</label>
-                        <input
-                            id="password"
-                            type="password"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            className="w-full h-14 px-4 text-base bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400 transition-colors"
-                        />
-                    </div>
-
-                    {error && (
-                        <p className="text-sm text-red-500 bg-red-50 px-4 py-3 rounded-xl">{error}</p>
-                    )}
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full h-14 bg-slate-900 text-white text-base font-medium rounded-xl hover:bg-slate-800 active:bg-slate-950 transition-colors disabled:opacity-50"
-                    >
-                        {loading ? "Signing in..." : "Sign in"}
-                    </button>
-                </form>
-
-                <p className="text-center text-sm text-slate-500 mt-8">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/register" className="text-slate-900 font-medium hover:underline">
-                        Register
-                    </Link>
-                </p>
+                </div>
             </div>
         </div>
     );
