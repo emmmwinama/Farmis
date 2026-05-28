@@ -10,7 +10,7 @@ generator client {
 datasource db {
   provider = "mysql"
   // url      = env("DATABASE_URL")
-  url      = "mysql://root:@localhost:3306/farmio"
+  url      = "mysql://root:anUEjPWaxuUGAsppnbGcMwYmcIMCxCdm@mainline.proxy.rlwy.net:56635/railway"
 }
 
 model User {
