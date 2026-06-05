@@ -9,7 +9,7 @@ import {
     Wallet, Settings, LogOut, ChevronLeft, ChevronRight,
     CalendarDays, Wheat, FileBarChart, Users2, Package,
     BarChart2, Award, Leaf, Bell, CalendarRange,
-    CloudSun, ChevronDown,
+    CloudSun, ChevronDown, Beef, Heart, Globe,
 } from "lucide-react";
 import FarmSwitcher from "@/components/FarmSwitcher";
 import DarkModeToggle from "@/components/DarkModeToggle";
@@ -26,6 +26,9 @@ const NAV_GROUPS = [
             { label: "Calendar",      href: "/dashboard/calendar",     icon: CalendarRange },
             { label: "Yields",        href: "/dashboard/yields",       icon: Wheat },
             { label: "Inventory",     href: "/dashboard/inventory",    icon: Package },
+            { label: "Livestock",   href: "/dashboard/livestock",        icon: Beef },
+            { label: "Health",      href: "/dashboard/livestock/health", icon: Heart },
+            { label: "Farm map",  href: "/dashboard/map",  icon: Globe },
         ],
     },
     {

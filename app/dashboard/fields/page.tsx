@@ -1,250 +1,452 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Loader2, X, Check, MapPin, Layers } from "lucide-react";
+import { Plus, Loader2, Map, Pencil, Trash2, X, Check, Leaf } from "lucide-react";
+import Link from "next/link";
 
-const SOIL_TYPES = ["Clay", "Sandy", "Loam", "Silty", "Sandy loam", "Clay loam", "Silt loam", "Peaty", "Chalky"];
+function fmtHa(n: number) {
+    return `${n.toFixed(2)} ha`;
+}
+function fmtDate(d: string) {
+    return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
 
-const emptyForm = {
-    name: "", totalArea: "", cultivatableArea: "", soilType: "Loam",
-    locationLat: "", locationLng: "", notes: "",
+const SOIL_TYPES = ["Clay", "Sandy", "Loam", "Silty", "Peaty", "Chalky", "Mixed"];
+
+type FieldForm = {
+    name:            string;
+    totalArea:       string;
+    cultivatableArea: string;
+    soilType:        string;
+    notes:           string;
 };
 
-function fmt(n: number) { return new Intl.NumberFormat("en-MW").format(Math.round(n)); }
+const EMPTY_FORM: FieldForm = {
+    name:             "",
+    totalArea:        "",
+    cultivatableArea: "",
+    soilType:         "Loam",
+    notes:            "",
+};
 
 export default function FieldsPage() {
-    const [fields, setFields] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
+    const [fields,      setFields]      = useState<any[]>([]);
+    const [loading,     setLoading]     = useState(true);
+    const [showForm,    setShowForm]    = useState(false);
     const [editingField, setEditingField] = useState<any>(null);
-    const [form, setForm] = useState(emptyForm);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState("");
-    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [form,        setForm]        = useState<FieldForm>({ ...EMPTY_FORM });
+    const [saving,      setSaving]      = useState(false);
+    const [error,       setError]       = useState("");
+    const [deletingId,  setDeletingId]  = useState<string | null>(null);
 
-    const load = () => {
+    const load = async () => {
         setLoading(true);
-        fetch("/api/fields").then((r) => r.json()).then((d) => { setFields(d); setLoading(false); });
+        try {
+            const res  = await fetch("/api/fields");
+            const data = await res.json();
+            setFields(Array.isArray(data) ? data : []);
+        } catch {
+            setFields([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => { load(); }, []);
 
-    const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+    const setF = <K extends keyof FieldForm>(k: K, v: FieldForm[K]) =>
+        setForm((p) => ({ ...p, [k]: v }));
 
-    const openAdd = () => { setEditingField(null); setForm(emptyForm); setError(""); setShowForm(true); };
+    const openAdd = () => {
+        setEditingField(null);
+        setForm({ ...EMPTY_FORM });
+        setError("");
+        setShowForm(true);
+    };
+
     const openEdit = (field: any) => {
         setEditingField(field);
         setForm({
-            name: field.name, totalArea: field.totalArea.toString(),
-            cultivatableArea: field.cultivatableArea.toString(),
-            soilType: field.soilType ?? "Loam",
-            locationLat: field.locationLat?.toString() ?? "",
-            locationLng: field.locationLng?.toString() ?? "",
-            notes: field.notes ?? "",
+            name:             field.name             ?? "",
+            totalArea:        String(field.totalArea  ?? ""),
+            cultivatableArea: String(field.cultivatableArea ?? ""),
+            soilType:         field.soilType          ?? "Loam",
+            notes:            field.notes             ?? "",
         });
-        setError(""); setShowForm(true);
+        setError("");
+        setShowForm(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); setSaving(true); setError("");
-        const url = editingField ? `/api/fields/${editingField.id}` : "/api/fields";
+        e.preventDefault();
+        setSaving(true);
+        setError("");
+
+        const url    = editingField ? `/api/fields/${editingField.id}` : "/api/fields";
         const method = editingField ? "PATCH" : "POST";
-        const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-        const d = await res.json();
-        if (!res.ok) { setError(d.error); setSaving(false); } else { setShowForm(false); load(); }
+
+        const payload = {
+            name:             form.name,
+            totalArea:        parseFloat(form.totalArea)        || 0,
+            cultivatableArea: parseFloat(form.cultivatableArea) || parseFloat(form.totalArea) || 0,
+            soilType:         form.soilType,
+            notes:            form.notes || null,
+        };
+
+        try {
+            const res  = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body:    JSON.stringify(payload),
+            });
+            const text = await res.text();
+            const d    = text ? JSON.parse(text) : {};
+            if (!res.ok) { setError(d.error ?? `Failed (${res.status})`); setSaving(false); return; }
+            setShowForm(false);
+            load();
+        } catch (err: any) {
+            setError(err.message ?? "Unexpected error");
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Delete this field and all its records?")) return;
+        if (!confirm("Delete this field and all its data? This cannot be undone.")) return;
         setDeletingId(id);
-        await fetch(`/api/fields/${id}`, { method: "DELETE" });
-        setDeletingId(null); load();
+        try {
+            await fetch(`/api/fields/${id}`, { method: "DELETE" });
+        } finally {
+            setDeletingId(null);
+            load();
+        }
     };
 
-    const totalArea = fields.reduce((s, f) => s + f.totalArea, 0);
-    const totalAllocated = fields.reduce((s, f) => s + f.allocatedArea, 0);
+    const totalHa     = fields.reduce((s, f) => s + (f.totalArea ?? 0), 0);
+    const mappedCount = fields.filter((f) => f.boundary).length;
 
     return (
         <div className="p-8 max-w-6xl mx-auto">
 
             {/* Header */}
-            <div className="flex items-start justify-between mb-8">
+            <div className="mb-8 flex items-start justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Fields</h1>
-                    <p className="text-slate-400 text-sm mt-1">
-                        {fields.length} fields · {totalArea.toFixed(1)} ha total · {totalAllocated.toFixed(1)} ha planted
+                    <h1 className="text-2xl font-black" style={{ color: "var(--text-primary)", letterSpacing: "-0.04em" }}>
+                        Fields
+                    </h1>
+                    <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+                        {fields.length} field{fields.length !== 1 ? "s" : ""} ·{" "}
+                        {fmtHa(totalHa)} total ·{" "}
+                        {mappedCount} mapped
                     </p>
                 </div>
-                <button onClick={openAdd}
-                        className="flex items-center gap-2 h-10 px-5 bg-[#1a3d1f] text-white text-sm font-bold rounded-xl hover:bg-[#2d5c35] transition-colors hover:shadow-lg hover:shadow-[#1a3d1f]/20">
-                    <Plus size={16} /> Add field
-                </button>
+                <div className="flex items-center gap-2">
+                    <Link href="/dashboard/map"
+                          className="flex items-center gap-2 h-10 px-4 rounded-xl text-sm font-bold transition-all"
+                          style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}>
+                        <Map size={15} /> Farm map
+                    </Link>
+                    <button onClick={openAdd}
+                            className="flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-bold text-white transition-all hover:-translate-y-0.5"
+                            style={{ background: "var(--farm-green)", boxShadow: "0 4px 12px rgba(26,61,31,0.3)" }}>
+                        <Plus size={15} /> Add field
+                    </button>
+                </div>
             </div>
 
-            {/* Summary */}
+            {/* Summary cards */}
             <div className="grid grid-cols-3 gap-4 mb-8">
                 {[
-                    { label: "Total land", value: `${totalArea.toFixed(1)} ha` },
-                    { label: "Planted area", value: `${totalAllocated.toFixed(1)} ha` },
-                    { label: "Available", value: `${(fields.reduce((s, f) => s + f.cultivatableArea, 0) - totalAllocated).toFixed(1)} ha` },
-                ].map(({ label, value }) => (
-                    <div key={label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
-                        <p className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">{label}</p>
-                        <p className="text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
+                    { label: "Total fields",  value: String(fields.length),  color: "var(--farm-green)" },
+                    { label: "Total area",    value: fmtHa(totalHa),         color: "#2563EB" },
+                    { label: "GPS mapped",    value: `${mappedCount} / ${fields.length}`, color: "#D97706" },
+                ].map(({ label, value, color }) => (
+                    <div key={label} className="rounded-2xl p-5"
+                         style={{ background: "var(--bg-card)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(15,23,42,0.06)" }}>
+                        <p className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: "var(--text-muted)" }}>
+                            {label}
+                        </p>
+                        <p className="text-3xl font-black" style={{ color }}>{value}</p>
                     </div>
                 ))}
             </div>
 
             {/* Fields grid */}
             {loading ? (
-                <div className="flex justify-center py-20"><Loader2 size={24} className="animate-spin text-slate-400" /></div>
+                <div className="flex justify-center py-20">
+                    <Loader2 size={24} className="animate-spin" style={{ color: "var(--farm-green)" }} />
+                </div>
             ) : fields.length === 0 ? (
-                <div className="bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 rounded-3xl p-16 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
-                        <MapPin size={28} className="text-slate-400" />
-                    </div>
-                    <p className="font-bold text-slate-900 dark:text-white text-lg mb-2">No fields yet</p>
-                    <p className="text-slate-400 text-sm mb-6">Add your first field to start tracking crops and activities</p>
-                    <button onClick={openAdd} className="inline-flex items-center gap-2 h-11 px-6 bg-[#1a3d1f] text-white text-sm font-bold rounded-xl hover:bg-[#2d5c35] transition-colors">
-                        <Plus size={16} /> Add your first field
+                <div className="rounded-2xl p-16 text-center"
+                     style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
+                    <p className="text-5xl mb-4">🌾</p>
+                    <p className="text-base font-bold mb-1" style={{ color: "var(--text-primary)" }}>
+                        No fields yet
+                    </p>
+                    <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>
+                        Add your first field to start tracking crops and activities.
+                    </p>
+                    <button onClick={openAdd}
+                            className="px-6 py-3 rounded-xl text-sm font-bold text-white"
+                            style={{ background: "var(--farm-green)" }}>
+                        Add first field
                     </button>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {fields.map((field) => {
-                        const pct = field.cultivatableArea > 0 ? Math.min((field.allocatedArea / field.cultivatableArea) * 100, 100) : 0;
-                        return (
-                            <div key={field.id} className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1a3d1f] to-[#3d8c47] flex items-center justify-center flex-shrink-0">
-                                            <MapPin size={16} className="text-white" />
+                    {fields.map((field) => (
+                        <div key={field.id} className="rounded-2xl overflow-hidden flex flex-col"
+                             style={{ background: "var(--bg-card)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(15,23,42,0.06)" }}>
+
+                            {/* Card header */}
+                            <div className="p-5 flex-1">
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                                             style={{ background: "var(--farm-pale)" }}>
+                                            <Leaf size={16} style={{ color: "var(--farm-green)" }} />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-slate-900 dark:text-white">{field.name}</h3>
-                                            <p className="text-xs text-slate-400">{field.soilType} soil</p>
+                                            <h3 className="text-base font-black" style={{ color: "var(--text-primary)" }}>
+                                                {field.name}
+                                            </h3>
+                                            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                                {field.soilType} soil
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => openEdit(field)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
-                                            <Pencil size={14} />
-                                        </button>
-                                        <button onClick={() => handleDelete(field.id)} disabled={deletingId === field.id} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-600 transition-colors">
-                                            {deletingId === field.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                                        </button>
+                                    <span className="text-[10px] font-black px-2.5 py-1 rounded-full"
+                                          style={{
+                                              background: field.boundary ? "#ECFDF5" : "var(--bg-subtle)",
+                                              color:      field.boundary ? "#059669" : "var(--text-muted)",
+                                          }}>
+                                        {field.boundary ? "Mapped" : "No boundary"}
+                                    </span>
+                                </div>
+
+                                {/* Area stats */}
+                                <div className="grid grid-cols-2 gap-2 mb-3">
+                                    <div className="rounded-xl p-2.5"
+                                         style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
+                                        <p className="text-[9px] font-black uppercase tracking-wide mb-0.5"
+                                           style={{ color: "var(--text-muted)" }}>Total area</p>
+                                        <p className="text-sm font-black" style={{ color: "var(--farm-green)" }}>
+                                            {fmtHa(field.totalArea)}
+                                        </p>
+                                    </div>
+                                    <div className="rounded-xl p-2.5"
+                                         style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
+                                        <p className="text-[9px] font-black uppercase tracking-wide mb-0.5"
+                                           style={{ color: "var(--text-muted)" }}>Cultivatable</p>
+                                        <p className="text-sm font-black" style={{ color: "var(--text-primary)" }}>
+                                            {fmtHa(field.cultivatableArea)}
+                                        </p>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3 mb-4">
-                                    <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
-                                        <p className="text-xs text-slate-400 mb-0.5">Total area</p>
-                                        <p className="font-bold text-slate-900 dark:text-white">{field.totalArea} ha</p>
+                                {/* Active crops */}
+                                {field.cropFields?.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mb-3">
+                                        {field.cropFields.slice(0, 3).map((cf: any) => (
+                                            <span key={cf.id}
+                                                  className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                                  style={{ background: "var(--farm-pale)", color: "var(--farm-green)" }}>
+                                                {cf.cropType?.name ?? cf.cropTypeName}
+                                            </span>
+                                        ))}
+                                        {field.cropFields.length > 3 && (
+                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                                  style={{ background: "var(--bg-subtle)", color: "var(--text-muted)" }}>
+                                                +{field.cropFields.length - 3} more
+                                            </span>
+                                        )}
                                     </div>
-                                    <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
-                                        <p className="text-xs text-slate-400 mb-0.5">Cultivatable</p>
-                                        <p className="font-bold text-slate-900 dark:text-white">{field.cultivatableArea} ha</p>
+                                )}
+
+                                {field.notes && (
+                                    <p className="text-xs italic" style={{ color: "var(--text-muted)" }}>
+                                        {field.notes}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Card footer */}
+                            <div className="flex items-center justify-between px-5 py-3"
+                                 style={{ borderTop: "1px solid var(--border)", background: "var(--bg-subtle)" }}>
+                                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                    Added {fmtDate(field.createdAt)}
+                                </p>
+                                <div className="flex items-center gap-1.5">
+                                    {/* Map button */}
+                                    <Link href={`/dashboard/fields/${field.id}/map`}
+                                          className="flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-all"
+                                          style={{ background: "var(--farm-pale)", color: "var(--farm-green)" }}>
+                                        <Map size={11} />
+                                        {field.boundary ? "Map" : "Draw"}
+                                    </Link>
+                                    {/* Edit */}
+                                    <button onClick={() => openEdit(field)}
+                                            className="p-1.5 rounded-lg transition-all"
+                                            style={{ background: "var(--bg-subtle)", color: "var(--text-muted)" }}
+                                            onMouseOver={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--border)"; }}
+                                            onMouseOut={(e)  => { (e.currentTarget as HTMLElement).style.background = "var(--bg-subtle)"; }}>
+                                        <Pencil size={13} />
+                                    </button>
+                                    {/* Delete */}
+                                    <button onClick={() => handleDelete(field.id)}
+                                            disabled={deletingId === field.id}
+                                            className="p-1.5 rounded-lg transition-all"
+                                            style={{ background: "#FFF1F2", color: "#E11D48" }}>
+                                        {deletingId === field.id
+                                            ? <Loader2 size={13} className="animate-spin" />
+                                            : <Trash2 size={13} />}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* ── Add / Edit form slide-over ──────────────────────────────────── */}
+            {showForm && (
+                <div className="fixed inset-0 z-50 flex">
+                    <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={() => setShowForm(false)} />
+                    <div className="w-full max-w-md h-full flex flex-col shadow-2xl"
+                         style={{ background: "var(--bg-card)", borderLeft: "1px solid var(--border)" }}>
+
+                        {/* Panel header */}
+                        <div className="flex items-center justify-between px-6 py-5 flex-shrink-0"
+                             style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-subtle)" }}>
+                            <div>
+                                <h2 className="text-base font-black" style={{ color: "var(--text-primary)" }}>
+                                    {editingField ? "Edit field" : "Add new field"}
+                                </h2>
+                                <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                                    {editingField ? "Update field details" : "Fill in the field details below"}
+                                </p>
+                            </div>
+                            <button onClick={() => setShowForm(false)}
+                                    className="w-8 h-8 rounded-xl flex items-center justify-center"
+                                    style={{ background: "var(--bg-subtle)", color: "var(--text-muted)", border: "1px solid var(--border)" }}>
+                                <X size={15} />
+                            </button>
+                        </div>
+
+                        {/* Form */}
+                        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+                            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
+
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
+                                           style={{ color: "var(--text-muted)" }}>
+                                        Field name *
+                                    </label>
+                                    <input
+                                        value={form.name}
+                                        onChange={(e) => setF("name", e.target.value)}
+                                        placeholder="e.g. North field, Block A"
+                                        required
+                                        className="w-full h-11 px-3 rounded-xl text-sm outline-none"
+                                        style={{ border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--text-primary)" }}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
+                                               style={{ color: "var(--text-muted)" }}>
+                                            Total area (ha) *
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={form.totalArea}
+                                            onChange={(e) => setF("totalArea", e.target.value)}
+                                            placeholder="e.g. 2.5"
+                                            required
+                                            className="w-full h-11 px-3 rounded-xl text-sm outline-none"
+                                            style={{ border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--text-primary)" }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
+                                               style={{ color: "var(--text-muted)" }}>
+                                            Cultivatable (ha)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={form.cultivatableArea}
+                                            onChange={(e) => setF("cultivatableArea", e.target.value)}
+                                            placeholder="Same as total"
+                                            className="w-full h-11 px-3 rounded-xl text-sm outline-none"
+                                            style={{ border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--text-primary)" }}
+                                        />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <div className="flex justify-between text-xs mb-1.5">
-                                        <span className="text-slate-400">Land utilisation</span>
-                                        <span className={`font-bold ${pct > 90 ? "text-red-500" : pct > 60 ? "text-amber-600" : "text-[#1a3d1f] dark:text-[#7dd68a]"}`}>
-                      {pct.toFixed(0)}%
-                    </span>
-                                    </div>
-                                    <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                        <div className={`h-full rounded-full ${pct > 90 ? "bg-red-500" : pct > 60 ? "bg-amber-500" : "bg-gradient-to-r from-[#1a3d1f] to-[#3d8c47]"}`}
-                                             style={{ width: `${pct}%` }} />
-                                    </div>
-                                    <div className="flex justify-between text-xs mt-1">
-                                        <span className="text-slate-400">{field.allocatedArea.toFixed(1)} ha planted</span>
-                                        <span className="text-slate-400">{(field.cultivatableArea - field.allocatedArea).toFixed(1)} ha free</span>
+                                    <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
+                                           style={{ color: "var(--text-muted)" }}>
+                                        Soil type
+                                    </label>
+                                    <div className="grid grid-cols-4 gap-2">
+                                        {SOIL_TYPES.map((s) => (
+                                            <button key={s} type="button"
+                                                    onClick={() => setF("soilType", s)}
+                                                    className="py-2 rounded-xl text-xs font-bold transition-all"
+                                                    style={{
+                                                        background: form.soilType === s ? "var(--farm-pale)"   : "var(--bg-subtle)",
+                                                        color:      form.soilType === s ? "var(--farm-green)"  : "var(--text-muted)",
+                                                        border:     `1.5px solid ${form.soilType === s ? "var(--farm-green)" : "var(--border)"}`,
+                                                    }}>
+                                                {s}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
 
-                                {field.cropCount > 0 && (
-                                    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                        <div className="flex flex-wrap gap-1">
-                                            {field.crops.slice(0, 3).map((c: string) => (
-                                                <span key={c} className="text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-0.5 rounded-lg font-medium">{c}</span>
-                                            ))}
-                                            {field.crops.length > 3 && <span className="text-xs text-slate-400">+{field.crops.length - 3}</span>}
-                                        </div>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
+                                           style={{ color: "var(--text-muted)" }}>
+                                        Notes (optional)
+                                    </label>
+                                    <textarea
+                                        value={form.notes}
+                                        onChange={(e) => setF("notes", e.target.value)}
+                                        rows={3}
+                                        placeholder="Any additional details about this field..."
+                                        className="w-full px-3 py-2.5 rounded-xl text-sm outline-none resize-none"
+                                        style={{ border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--text-primary)" }}
+                                    />
+                                </div>
+
+                                {error && (
+                                    <div className="rounded-xl px-4 py-3 flex items-start gap-2"
+                                         style={{ background: "#FFF1F2", border: "1px solid #FFE4E6" }}>
+                                        <X size={13} className="flex-shrink-0 mt-0.5" style={{ color: "#E11D48" }} />
+                                        <p className="text-sm font-semibold" style={{ color: "#9F1239" }}>{error}</p>
                                     </div>
                                 )}
+                            </div>
 
-                                {field.locationLat && field.locationLng && (
-                                    <p className="text-xs text-slate-400 mt-3 flex items-center gap-1">
-                                        <MapPin size={10} /> {parseFloat(field.locationLat).toFixed(4)}, {parseFloat(field.locationLng).toFixed(4)}
-                                    </p>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
-
-            {/* Form */}
-            {showForm && (
-                <div className="fixed inset-0 z-50 flex">
-                    <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={() => setShowForm(false)} />
-                    <div className="w-full max-w-md bg-white dark:bg-slate-900 h-full overflow-y-auto shadow-2xl flex flex-col">
-                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
-                            <h2 className="text-base font-bold text-slate-900 dark:text-white">{editingField ? "Edit field" : "Add new field"}</h2>
-                            <button onClick={() => setShowForm(false)} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"><X size={18} /></button>
-                        </div>
-                        <form onSubmit={handleSubmit} className="flex-1 p-6 flex flex-col gap-5">
-                            <div>
-                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Field name</label>
-                                <input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. North Block, River Field" required
-                                       className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] transition-colors text-slate-900 dark:text-white" />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                {[
-                                    { key: "totalArea", label: "Total area (ha)" },
-                                    { key: "cultivatableArea", label: "Cultivatable (ha)" },
-                                ].map(({ key, label }) => (
-                                    <div key={key}>
-                                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">{label}</label>
-                                        <input type="number" step="0.01" min="0" value={form[key as keyof typeof form]} onChange={(e) => set(key, e.target.value)} placeholder="0.00" required
-                                               className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] transition-colors text-slate-900 dark:text-white" />
-                                    </div>
-                                ))}
-                            </div>
-                            <div>
-                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Soil type</label>
-                                <select value={form.soilType} onChange={(e) => set("soilType", e.target.value)} required
-                                        className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] transition-colors text-slate-900 dark:text-white">
-                                    {SOIL_TYPES.map((s) => <option key={s}>{s}</option>)}
-                                </select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                {[
-                                    { key: "locationLat", label: "Latitude (optional)" },
-                                    { key: "locationLng", label: "Longitude (optional)" },
-                                ].map(({ key, label }) => (
-                                    <div key={key}>
-                                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">{label}</label>
-                                        <input type="number" step="any" value={form[key as keyof typeof form]} onChange={(e) => set(key, e.target.value)} placeholder="-13.9626"
-                                               className="w-full h-12 px-4 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] transition-colors text-slate-900 dark:text-white" />
-                                    </div>
-                                ))}
-                            </div>
-                            <div>
-                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 block">Notes (optional)</label>
-                                <textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={3} placeholder="Any notes about this field..."
-                                          className="w-full px-4 py-3 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:border-[#3d8c47] transition-colors text-slate-900 dark:text-white resize-none" />
-                            </div>
-                            {error && <p className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-4 py-3 rounded-xl">{error}</p>}
-                            <div className="flex gap-3 mt-auto pt-4">
+                            {/* Footer */}
+                            <div className="flex gap-3 p-6 flex-shrink-0"
+                                 style={{ borderTop: "1px solid var(--border)", background: "var(--bg-card)" }}>
                                 <button type="button" onClick={() => setShowForm(false)}
-                                        className="flex-1 h-12 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                        className="flex-1 h-11 rounded-xl font-bold text-sm"
+                                        style={{ border: "1.5px solid var(--border)", color: "var(--text-muted)" }}>
                                     Cancel
                                 </button>
                                 <button type="submit" disabled={saving}
-                                        className="flex-1 h-12 bg-[#1a3d1f] text-white text-sm font-bold rounded-xl hover:bg-[#2d5c35] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                                    {saving ? <><Loader2 size={15} className="animate-spin" /> Saving...</> : <><Check size={15} /> {editingField ? "Update" : "Add field"}</>}
+                                        className="flex-1 h-11 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
+                                        style={{ background: saving ? "#94A3B8" : "var(--farm-green)" }}>
+                                    {saving
+                                        ? <><Loader2 size={14} className="animate-spin" /> Saving...</>
+                                        : <><Check size={14} /> {editingField ? "Save changes" : "Add field"}</>}
                                 </button>
                             </div>
                         </form>

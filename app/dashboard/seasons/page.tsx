@@ -34,7 +34,6 @@ export default function SeasonsPage() {
     return (
         <div className="p-8 max-w-6xl mx-auto">
 
-            // Add this button next to the header:
             <Link href="/dashboard/seasons/compare"
                   className="btn-secondary text-xs">
                 <ArrowLeftRight size={13} />

@@ -34,9 +34,36 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 }
 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await prisma.field.delete({ where: { id: params.id } });
     return NextResponse.json({ success: true });
+}
+
+export async function GET(
+    _: Request,
+    { params }: { params: { id: string } }
+) {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.email) {
+        return NextResponse.json(
+            { error: "Unauthorized" },
+            { status: 401 }
+        );
+    }
+
+    const field = await prisma.field.findUnique({
+        where: { id: params.id },
+    });
+
+    if (!field) {
+        return NextResponse.json(
+            { error: "Field not found" },
+            { status: 404 }
+        );
+    }
+
+    return NextResponse.json(field);
 }

@@ -2,15 +2,61 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-    const [content, testimonials, features, media] = await Promise.all([
-        prisma.siteContent.findMany(),
-        prisma.testimonial.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
-        prisma.cmsFeature.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
-        prisma.cmsMedia.findMany(),
-    ]);
+    try {
+        const [
+            contentItems,
+            features,
+            testimonials,
+            media,
+            impactStats,
+        ] = await Promise.all([
+            prisma.siteContent.findMany({
+                orderBy: { key: "asc" },
+            }),
 
-    const contentMap = Object.fromEntries(content.map((c) => [c.key, c.value]));
-    const mediaMap = Object.fromEntries(media.map((m) => [m.key, m]));
+            prisma.cmsFeature.findMany({
+                where: { isActive: true },
+                orderBy: { sortOrder: "asc" },
+            }),
 
-    return NextResponse.json({ content: contentMap, testimonials, features, media: mediaMap });
+            prisma.testimonial.findMany({
+                where: { isActive: true },
+                orderBy: [
+                    { sortOrder: "asc" },
+                    { createdAt: "desc" },
+                ],
+            }),
+
+            prisma.cmsMedia.findMany(),
+
+            prisma.impactStat.findMany({
+                where: { isActive: true },
+                orderBy: { sortOrder: "asc" },
+            }),
+        ]);
+
+        const content = Object.fromEntries(
+            contentItems.map((item) => [item.key, item.value])
+        );
+
+        return NextResponse.json({
+            success: true,
+            content,
+            contentItems,
+            features,
+            testimonials,
+            media,
+            impactStats,
+        });
+    } catch (error) {
+        console.error("Landing page API error:", error);
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: "Failed to load landing page content.",
+            },
+            { status: 500 }
+        );
+    }
 }

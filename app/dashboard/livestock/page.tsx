@@ -150,6 +150,7 @@ export default function LivestockPage() {
     const groupings = (data?.byType   ?? []) as any[];
 
     // @ts-ignore
+    // @ts-ignore
     return (
         <div className="p-8 max-w-7xl mx-auto animate-fade-in">
 

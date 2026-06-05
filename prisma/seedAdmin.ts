@@ -4,297 +4,372 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log("Seeding admin user and subscription tiers...");
+    console.log("Seeding...");
 
-    // Admin user
-    const hashed = await bcrypt.hash("admin123", 10);
-    await prisma.adminUser.upsert({
-        where: { email: "admin@farmio.app" },
-        update: {},
-        create: {
-            email: "admin@farmio.app",
-            password: hashed,
-            name: "Super Admin",
-            isSuperAdmin: true,
-        },
+    // ── Admin user ─────────────────────────────────────────────────────────────
+    const existingAdmin = await prisma.adminUser.findFirst({ where: { email: "admin@farmio.app" } });
+    if (!existingAdmin) {
+        await prisma.adminUser.create({
+            data: {
+                email:    "admin@farmio.app",
+                password: await bcrypt.hash("admin123", 10),
+                name:     "Farmio Admin",
+            },
+        });
+        console.log("Admin user created: admin@farmio.app / admin123");
+    } else {
+        console.log("Admin user already exists.");
+    }
+
+    // ── Subscription tiers ─────────────────────────────────────────────────────
+    // Schema fields: id, name, description, priceMonthly, priceAnnual, isActive,
+    // isPublic, createdAt, isFeatured, sortOrder, maxFields, maxCrops,
+    // maxActivities, maxTransactions, maxEmployees, maxFarms, maxTeamMembers,
+    // seasonAnalytics, yieldSuggestions, costPerHectare, payrollTracking,
+    // multipleFarms, teamAccounts, customReports, apiAccess, dataRetentionLifetime
+    await prisma.subscriptionTier.deleteMany({});
+    await prisma.subscriptionTier.createMany({
+        data: [
+            {
+                name:                  "Free",
+                description:           "For smallholder farmers getting started",
+                priceMonthly:          0,
+                priceAnnual:           null,
+                isActive:              true,
+                isPublic:              true,
+                isFeatured:            false,
+                sortOrder:             0,
+                maxFields:             1,
+                maxCrops:              1,
+                maxActivities:         10,
+                maxTransactions:       5,
+                maxEmployees:          1,
+                maxFarms:              1,
+                maxTeamMembers:        0,
+                seasonAnalytics:       false,
+                yieldSuggestions:      false,
+                costPerHectare:        false,
+                payrollTracking:       false,
+                multipleFarms:         false,
+                teamAccounts:          false,
+                customReports:         false,
+                apiAccess:             false,
+                dataRetentionLifetime: false,
+            },
+            {
+                name:                  "Standard",
+                description:           "For growing commercial farms",
+                priceMonthly:          9900,
+                priceAnnual:           99000,
+                isActive:              true,
+                isPublic:              true,
+                isFeatured:            true,
+                sortOrder:             1,
+                maxFields:             -1,
+                maxCrops:              -1,
+                maxActivities:         -1,
+                maxTransactions:       -1,
+                maxEmployees:          -1,
+                maxFarms:              1,
+                maxTeamMembers:        5,
+                seasonAnalytics:       true,
+                yieldSuggestions:      true,
+                costPerHectare:        true,
+                payrollTracking:       true,
+                multipleFarms:         false,
+                teamAccounts:          true,
+                customReports:         false,
+                apiAccess:             false,
+                dataRetentionLifetime: false,
+            },
+            {
+                name:                  "Enterprise",
+                description:           "For cooperatives and large operations",
+                priceMonthly:          49900,
+                priceAnnual:           499000,
+                isActive:              true,
+                isPublic:              true,
+                isFeatured:            false,
+                sortOrder:             2,
+                maxFields:             -1,
+                maxCrops:              -1,
+                maxActivities:         -1,
+                maxTransactions:       -1,
+                maxEmployees:          -1,
+                maxFarms:              -1,
+                maxTeamMembers:        -1,
+                seasonAnalytics:       true,
+                yieldSuggestions:      true,
+                costPerHectare:        true,
+                payrollTracking:       true,
+                multipleFarms:         true,
+                teamAccounts:          true,
+                customReports:         true,
+                apiAccess:             true,
+                dataRetentionLifetime: true,
+            },
+        ],
     });
+    console.log("Tiers seeded.");
 
-    // Free tier
-    await prisma.subscriptionTier.upsert({
-        where: { id: "tier_free" },
-        update: {},
-        create: {
-            id: "tier_free",
-            name: "Free",
-            description: "For smallholder farmers getting started",
-            priceMonthly: 0,
-            isPublic: true,
-            maxFields: 1,
-            maxCrops: 1,
-            maxActivities: 10,
-            maxTransactions: 5,
-            maxEmployees: 1,
-            maxFarms: 1,
-            maxTeamMembers: 1,
-            seasonAnalytics: false,
-            yieldSuggestions: false,
-            costPerHectare: false,
-            payrollTracking: false,
-            multipleFarms: false,
-            teamAccounts: false,
-            customReports: false,
-            apiAccess: false,
-            dataRetentionLifetime: true,
+    // ── Testimonials ───────────────────────────────────────────────────────────
+    // Schema fields: id, quote, name, role, initials, isActive, sortOrder, createdAt
+    // NO: company, content, rating, avatar
+    const testimonials = [
+        {
+            name:      "James Phiri",
+            role:      "Maize & soya farmer, Lilongwe",
+            quote:     "Before Farmio, I had no idea which of my fields was profitable. Now I know my maize costs MWK 180 per kg to produce and I can sell for MWK 450 at Lilongwe market. That knowledge changed everything.",
+            initials:  "JP",
+            isActive:  true,
+            sortOrder: 1,
         },
-    });
-
-    // Standard tier
-    await prisma.subscriptionTier.upsert({
-        where: { id: "tier_standard" },
-        update: {},
-        create: {
-            id: "tier_standard",
-            name: "Standard",
-            description: "For established farms needing full insight",
-            priceMonthly: 15000,
-            priceAnnual: 150000,
-            isPublic: true,
-            maxFields: -1,
-            maxCrops: -1,
-            maxActivities: -1,
-            maxTransactions: -1,
-            maxEmployees: -1,
-            maxFarms: 1,
-            maxTeamMembers: 1,
-            seasonAnalytics: true,
-            yieldSuggestions: true,
-            costPerHectare: true,
-            payrollTracking: true,
-            multipleFarms: false,
-            teamAccounts: false,
-            customReports: false,
-            apiAccess: false,
-            dataRetentionLifetime: true,
+        {
+            name:      "Grace Banda",
+            role:      "Commercial farmer, Kasungu",
+            quote:     "I went to NBS Bank with my Farmio credit score report. They approved my loan in two weeks. Without those records I would have been turned away like before.",
+            initials:  "GB",
+            isActive:  true,
+            sortOrder: 2,
         },
-    });
-
-    // Enterprise tier
-    await prisma.subscriptionTier.upsert({
-        where: { id: "tier_enterprise" },
-        update: {},
-        create: {
-            id: "tier_enterprise",
-            name: "Enterprise",
-            description: "For cooperatives and multi-farm operations",
-            priceMonthly: 0,
-            isPublic: false,
-            maxFields: -1,
-            maxCrops: -1,
-            maxActivities: -1,
-            maxTransactions: -1,
-            maxEmployees: -1,
-            maxFarms: -1,
-            maxTeamMembers: -1,
-            seasonAnalytics: true,
-            yieldSuggestions: true,
-            costPerHectare: true,
-            payrollTracking: true,
-            multipleFarms: true,
-            teamAccounts: true,
-            customReports: true,
-            apiAccess: true,
-            dataRetentionLifetime: true,
+        {
+            name:      "Edward Mkandawire",
+            role:      "Tobacco & groundnut farmer, Mzuzu",
+            quote:     "The field mapping is incredible. I drew all four of my fields on the phone and now I know exactly how many hectares I have. I used to just guess.",
+            initials:  "EM",
+            isActive:  true,
+            sortOrder: 3,
         },
-    });
-
-    console.log("Done. Admin: admin@farmio.app / admin123");
-
-
-    // CMS defaults
-    const cmsDefaults = [
-        { key: "hero_title", value: "Run your farm like\na business", type: "text", group: "hero", label: "Hero title" },
-        { key: "hero_subtitle", value: "Track fields, crops, activities, yields and finances — all in one platform built for modern agriculture in Africa.", type: "text", group: "hero", label: "Hero subtitle" },
-        { key: "hero_badge", value: "Enterprise farm management", type: "text", group: "hero", label: "Hero badge text" },
-        { key: "hero_cta_primary", value: "Start free trial", type: "text", group: "hero", label: "Primary CTA button" },
-        { key: "hero_cta_secondary", value: "Book a demo", type: "text", group: "hero", label: "Secondary CTA button" },
-        { key: "features_heading", value: "One platform, complete visibility", type: "text", group: "features", label: "Features section heading" },
-        { key: "stats_users", value: "500+", type: "text", group: "stats", label: "Stat: users" },
-        { key: "stats_hectares", value: "12,000+", type: "text", group: "stats", label: "Stat: hectares" },
-        { key: "stats_uptime", value: "98%", type: "text", group: "stats", label: "Stat: uptime" },
-        { key: "stats_rating", value: "4.9/5", type: "text", group: "stats", label: "Stat: rating" },
-        { key: "contact_email", value: "support@farmio.app", type: "text", group: "contact", label: "Support email" },
-        { key: "contact_phone", value: "+265 999 000 001", type: "text", group: "contact", label: "Support phone" },
-        { key: "contact_whatsapp", value: "+265 999 000 002", type: "text", group: "contact", label: "WhatsApp number" },
-        { key: "contact_address", value: "Farmio Ltd, Lilongwe, Malawi", type: "text", group: "contact", label: "Physical address" },
-        { key: "contact_website", value: "www.farmio.app", type: "text", group: "contact", label: "Website" },
-        { key: "footer_tagline", value: "Modern farm management for African agriculture. Built in Malawi.", type: "text", group: "footer", label: "Footer tagline" },
-        { key: "social_proof_text", value: "TRUSTED BY FARMS ACROSS MALAWI & SOUTHERN AFRICA", type: "text", group: "social", label: "Social proof banner text" },
     ];
+    for (const t of testimonials) {
+        const exists = await prisma.testimonial.findFirst({ where: { name: t.name } });
+        if (!exists) await prisma.testimonial.create({ data: t });
+    }
+    console.log("Testimonials seeded.");
 
-    for (const item of cmsDefaults) {
+    // ── Market prices ──────────────────────────────────────────────────────────
+    // Schema fields: id, cropName, variety, unit, priceMin, priceMax, priceAvg,
+    // market, region, currency, season, recordedAt, source, isActive
+    const marketPrices = [
+        { cropName: "Maize",       variety: "White",     unit: "kg",    priceMin: 350,    priceMax: 550,    priceAvg: 450,    market: "ADMARC",          region: "National", season: "2024/25" },
+        { cropName: "Maize",       variety: "White",     unit: "bag50", priceMin: 17500,  priceMax: 27500,  priceAvg: 22500,  market: "ADMARC",          region: "National", season: "2024/25" },
+        { cropName: "Maize",       variety: "White",     unit: "kg",    priceMin: 380,    priceMax: 580,    priceAvg: 480,    market: "Lilongwe Market", region: "Central",  season: "2024/25" },
+        { cropName: "Maize",       variety: "White",     unit: "kg",    priceMin: 360,    priceMax: 560,    priceAvg: 460,    market: "Blantyre Market", region: "Southern", season: "2024/25" },
+        { cropName: "Maize",       variety: "White",     unit: "kg",    priceMin: 370,    priceMax: 570,    priceAvg: 470,    market: "Mzuzu Market",    region: "Northern", season: "2024/25" },
+        { cropName: "Tobacco",     variety: "Burley",    unit: "kg",    priceMin: 2800,   priceMax: 5500,   priceAvg: 4200,   market: "Auction Floors",  region: "National", season: "2024/25" },
+        { cropName: "Tobacco",     variety: "NASCHO",    unit: "kg",    priceMin: 3200,   priceMax: 6000,   priceAvg: 4800,   market: "Auction Floors",  region: "National", season: "2024/25" },
+        { cropName: "Soya",        variety: "Nasoko",    unit: "kg",    priceMin: 800,    priceMax: 1200,   priceAvg: 1000,   market: "ADMARC",          region: "National", season: "2024/25" },
+        { cropName: "Soya",        variety: "Nasoko",    unit: "kg",    priceMin: 850,    priceMax: 1300,   priceAvg: 1050,   market: "Lilongwe Market", region: "Central",  season: "2024/25" },
+        { cropName: "Groundnuts",  variety: "CG7",       unit: "kg",    priceMin: 1500,   priceMax: 2800,   priceAvg: 2100,   market: "ADMARC",          region: "National", season: "2024/25" },
+        { cropName: "Groundnuts",  variety: "CG7",       unit: "kg",    priceMin: 1600,   priceMax: 3000,   priceAvg: 2200,   market: "Lilongwe Market", region: "Central",  season: "2024/25" },
+        { cropName: "Rice",        variety: "Kilombero", unit: "kg",    priceMin: 900,    priceMax: 1500,   priceAvg: 1200,   market: "ADMARC",          region: "National", season: "2024/25" },
+        { cropName: "Rice",        variety: "Kilombero", unit: "kg",    priceMin: 950,    priceMax: 1600,   priceAvg: 1250,   market: "Blantyre Market", region: "Southern", season: "2024/25" },
+        { cropName: "Beans",       variety: "Napilira",  unit: "kg",    priceMin: 1200,   priceMax: 2000,   priceAvg: 1600,   market: "ADMARC",          region: "National", season: "2024/25" },
+        { cropName: "Beans",       variety: "Napilira",  unit: "kg",    priceMin: 1300,   priceMax: 2200,   priceAvg: 1700,   market: "Lilongwe Market", region: "Central",  season: "2024/25" },
+        { cropName: "Cotton",      variety: "Chureza",   unit: "kg",    priceMin: 850,    priceMax: 1400,   priceAvg: 1150,   market: "ADMARC",          region: "National", season: "2024/25" },
+        { cropName: "Sweet Potato", variety: "Zondeni", unit: "kg",    priceMin: 250,    priceMax: 500,    priceAvg: 380,    market: "Lilongwe Market", region: "Central",  season: "2024/25" },
+        { cropName: "Cassava",     variety: "Manyokola", unit: "kg",    priceMin: 180,    priceMax: 350,    priceAvg: 270,    market: "ADMARC",          region: "National", season: "2024/25" },
+        { cropName: "Sunflower",   variety: "Local",     unit: "kg",    priceMin: 700,    priceMax: 1200,   priceAvg: 950,    market: "ADMARC",          region: "National", season: "2024/25" },
+        // 2023/24 for comparison
+        { cropName: "Maize",       variety: "White",     unit: "kg",    priceMin: 280,    priceMax: 420,    priceAvg: 350,    market: "ADMARC",          region: "National", season: "2023/24" },
+        { cropName: "Soya",        variety: "Nasoko",    unit: "kg",    priceMin: 650,    priceMax: 950,    priceAvg: 800,    market: "ADMARC",          region: "National", season: "2023/24" },
+        { cropName: "Groundnuts",  variety: "CG7",       unit: "kg",    priceMin: 1200,   priceMax: 2200,   priceAvg: 1700,   market: "ADMARC",          region: "National", season: "2023/24" },
+        { cropName: "Tobacco",     variety: "Burley",    unit: "kg",    priceMin: 2200,   priceMax: 4500,   priceAvg: 3500,   market: "Auction Floors",  region: "National", season: "2023/24" },
+        { cropName: "Beans",       variety: "Napilira",  unit: "kg",    priceMin: 950,    priceMax: 1600,   priceAvg: 1300,   market: "ADMARC",          region: "National", season: "2023/24" },
+        { cropName: "Rice",        variety: "Kilombero", unit: "kg",    priceMin: 750,    priceMax: 1200,   priceAvg: 980,    market: "ADMARC",          region: "National", season: "2023/24" },
+    ];
+    for (const p of marketPrices) {
+        const exists = await prisma.marketPrice.findFirst({
+            where: { cropName: p.cropName, unit: p.unit, market: p.market, season: p.season },
+        });
+        if (!exists) await prisma.marketPrice.create({ data: { ...p, source: "ADMARC" } });
+    }
+    console.log("Market prices seeded.");
+
+    // ── Impact stats ───────────────────────────────────────────────────────────
+    // Schema fields: id, icon, value, label, source, color, sortOrder, isActive, createdAt
+    const impactStats = [
+        { icon: "👨‍🌾", value: "67%",      label: "of smallholder farmers in Malawi keep no formal financial records",     source: "World Bank, 2023",              color: "#DC2626", sortOrder: 0, isActive: true },
+        { icon: "🏦",   value: "89%",      label: "of farmer loan applications rejected — no financial history",             source: "RBM Financial Inclusion Report", color: "#D97706", sortOrder: 1, isActive: true },
+        { icon: "💸",   value: "MWK 2.1T", label: "lost annually by Malawian farmers selling below optimal market prices",  source: "USAID AgriMarket Study",         color: "#9333EA", sortOrder: 2, isActive: true },
+        { icon: "📱",   value: "72%",      label: "of Malawians now have mobile phone access — up from 38% in 2018",        source: "GSMA Mobile Economy Africa 2023",color: "#2563EB", sortOrder: 3, isActive: true },
+        { icon: "🌾",   value: "1.8M",     label: "smallholder farming households in Malawi needing digitization",          source: "National Statistical Office",    color: "#16A34A", sortOrder: 4, isActive: true },
+        { icon: "📈",   value: "$2.4B",    label: "Agricultural SaaS market in sub-Saharan Africa by 2027",                 source: "AgriTech Investment Report 2023",color: "#0891B2", sortOrder: 5, isActive: true },
+    ];
+    for (const stat of impactStats) {
+        const exists = await prisma.impactStat.findFirst({ where: { value: stat.value, label: stat.label } });
+        if (!exists) await prisma.impactStat.create({ data: stat });
+    }
+    console.log("Impact stats seeded.");
+
+    // ── Pitch sections ─────────────────────────────────────────────────────────
+    // Schema fields: id, key, title, content (Json), isActive, updatedAt
+    const pitchSections = [
+        {
+            key: "hook", title: "The Hook",
+            content: {
+                headline: "Every year, Malawian farmers collectively lose over MWK 2.1 trillion in potential income",
+                subline:  "Not from bad weather or poor harvests — but from not knowing their numbers.",
+                solution: "Farmio solves all of this. In one app. For any smartphone.",
+            },
+        },
+        {
+            key: "problem", title: "The Problem",
+            content: {
+                headline: "African farmers work hard. The system is working against them.",
+                points: [
+                    { stat: "67%",  desc: "of smallholder farmers in Malawi keep no formal financial records",        source: "World Bank, 2023" },
+                    { stat: "89%",  desc: "of farmer loan applications are rejected due to lack of financial records", source: "RBM Report" },
+                    { stat: "1.8M", desc: "smallholder farming households in Malawi needing digitization",             source: "NSO Malawi" },
+                ],
+            },
+        },
+        {
+            key: "solution", title: "The Solution",
+            content: {
+                headline:    "Farmio is a farm management operating system built for African agriculture",
+                description: "We replace paper records with a powerful, affordable, mobile-first platform.",
+                features: [
+                    "GPS field mapping & zone management",
+                    "Real-time ADMARC market prices",
+                    "Farm credit score & loan readiness",
+                    "Full financial tracking & reporting",
+                    "Weather integration & farming advice",
+                    "Animal husbandry management",
+                    "AI-powered insights & anomaly detection",
+                    "Team management & role permissions",
+                ],
+            },
+        },
+        {
+            key: "market", title: "Market Opportunity",
+            content: {
+                tam: { value: "$2.4B", label: "Total Addressable Market", desc: "Agricultural SaaS in sub-Saharan Africa by 2027" },
+                sam: { value: "$180M", label: "Serviceable Market",       desc: "Farm management software across Malawi, Zambia, Zimbabwe, Tanzania" },
+                som: { value: "$4.2M", label: "Obtainable (Year 1–3)",    desc: "12,000 paying farms across Malawi at MWK 9,900/month average" },
+                drivers: [
+                    { title: "Smartphone penetration",    desc: "72% of Malawians now have mobile phone access" },
+                    { title: "Government digitalization", desc: "Malawi Digital Economy Policy 2023–2030" },
+                    { title: "Funder momentum",           desc: "$2.8B committed to African AgriTech by DFIs 2024–2027" },
+                    { title: "Market gap",                desc: "No locally-built, locally-priced platform exists in Malawi" },
+                ],
+            },
+        },
+        {
+            key: "model", title: "Business Model",
+            content: {
+                streams: [
+                    { name: "SaaS Subscriptions", icon: "💳", status: "Live",  desc: "Free, Standard (MWK 9,900/mo), Enterprise (MWK 49,900/mo)" },
+                    { name: "Credit Score API",   icon: "🏦", status: "2025",  desc: "License credit score engine to banks and MFIs" },
+                    { name: "Market Data",        icon: "📊", status: "2025",  desc: "Anonymised crop production data to commodity traders" },
+                    { name: "Input Marketplace",  icon: "🛒", status: "2026",  desc: "Commission-based marketplace for input suppliers. 3–5% fee" },
+                ],
+                unitEconomics: { arpu: "MWK 8,400", cac: "MWK 15,000", ltv: "MWK 302,400", ltvCac: "20x" },
+            },
+        },
+        {
+            key: "traction", title: "Traction & Validation",
+            content: {
+                metrics: [
+                    { metric: "500+",    label: "Farms registered" },
+                    { metric: "12,000+", label: "Hectares tracked" },
+                    { metric: "94%",     label: "30-day retention" },
+                    { metric: "4.8/5",   label: "User satisfaction" },
+                ],
+                milestones: [
+                    { date: "Q1 2024", event: "MVP launched with 50 beta farmers in Lilongwe and Kasungu" },
+                    { date: "Q2 2024", event: "ADMARC price integration — first Malawian AgriTech with live official prices" },
+                    { date: "Q3 2024", event: "First farmer accesses bank loan using Farmio credit score report" },
+                    { date: "Q4 2024", event: "500 registered farms across 5 districts. 67% on paid plans" },
+                    { date: "Q1 2025", event: "GPS field mapping launched. 12,000+ hectares mapped in first month" },
+                    { date: "Now",     event: "Raising seed round to scale to 10,000 farms by end of 2025" },
+                ],
+            },
+        },
+        {
+            key: "ask", title: "The Ask",
+            content: {
+                amount: "$250,000",
+                type:   "Seed round · Convertible note or equity",
+                runway: "18-month runway",
+                useOfFunds: [
+                    { use: "Product development & AI", pct: 40, amount: "$100,000" },
+                    { use: "Sales & marketing",        pct: 30, amount: "$75,000" },
+                    { use: "Team expansion",           pct: 20, amount: "$50,000" },
+                    { use: "Operations & compliance",  pct: 10, amount: "$25,000" },
+                ],
+                unlocks: [
+                    "10,000 registered farms by end of Year 1",
+                    "Expansion into Zambia (Q3 2025)",
+                    "Bank & MFI credit score API launch",
+                    "WhatsApp and USSD channel (feature phones)",
+                    "First $1M ARR milestone",
+                    "Series A readiness by Month 18",
+                ],
+                contact: { email: "invest@farmio.app", phone: "+265 999 000 000", web: "farmio.app" },
+            },
+        },
+    ];
+    for (const section of pitchSections) {
+        await prisma.pitchSection.upsert({
+            where:  { key: section.key },
+            update: { title: section.title, content: section.content },
+            create: { key: section.key, title: section.title, content: section.content },
+        });
+    }
+    console.log("Pitch sections seeded.");
+
+    // ── CMS Features ───────────────────────────────────────────────────────────
+    // Schema fields: id, icon, title, description, sortOrder, isActive
+    const features = [
+        { icon: "🗺️", title: "Field & crop mapping",      description: "Draw GPS field boundaries, section zones by crop, measure acreage accurately.",                            sortOrder: 0, isActive: true },
+        { icon: "📊", title: "ADMARC market intelligence", description: "Live farm gate prices from ADMARC and regional markets. Know the best time and place to sell.",            sortOrder: 1, isActive: true },
+        { icon: "🏆", title: "Farm credit score",          description: "Your complete farm history becomes a loan readiness report. Walk into any bank with a score and a PDF.",   sortOrder: 2, isActive: true },
+        { icon: "🌤️", title: "Weather integration",        description: "7-day forecast with farming advice. Know when to spray, plant, irrigate — before you spend money.",        sortOrder: 3, isActive: true },
+        { icon: "🐄", title: "Animal husbandry",           description: "Track livestock health, production, weight gain and sales. Calculate true cost per animal automatically.", sortOrder: 4, isActive: true },
+        { icon: "✨", title: "AI-powered insights",        description: "Anomaly alerts, season comparisons, cost benchmarking — all explained in plain language.",                 sortOrder: 5, isActive: true },
+    ];
+    for (const f of features) {
+        const exists = await prisma.cmsFeature.findFirst({ where: { title: f.title } });
+        if (!exists) await prisma.cmsFeature.create({ data: f });
+    }
+    console.log("CMS features seeded.");
+
+    // ── Site content ───────────────────────────────────────────────────────────
+    // Schema fields: id, key, value, type, group, label, updatedAt, updatedBy
+    const siteContent = [
+        { key: "hero_headline",         value: "Manage your farm like a business.",                                                                                                                          type: "text", group: "hero",     label: "Hero headline" },
+        { key: "hero_subheadline",      value: "Farmio replaces paper records with a powerful digital system — track fields, crops, costs and yields. Get AI-powered insights. Know your profit before you sell.", type: "text", group: "hero",     label: "Hero subheadline" },
+        { key: "hero_cta_primary",      value: "Start free — no card needed",                                                                                                                               type: "text", group: "hero",     label: "Primary CTA button" },
+        { key: "hero_cta_secondary",    value: "See how it works",                                                                                                                                          type: "text", group: "hero",     label: "Secondary CTA button" },
+        { key: "problem_headline",      value: "African farmers work hard. The system is working against them.",                                                                                             type: "text", group: "hero",     label: "Problem headline" },
+        { key: "problem_sub",           value: "Without digital records, farmers can't access credit, don't know their true costs, and sell at the wrong time. Farmio fixes this.",                         type: "text", group: "hero",     label: "Problem subheadline" },
+        { key: "features_headline",     value: "Built for the realities of African farming",                                                                                                                type: "text", group: "hero",     label: "Features headline" },
+        { key: "features_sub",          value: "Not a generic tool retrofitted for Africa. Built from scratch for Malawian conditions, crops, currencies and challenges.",                                  type: "text", group: "hero",     label: "Features subheadline" },
+        { key: "impact_headline",       value: "Numbers that tell the real story",                                                                                                                          type: "text", group: "stats",    label: "Impact stats headline" },
+        { key: "testimonials_headline", value: "What farmers are saying",                                                                                                                                   type: "text", group: "hero",     label: "Testimonials headline" },
+        { key: "pricing_headline",      value: "Start free. Scale when you grow.",                                                                                                                          type: "text", group: "hero",     label: "Pricing headline" },
+        { key: "pricing_sub",           value: "No hidden fees. No contracts. Pay monthly and cancel anytime. All prices in Malawian Kwacha.",                                                              type: "text", group: "hero",     label: "Pricing subheadline" },
+        { key: "funders_headline",      value: "A platform that delivers on every funder's mandate",                                                                                                        type: "text", group: "hero",     label: "Funders headline" },
+        { key: "funders_sub",           value: "Farmio sits at the intersection of agricultural development, financial inclusion, and digital transformation.",                                             type: "text", group: "hero",     label: "Funders subheadline" },
+        { key: "cta_headline",          value: "Your farm deserves better than paper.",                                                                                                                     type: "text", group: "hero",     label: "CTA headline" },
+        { key: "cta_sub",               value: "Join hundreds of Malawian farmers already using Farmio to make smarter decisions, access credit and build profitable farms.",                               type: "text", group: "hero",     label: "CTA subheadline" },
+        { key: "contact_email",         value: "hello@farmio.app",                                                                                                                                         type: "text", group: "contact",  label: "Contact email" },
+        { key: "invest_email",          value: "invest@farmio.app",                                                                                                                                        type: "text", group: "contact",  label: "Investor email" },
+        { key: "contact_phone",         value: "+265 999 000 000",                                                                                                                                         type: "text", group: "contact",  label: "Contact phone" },
+    ];
+    for (const item of siteContent) {
         await prisma.siteContent.upsert({
-            where: { key: item.key },
+            where:  { key: item.key },
             update: {},
             create: item,
         });
     }
+    console.log("Site content seeded.");
 
-// Default testimonials
-    const testimonials = [
-        {
-            quote: "Farmio transformed how we track our maize and soybean seasons. The cost per hectare reports alone saved us from two bad decisions.",
-            name: "James Phiri",
-            role: "Farm Manager, Shire Valley Estates",
-            initials: "JP",
-            sortOrder: 1,
-        },
-        {
-            quote: "We manage 4 farms across Lilongwe district. Having everything in one place — fields, staff, costs, yields — is a game changer.",
-            name: "Grace Banda",
-            role: "Director, Sunrise Agricultural Co-op",
-            initials: "GB",
-            sortOrder: 2,
-        },
-        {
-            quote: "The selling price suggestion tool is brilliant. It tells us exactly what we need to sell our tobacco for to hit our target margin.",
-            name: "Charles Mwale",
-            role: "Owner, Mzuzu Tobacco Growers",
-            initials: "CM",
-            sortOrder: 3,
-        },
-    ];
-
-    for (const t of testimonials) {
-        const existing = await prisma.testimonial.findFirst({ where: { name: t.name } });
-        if (!existing) await prisma.testimonial.create({ data: t });
-    }
-
-    console.log("CMS defaults and testimonials seeded.");
-
-    // Seed CMS features
-    const features = [
-        { icon: "🗺", title: "Field management", description: "Map your fields, track soil types, monitor cultivatable area and land allocation in real time. Pin GPS locations and draw field boundaries.", sortOrder: 1 },
-        { icon: "🌱", title: "Crop tracking", description: "Assign crops to fields by season, track varieties, and monitor status from planting to harvest. Group by season for a full picture.", sortOrder: 2 },
-        { icon: "📋", title: "Farm activities", description: "Log every activity — planting, irrigation, spraying, weeding — with full labour, input and cost records linked to crops and seasons.", sortOrder: 3 },
-        { icon: "🌾", title: "Yield recording", description: "Record harvests and get automated selling price suggestions based on your actual production costs and target profit margins.", sortOrder: 4 },
-        { icon: "💰", title: "Finance & reports", description: "Track income, expenses and overhead. Get detailed profitability reports per crop, field and season including cost per hectare.", sortOrder: 5 },
-        { icon: "👷", title: "Team management", description: "Manage employees, assign them to activities, track labour days and hours, and monitor payroll costs across all farm operations.", sortOrder: 6 },
-    ];
-
-    for (const f of features) {
-        const existing = await prisma.cmsFeature.findFirst({ where: { title: f.title } });
-        if (!existing) await prisma.cmsFeature.create({ data: f });
-    }
-
-// Seed CMS media
-    const media = [
-        { key: "hero_image", url: "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=1200&q=80", type: "image", label: "Hero background image" },
-        { key: "hero_video", url: "", type: "video", label: "Hero background video (overrides image if set)" },
-        { key: "demo_image", url: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80", type: "image", label: "Demo section image" },
-    ];
-
-    for (const m of media) {
-        await prisma.cmsMedia.upsert({ where: { key: m.key }, update: {}, create: m });
-    }
-
-// Seed CMS pages
-    const pages = [
-        { slug: "about", title: "About Farmio", content: "# About Farmio\n\nFarmio is a modern farm management platform built for African agriculture. Founded in Malawi, we help farmers track their fields, crops, activities, yields and finances in one place.\n\n## Our mission\n\nTo give every farmer — from smallholder to commercial — the tools to run their farm like a business.\n\n## Our story\n\nFarmio was born out of a simple observation: farmers in Malawi and across Africa were managing complex operations with notebooks and memory. We believed there was a better way.\n\n## Our team\n\nWe are a small, passionate team based in Lilongwe, Malawi." },
-        { slug: "blog", title: "Blog", content: "# Farmio Blog\n\nInsights, tips and updates from the Farmio team.\n\n## Coming soon\n\nWe are working on our first articles. Check back soon!" },
-        { slug: "careers", title: "Careers", content: "# Careers at Farmio\n\nWe are always looking for talented people who are passionate about agriculture and technology.\n\n## Open positions\n\nNo open positions at this time. Send your CV to careers@farmio.app and we will keep you in mind for future roles." },
-        { slug: "press", title: "Press", content: "# Press & Media\n\nFor press inquiries, please contact press@farmio.app.\n\n## Brand assets\n\nDownload our logo and brand guidelines by emailing press@farmio.app." },
-        { slug: "privacy", title: "Privacy Policy", content: "# Privacy Policy\n\nLast updated: January 2025\n\n## What we collect\n\nWe collect information you provide when registering, including your name, email address and farm details.\n\n## How we use it\n\nWe use your information to provide and improve our services. We do not sell your data to third parties.\n\n## Data retention\n\nFree plan users retain access to their data indefinitely. We never delete your historical records.\n\n## Contact\n\nFor privacy concerns, contact privacy@farmio.app." },
-        { slug: "terms", title: "Terms of Service", content: "# Terms of Service\n\nLast updated: January 2025\n\nBy using Farmio, you agree to these terms.\n\n## Acceptable use\n\nYou may use Farmio for lawful farm management purposes only.\n\n## Subscription\n\nPaid subscriptions are billed monthly or annually. Cancellations take effect at the end of the billing period.\n\n## Limitation of liability\n\nFarmio is not liable for any loss of data or revenue arising from use of our platform.\n\n## Contact\n\nlegal@farmio.app" },
-        { slug: "security", title: "Security", content: "# Security at Farmio\n\n## Data encryption\n\nAll data is encrypted in transit using TLS 1.3 and at rest using AES-256.\n\n## Authentication\n\nPasswords are hashed using bcrypt. We support secure session management.\n\n## Reporting vulnerabilities\n\nIf you discover a security vulnerability, please report it to security@farmio.app. We will respond within 48 hours.\n\n## Uptime\n\nWe target 99.9% uptime and publish our status at status.farmio.app." },
-        { slug: "changelog", title: "Changelog", content: "# Changelog\n\n## Version 1.0.0 — January 2025\n\n- Initial release\n- Field management with GPS location\n- Crop tracking by season\n- Farm activity logging with labour and input costs\n- Yield recording with selling price suggestions\n- Finance tracking with profitability reports\n- Employee management\n- Season analytics\n- Admin panel with subscription management\n- Enterprise team accounts with role-based permissions" },
-        { slug: "roadmap", title: "Roadmap", content: "# Product Roadmap\n\n## Coming soon\n\n### Mobile app (Q2 2025)\nOffline-capable Android and iOS app for field use.\n\n### Weather integration (Q2 2025)\nReal-time weather data and alerts linked to your field locations.\n\n### Market prices (Q3 2025)\nLive crop market prices to inform your selling decisions.\n\n### SMS notifications (Q3 2025)\nActivity reminders and alerts via SMS for areas with limited internet.\n\n### Multi-currency support (Q4 2025)\nSupport for ZMW, TZS, KES and other African currencies.\n\n## Completed\n\n- ✅ Field management\n- ✅ Crop & season tracking\n- ✅ Activity logging\n- ✅ Yield recording\n- ✅ Finance & reports\n- ✅ Enterprise team accounts" },
-        { slug: "support", title: "Support", content: "# Support\n\n## Getting started\n\nNew to Farmio? Start by adding your first field, then assign crops to it. Log activities as they happen and record your harvest at the end of the season.\n\n## Contact us\n\n- **Email:** support@farmio.app\n- **Phone:** +265 999 000 001\n- **WhatsApp:** +265 999 000 002\n- **Hours:** Monday to Friday, 8am – 5pm CAT\n\n## FAQs\n\nVisit our [homepage](/) for answers to common questions." },
-    ];
-
-    for (const page of pages) {
-        await prisma.cmsPage.upsert({ where: { slug: page.slug }, update: {}, create: page });
-    }
-
-// Update tiers with sortOrder and isFeatured
-    await prisma.subscriptionTier.update({ where: { id: "tier_free" }, data: { sortOrder: 1, isFeatured: false } });
-    await prisma.subscriptionTier.update({ where: { id: "tier_standard" }, data: { sortOrder: 2, isFeatured: true } });
-    await prisma.subscriptionTier.update({ where: { id: "tier_enterprise" }, data: { sortOrder: 3, isFeatured: false } });
-
-    console.log("CMS features, media, pages and tier updates seeded.");
-
-
-    // ADMARC Farm Gate Prices (2024/25 season)
-    const marketPrices = [
-        // Maize
-        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 350, priceMax: 550, priceAvg: 450, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Maize", variety: "White", unit: "bag50", priceMin: 17500, priceMax: 27500, priceAvg: 22500, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Maize", variety: "White", unit: "tonne", priceMin: 350000, priceMax: 550000, priceAvg: 450000, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 380, priceMax: 580, priceAvg: 480, market: "Lilongwe Market", region: "Central", season: "2024/25" },
-        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 360, priceMax: 560, priceAvg: 460, market: "Blantyre Market", region: "Southern", season: "2024/25" },
-        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 370, priceMax: 570, priceAvg: 470, market: "Mzuzu Market", region: "Northern", season: "2024/25" },
-
-        // Tobacco
-        { cropName: "Tobacco", variety: "Burley", unit: "kg", priceMin: 2800, priceMax: 5500, priceAvg: 4200, market: "Auction Floors", region: "National", season: "2024/25" },
-        { cropName: "Tobacco", variety: "NASCHO", unit: "kg", priceMin: 3200, priceMax: 6000, priceAvg: 4800, market: "Auction Floors", region: "National", season: "2024/25" },
-
-        // Soya beans
-        { cropName: "Soya", variety: "Nasoko", unit: "kg", priceMin: 800, priceMax: 1200, priceAvg: 1000, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Soya", variety: "Nasoko", unit: "bag50", priceMin: 40000, priceMax: 60000, priceAvg: 50000, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Soya", variety: "Nasoko", unit: "kg", priceMin: 850, priceMax: 1300, priceAvg: 1050, market: "Lilongwe Market", region: "Central", season: "2024/25" },
-        { cropName: "Soya", variety: "Nasoko", unit: "kg", priceMin: 820, priceMax: 1250, priceAvg: 1020, market: "Blantyre Market", region: "Southern", season: "2024/25" },
-
-        // Groundnuts
-        { cropName: "Groundnuts", variety: "CG7", unit: "kg", priceMin: 1500, priceMax: 2800, priceAvg: 2100, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Groundnuts", variety: "CG7", unit: "bag50", priceMin: 75000, priceMax: 140000, priceAvg: 105000, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Groundnuts", variety: "CG7", unit: "kg", priceMin: 1600, priceMax: 3000, priceAvg: 2200, market: "Lilongwe Market", region: "Central", season: "2024/25" },
-
-        // Rice
-        { cropName: "Rice", variety: "Kilombero", unit: "kg", priceMin: 900, priceMax: 1500, priceAvg: 1200, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Rice", variety: "Kilombero", unit: "bag50", priceMin: 45000, priceMax: 75000, priceAvg: 60000, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Rice", variety: "Kilombero", unit: "kg", priceMin: 950, priceMax: 1600, priceAvg: 1250, market: "Blantyre Market", region: "Southern", season: "2024/25" },
-
-        // Beans
-        { cropName: "Beans", variety: "Napilira", unit: "kg", priceMin: 1200, priceMax: 2000, priceAvg: 1600, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Beans", variety: "Napilira", unit: "bag50", priceMin: 60000, priceMax: 100000, priceAvg: 80000, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Beans", variety: "Napilira", unit: "kg", priceMin: 1300, priceMax: 2200, priceAvg: 1700, market: "Lilongwe Market", region: "Central", season: "2024/25" },
-
-        // Cotton
-        { cropName: "Cotton", variety: "Chureza", unit: "kg", priceMin: 850, priceMax: 1400, priceAvg: 1150, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Cotton", variety: "Chureza", unit: "kg", priceMin: 900, priceMax: 1500, priceAvg: 1200, market: "Blantyre Market", region: "Southern", season: "2024/25" },
-
-        // Sweet potato
-        { cropName: "Sweet Potato", variety: "Zondeni", unit: "kg", priceMin: 250, priceMax: 500, priceAvg: 380, market: "Lilongwe Market", region: "Central", season: "2024/25" },
-        { cropName: "Sweet Potato", variety: "Zondeni", unit: "kg", priceMin: 280, priceMax: 520, priceAvg: 400, market: "Blantyre Market", region: "Southern", season: "2024/25" },
-
-        // Cassava
-        { cropName: "Cassava", variety: "Manyokola", unit: "kg", priceMin: 180, priceMax: 350, priceAvg: 270, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Cassava", variety: "Manyokola", unit: "kg", priceMin: 200, priceMax: 380, priceAvg: 290, market: "Lilongwe Market", region: "Central", season: "2024/25" },
-
-        // Sunflower
-        { cropName: "Sunflower", variety: "Local", unit: "kg", priceMin: 700, priceMax: 1200, priceAvg: 950, market: "ADMARC", region: "National", season: "2024/25" },
-        { cropName: "Sunflower", variety: "Local", unit: "kg", priceMin: 750, priceMax: 1300, priceAvg: 1000, market: "Lilongwe Market", region: "Central", season: "2024/25" },
-
-        // Previous season for comparison
-        { cropName: "Maize", variety: "White", unit: "kg", priceMin: 280, priceMax: 420, priceAvg: 350, market: "ADMARC", region: "National", season: "2023/24" },
-        { cropName: "Soya", variety: "Nasoko", unit: "kg", priceMin: 650, priceMax: 950, priceAvg: 800, market: "ADMARC", region: "National", season: "2023/24" },
-        { cropName: "Groundnuts", variety: "CG7", unit: "kg", priceMin: 1200, priceMax: 2200, priceAvg: 1700, market: "ADMARC", region: "National", season: "2023/24" },
-        { cropName: "Tobacco", variety: "Burley", unit: "kg", priceMin: 2200, priceMax: 4500, priceAvg: 3500, market: "Auction Floors", region: "National", season: "2023/24" },
-        { cropName: "Beans", variety: "Napilira", unit: "kg", priceMin: 950, priceMax: 1600, priceAvg: 1300, market: "ADMARC", region: "National", season: "2023/24" },
-        { cropName: "Rice", variety: "Kilombero", unit: "kg", priceMin: 750, priceMax: 1200, priceAvg: 980, market: "ADMARC", region: "National", season: "2023/24" },
-    ];
-
-    for (const price of marketPrices) {
-        const existing = await prisma.marketPrice.findFirst({
-            where: { cropName: price.cropName, unit: price.unit, market: price.market, season: price.season },
-        });
-        if (!existing) {
-            await prisma.marketPrice.create({ data: { ...price, source: "ADMARC" } });
-        }
-    }
-
-    console.log("Market prices seeded.");
+    console.log("\n✅ Seed complete.");
 }
 
 main()
-    .catch(console.error)
+    .catch((e) => { console.error(e); process.exit(1); })
     .finally(() => prisma.$disconnect());

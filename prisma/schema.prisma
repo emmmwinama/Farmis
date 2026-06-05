@@ -7,6 +7,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// datasource db {
+//   provider = "mysql"
+//   url      = "mysql://root:@localhost:3306/farmio"
+// }
+
 datasource db {
   provider = "mysql"
   // url      = env("DATABASE_URL")
@@ -96,6 +101,9 @@ model CropField {
   plantingDate        DateTime
   expectedHarvestDate DateTime
   status              String   @default("Active")
+  isArchived          Boolean  @default(false)      // ← ADD
+  archivedAt          DateTime?                      // ← ADD
+  archivedReason      String?
   createdAt           DateTime @default(now())
   fieldId             String
   cropTypeId          String
@@ -107,6 +115,7 @@ model CropField {
   transactions   Transaction[]
   // inventory    InventoryItem[]
   inventoryItems InventoryItem[]
+  fieldZones     FieldZone[]
 }
 
 model Employee {
@@ -323,7 +332,7 @@ model SiteContent {
   value     String   @db.Text
   type      String   @default("text") // text, image_url, boolean, json
   group     String   @default("general") // hero, features, contact, social
-  label     String // Human readable label for admin
+  label     String? // Human readable label for admin
   updatedAt DateTime @updatedAt
   updatedBy String?
 }
@@ -690,8 +699,8 @@ model FieldZone {
   fieldId     String
   farmId      String
   name        String
-  type        String // crop, soil, infrastructure, empty
-  cropFieldId String? // link to crop record
+  type        String
+  cropFieldId String?
   geoJson     Json
   areaHa      Float?
   colour      String?
@@ -700,6 +709,8 @@ model FieldZone {
 
   boundary FieldBoundary @relation(fields: [boundaryId], references: [id], onDelete: Cascade)
   field    Field         @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  cropField CropField? @relation(fields: [cropFieldId], references: [id])
 }
 
 model FarmMarker {
@@ -715,4 +726,26 @@ model FarmMarker {
   createdAt DateTime @default(now())
 
   farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+}
+
+
+model ImpactStat {
+  id        String   @id @default(cuid())
+  icon      String   @default("📊")
+  value     String
+  label     String
+  source    String?
+  color     String?  @default("#1a3d1f")
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model PitchSection {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  title     String
+  content   Json
+  isActive  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
 }

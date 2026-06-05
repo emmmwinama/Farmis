@@ -2,39 +2,44 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFarm } from "@/lib/apiHelpers";
 import { checkLimit } from "@/lib/subscription";
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: Request) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email)
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { searchParams } = new URL(req.url);
+    const showArchived = searchParams.get("archived") === "true";
+    const season       = searchParams.get("season");
+
     const { farm } = await getSessionFarm();
-    if (!farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!farm) return NextResponse.json({ error: "No farm" }, { status: 404 });
 
-    const fields = await prisma.field.findMany({
-        where: { farmId: farm.id },
+    const where: any = {
+        field: { farmId: farm.id },
+        isArchived: showArchived ? true : false,
+    };
+
+    if (season) where.season = season;
+
+    const crops = await prisma.cropField.findMany({
+        where,
         include: {
-            cropFields: {
-                include: { cropType: true },
-                orderBy: { createdAt: "desc" },
-            },
+            cropType:  true,
+            field:     true,
+            yields:    true,
+            fieldZones: true,
         },
+        orderBy: { createdAt: "desc" },
     });
 
-    const cropFields = fields.flatMap((f) =>
-        f.cropFields.map((c) => ({
-            id: c.id,
-            cropTypeName: c.cropType.name,
-            cropTypeId: c.cropTypeId,
-            variety: c.variety,
-            areaPlanted: c.areaPlanted,
-            season: c.season,
-            plantingDate: c.plantingDate,
-            expectedHarvestDate: c.expectedHarvestDate,
-            status: c.status,
-            fieldId: f.id,
-            fieldName: f.name,
-            fieldCultivatable: f.cultivatableArea,
-        }))
-    );
-
-    return NextResponse.json(cropFields);
+    return NextResponse.json(crops.map((c) => ({
+        ...c,
+        cropTypeName: c.cropType.name,
+        fieldName:    c.field.name,
+    })));
 }
 
 export async function POST(req: Request) {
