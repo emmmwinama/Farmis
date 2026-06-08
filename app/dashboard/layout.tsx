@@ -44,8 +44,8 @@ const NAV_GROUPS = [
         label: "Insights",
         items: [
             { label: "Reports",       href: "/dashboard/reports",      icon: FileBarChart },
-            { label: "Credit score",  href: "/dashboard/credit-score", icon: Award },
-            { label: "Farm impact",   href: "/dashboard/impact",       icon: Leaf },
+            // { label: "Credit score",  href: "/dashboard/credit-score", icon: Award },
+            // { label: "Farm impact",   href: "/dashboard/impact",       icon: Leaf },
             { label: "Weather",       href: "/dashboard/weather",      icon: CloudSun },
         ],
     },

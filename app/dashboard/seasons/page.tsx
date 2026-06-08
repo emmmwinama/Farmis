@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {Loader2, CalendarDays, TrendingUp, ArrowLeftRight} from "lucide-react";
+import { Loader2, CalendarDays, ArrowLeftRight } from "lucide-react";
 
 function fmt(n: number) { return new Intl.NumberFormat("en-MW").format(Math.round(n)); }
 function formatDate(d: string) {
@@ -14,14 +14,23 @@ const ACTIVITY_ICONS: Record<string, string> = {
     Fertilising: "🌾", Harvesting: "🏃", "Land preparation": "🚜", Other: "📋",
 };
 
+const STATUS_BADGE: Record<string, { bg: string; color: string }> = {
+    Active:    { bg: "#ECFDF5", color: "#166534" },
+    Harvested: { bg: "#EFF6FF", color: "#1E3A8A" },
+    Failed:    { bg: "#FEF2F2", color: "#7F1D1D" },
+    Resting:   { bg: "#F5F3FF", color: "#3C3489" },
+};
+
 export default function SeasonsPage() {
-    const [data, setData] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+    const [data,           setData]           = useState<any>(null);
+    const [loading,        setLoading]        = useState(true);
     const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
 
     useEffect(() => {
         setLoading(true);
-        const url = selectedSeason ? `/api/seasons?season=${encodeURIComponent(selectedSeason)}` : "/api/seasons";
+        const url = selectedSeason
+            ? `/api/seasons?season=${encodeURIComponent(selectedSeason)}`
+            : "/api/seasons";
         fetch(url).then((r) => r.json()).then((d) => {
             setData(d);
             if (!selectedSeason && d.allSeasons?.length > 0) setSelectedSeason(d.allSeasons[0]);
@@ -34,89 +43,132 @@ export default function SeasonsPage() {
     return (
         <div className="p-8 max-w-6xl mx-auto">
 
-            <Link href="/dashboard/seasons/compare"
-                  className="btn-secondary text-xs">
-                <ArrowLeftRight size={13} />
-                Compare seasons
-            </Link>
-
-            <div className="mb-8">
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Seasons</h1>
-                <p className="text-slate-400 text-sm mt-1">View crops, activities and performance by growing season</p>
+            {/* Header */}
+            <div className="flex items-start justify-between mb-8">
+                <div>
+                    <h1 className="text-2xl font-black" style={{ color: "var(--text-primary)", letterSpacing: "-0.04em" }}>
+                        Seasons
+                    </h1>
+                    <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+                        View crops, activities and performance by growing season
+                    </p>
+                </div>
+                <Link href="/dashboard/seasons/compare"
+                      className="flex items-center gap-2 h-10 px-4 rounded-xl text-sm font-bold transition-all"
+                      style={{
+                          background: "var(--bg-card)",
+                          color:      "var(--text-secondary)",
+                          border:     "1px solid var(--border)",
+                      }}>
+                    <ArrowLeftRight size={14} /> Compare seasons
+                </Link>
             </div>
 
-            {/* Season selector */}
+            {/* Season selector pills */}
             <div className="flex gap-2 mb-8 flex-wrap">
                 {seasons.map((s: string) => (
                     <button key={s} onClick={() => setSelectedSeason(s)}
-                            className={`h-10 px-5 rounded-xl text-sm font-bold transition-colors ${
-                                selectedSeason === s
-                                    ? "bg-[#1a3d1f] text-white shadow-md"
-                                    : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-[#1a3d1f] hover:text-[#1a3d1f] dark:hover:text-[#7dd68a]"
-                            }`}>
+                            className="h-10 px-5 rounded-xl text-sm font-bold transition-all"
+                            style={{
+                                background: selectedSeason === s ? "var(--farm-green)" : "var(--bg-card)",
+                                color:      selectedSeason === s ? "white"             : "var(--text-secondary)",
+                                border:     `1.5px solid ${selectedSeason === s ? "transparent" : "var(--border)"}`,
+                            }}>
                         {s}
                     </button>
                 ))}
             </div>
 
             {loading ? (
-                <div className="flex justify-center py-20"><Loader2 size={24} className="animate-spin text-slate-400" /></div>
+                <div className="flex justify-center py-20">
+                    <Loader2 size={24} className="animate-spin" style={{ color: "var(--farm-green)" }} />
+                </div>
             ) : !selectedSeason ? (
-                <div className="bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 rounded-3xl p-16 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
-                        <CalendarDays size={28} className="text-slate-400" />
+                <div className="rounded-2xl p-16 text-center"
+                     style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                         style={{ background: "var(--bg-subtle)" }}>
+                        <CalendarDays size={24} style={{ color: "var(--text-muted)" }} />
                     </div>
-                    <p className="font-bold text-slate-900 dark:text-white text-lg mb-2">No seasons yet</p>
-                    <p className="text-slate-400 text-sm">Add crops with a season name to start tracking seasons</p>
+                    <p className="text-lg font-black mb-1" style={{ color: "var(--text-primary)" }}>No seasons yet</p>
+                    <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+                        Add crops with a season name to start tracking seasons
+                    </p>
                 </div>
             ) : (
                 <>
-                    {/* Season summary */}
+                    {/* Summary cards */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                         {[
-                            { label: "Crops planted", value: String(data?.totals?.crops ?? 0) },
-                            { label: "Total area", value: `${(data?.totals?.area ?? 0).toFixed(1)} ha` },
-                            { label: "Activities", value: String(data?.totals?.activities ?? 0) },
-                            { label: "Activity cost", value: `MWK ${fmt(data?.totals?.cost ?? 0)}` },
-                        ].map(({ label, value }) => (
-                            <div key={label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
-                                <p className="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-1">{label}</p>
-                                <p className="text-2xl font-black text-slate-900 dark:text-white">{value}</p>
+                            { label: "Crops planted",  value: String(data?.totals?.crops      ?? 0),                         color: "var(--farm-green)"  },
+                            { label: "Total area",     value: `${(data?.totals?.area ?? 0).toFixed(1)} ha`,                  color: "#2563EB"            },
+                            { label: "Activities",     value: String(data?.totals?.activities ?? 0),                         color: "var(--text-primary)" },
+                            { label: "Activity cost",  value: `MWK ${fmt(data?.totals?.cost   ?? 0)}`,                       color: "#DC2626"            },
+                        ].map(({ label, value, color }) => (
+                            <div key={label} className="rounded-2xl p-5"
+                                 style={{ background: "var(--bg-card)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(15,23,42,0.06)" }}>
+                                <p className="text-[10px] font-black uppercase tracking-widest mb-2" style={{ color: "var(--text-muted)" }}>
+                                    {label}
+                                </p>
+                                <p className="text-2xl font-black" style={{ color }}>{value}</p>
                             </div>
                         ))}
                     </div>
 
                     {/* Crop type breakdown */}
                     {(data?.byType ?? []).length > 0 && (
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-6">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4">Crops this season</p>
+                        <div className="rounded-2xl p-6 mb-6"
+                             style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                            <p className="text-[10px] font-black uppercase tracking-widest mb-4"
+                               style={{ color: "var(--text-muted)" }}>
+                                Crops this season
+                            </p>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {data.byType.map((t: any) => {
-                                    const activeCount = (t.statuses ?? []).filter((s: string) => s === "Active").length;
+                                    const activeCount    = (t.statuses ?? []).filter((s: string) => s === "Active").length;
                                     const harvestedCount = (t.statuses ?? []).filter((s: string) => s === "Harvested").length;
                                     return (
-                                        <div key={t.name} className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4">
+                                        <div key={t.name} className="rounded-xl p-4"
+                                             style={{ background: "var(--farm-pale)", border: "1px solid #86efac" }}>
                                             <div className="flex items-center gap-2 mb-3">
-                                                <span className="text-xl">🌱</span>
-                                                <p className="font-bold text-slate-900 dark:text-white">{t.name}</p>
+                                                <span className="text-lg">🌱</span>
+                                                <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
+                                                    {t.name}
+                                                </p>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-2">
+                                            <div className="grid grid-cols-2 gap-2 mb-2">
                                                 <div>
-                                                    <p className="text-xs text-slate-400">Area</p>
-                                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{t.totalArea.toFixed(1)} ha</p>
+                                                    <p className="text-[10px] font-black uppercase tracking-wide mb-0.5"
+                                                       style={{ color: "var(--text-muted)" }}>
+                                                        Area
+                                                    </p>
+                                                    <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
+                                                        {t.totalArea.toFixed(1)} ha
+                                                    </p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs text-slate-400">Cost</p>
-                                                    <p className="text-sm font-bold text-slate-900 dark:text-white">MWK {fmt(t.totalCost)}</p>
+                                                    <p className="text-[10px] font-black uppercase tracking-wide mb-0.5"
+                                                       style={{ color: "var(--text-muted)" }}>
+                                                        Cost
+                                                    </p>
+                                                    <p className="text-sm font-extrabold" style={{ color: "#DC2626" }}>
+                                                        MWK {fmt(t.totalCost)}
+                                                    </p>
                                                 </div>
-                                                <div className="flex gap-2">
-                                                    {activeCount > 0 && (
-                                                        <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-0.5 rounded-lg font-bold">{activeCount} active</span>
-                                                    )}
-                                                    {harvestedCount > 0 && (
-                                                        <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-0.5 rounded-lg font-bold">{harvestedCount} harvested</span>
-                                                    )}
-                                                </div>
+                                            </div>
+                                            <div className="flex gap-2 flex-wrap">
+                                                {activeCount > 0 && (
+                                                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full"
+                                                          style={{ background: "#ECFDF5", color: "#166534" }}>
+                                                        {activeCount} active
+                                                    </span>
+                                                )}
+                                                {harvestedCount > 0 && (
+                                                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full"
+                                                          style={{ background: "#EFF6FF", color: "#1E3A8A" }}>
+                                                        {harvestedCount} harvested
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     );
@@ -127,54 +179,91 @@ export default function SeasonsPage() {
 
                     {/* Crop records */}
                     {(data?.cropFields ?? []).length > 0 && (
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden mb-6">
-                            <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">Crop records</p>
+                        <div className="rounded-2xl overflow-hidden mb-6"
+                             style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                            <div className="px-5 py-4"
+                                 style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-subtle)" }}>
+                                <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
+                                    Crop records
+                                </p>
                             </div>
-                            <div className="divide-y divide-slate-50 dark:divide-slate-800">
-                                {data.cropFields.map((cf: any) => (
-                                    <div key={cf.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-lg">🌱</span>
-                                            <div>
-                                                <p className="text-sm font-bold text-slate-900 dark:text-white">{cf.cropTypeName}</p>
-                                                <p className="text-xs text-slate-400">{cf.variety} · {cf.fieldName} · {cf.areaPlanted} ha</p>
+                            <div>
+                                {data.cropFields.map((cf: any) => {
+                                    const badge = STATUS_BADGE[cf.status] ?? STATUS_BADGE["Active"];
+                                    return (
+                                        <div key={cf.id}
+                                             className="flex items-center justify-between px-5 py-3.5 transition-colors"
+                                             style={{ borderBottom: "1px solid var(--border)" }}
+                                             onMouseOver={(e) => (e.currentTarget.style.background = "var(--bg-subtle)")}
+                                             onMouseOut={(e)  => (e.currentTarget.style.background = "transparent")}>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-lg">🌱</span>
+                                                <div>
+                                                    <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
+                                                        {cf.cropTypeName}
+                                                    </p>
+                                                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                                        {cf.variety} · {cf.fieldName} · {cf.areaPlanted} ha
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full"
+                                                      style={{ background: badge.bg, color: badge.color }}>
+                                                    {cf.status}
+                                                </span>
+                                                <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
+                                                    MWK {fmt(cf.totalCost)}
+                                                </p>
+                                                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                                    {cf.activityCount} activities
+                                                </p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-lg font-bold ${
-                          cf.status === "Active" ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" :
-                              cf.status === "Harvested" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400" :
-                                  "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                      }`}>{cf.status}</span>
-                                            <p className="text-sm font-bold text-slate-900 dark:text-white">MWK {fmt(cf.totalCost)}</p>
-                                            <p className="text-xs text-slate-400">{cf.activityCount} activities</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
 
-                    {/* Recent activities */}
+                    {/* Season activities */}
                     {(data?.activities ?? []).length > 0 && (
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
-                            <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
-                                <p className="text-sm font-bold text-slate-900 dark:text-white">Season activities</p>
+                        <div className="rounded-2xl overflow-hidden"
+                             style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                            <div className="px-5 py-4"
+                                 style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-subtle)" }}>
+                                <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
+                                    Season activities
+                                </p>
                             </div>
-                            <div className="divide-y divide-slate-50 dark:divide-slate-800">
+                            <div>
                                 {data.activities.slice(0, 10).map((a: any) => (
-                                    <div key={a.id} className="flex items-center justify-between px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                    <div key={a.id}
+                                         className="flex items-center justify-between px-5 py-3 transition-colors"
+                                         style={{ borderBottom: "1px solid var(--border)" }}
+                                         onMouseOver={(e) => (e.currentTarget.style.background = "var(--bg-subtle)")}
+                                         onMouseOut={(e)  => (e.currentTarget.style.background = "transparent")}>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-base">{ACTIVITY_ICONS[a.activityType] ?? "📋"}</span>
+                                            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
+                                                 style={{ background: "var(--bg-subtle)" }}>
+                                                {ACTIVITY_ICONS[a.activityType] ?? "📋"}
+                                            </div>
                                             <div>
-                                                <p className="text-sm font-bold text-slate-900 dark:text-white">{a.activityType}</p>
-                                                <p className="text-xs text-slate-400">{a.fieldName}{a.cropName ? ` · ${a.cropName}` : ""}</p>
+                                                <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
+                                                    {a.activityType}
+                                                </p>
+                                                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                                    {a.fieldName}{a.cropName ? ` · ${a.cropName}` : ""}
+                                                </p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-sm font-bold text-slate-900 dark:text-white">MWK {fmt(a.totalCost)}</p>
-                                            <p className="text-xs text-slate-400">{formatDate(a.date)}</p>
+                                            <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
+                                                MWK {fmt(a.totalCost)}
+                                            </p>
+                                            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                                {formatDate(a.date)}
+                                            </p>
                                         </div>
                                     </div>
                                 ))}

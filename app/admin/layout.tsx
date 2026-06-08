@@ -7,6 +7,7 @@ import {
     LayoutDashboard, Users, CreditCard, Layers,
     LogOut, ChevronLeft, ChevronRight, Receipt,
     MessageSquare, FileText, BarChart2, ChevronRight as Breadcrumb,
+    Sun, Moon,
 } from "lucide-react";
 
 const NAV_GROUPS = [
@@ -37,6 +38,7 @@ const NAV_GROUPS = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [collapsed, setCollapsed] = useState(false);
+    const [theme, setTheme]         = useState<"light" | "dark">("light");
     const pathname = usePathname();
     const router   = useRouter();
 
@@ -46,6 +48,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             .then((r) => { if (r.status === 401) router.push("/admin/login"); })
             .catch(() => router.push("/admin/login"));
     }, [pathname]);
+
+    useEffect(() => {
+        const stored = localStorage.getItem("admin-theme") as "light" | "dark" | null;
+        if (stored) setTheme(stored);
+    }, []);
+
+    const toggleTheme = () => {
+        const next = theme === "light" ? "dark" : "light";
+        setTheme(next);
+        localStorage.setItem("admin-theme", next);
+    };
+
+    const dark = theme === "dark";
 
     if (pathname === "/admin/login") return <>{children}</>;
 
@@ -59,14 +74,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
 
     return (
-        <div className="flex h-screen overflow-hidden" style={{ background: "#F1F5F9" }}>
+        <div className="flex h-screen overflow-hidden"
+             style={{ background: dark ? "#0F172A" : "#F1F5F9" }}>
 
             {/* ── Sidebar ─────────────────────────────────────────────────────── */}
             <aside className={`
-        flex-shrink-0 flex flex-col h-screen sticky top-0
-        transition-all duration-300 ease-in-out
-        ${collapsed ? "w-[4.5rem]" : "w-60"}
-      `}
+                flex-shrink-0 flex flex-col h-screen sticky top-0
+                transition-all duration-300 ease-in-out
+                ${collapsed ? "w-[4.5rem]" : "w-60"}
+            `}
                    style={{ background: "#1E293B", boxShadow: "4px 0 20px rgba(0,0,0,0.15)" }}>
 
                 {/* Logo */}
@@ -110,16 +126,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                     return (
                                         <Link key={href} href={href} title={collapsed ? label : undefined}
                                               className={`
-                        flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5
-                        text-[13px] font-semibold transition-all duration-150
-                        ${collapsed ? "justify-center" : ""}
-                      `}
+                                                flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5
+                                                text-[13px] font-semibold transition-all duration-150
+                                                ${collapsed ? "justify-center" : ""}
+                                              `}
                                               style={{
                                                   background: active ? "rgba(255,255,255,0.12)" : "transparent",
                                                   color:      active ? "white" : "rgba(148,163,184,0.8)",
                                               }}
                                               onMouseOver={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.9)"; } }}
-                                              onMouseOut={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "rgba(148,163,184,0.8)"; } }}>
+                                              onMouseOut={(e)  => { if (!active) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "rgba(148,163,184,0.8)"; } }}>
                                             <Icon size={16} className="flex-shrink-0" />
                                             {!collapsed && <span className="truncate">{label}</span>}
                                         </Link>
@@ -147,9 +163,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <button onClick={() => setCollapsed(!collapsed)}
                         className="absolute -right-3 top-[4.5rem] w-6 h-6 rounded-full flex items-center justify-center z-10"
                         style={{
-                            background:  "#1E293B",
-                            border:      "2px solid #334155",
-                            boxShadow:   "0 2px 8px rgba(0,0,0,0.3)",
+                            background: "#1E293B",
+                            border:     "2px solid #334155",
+                            boxShadow:  "0 2px 8px rgba(0,0,0,0.3)",
                         }}>
                     {collapsed
                         ? <ChevronRight size={11} className="text-white" />
@@ -158,23 +174,42 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </aside>
 
             {/* ── Main content ─────────────────────────────────────────────────── */}
-            <main className="flex-1 min-w-0 overflow-y-auto" style={{ background: "#F1F5F9" }}>
+            <main className="flex-1 min-w-0 overflow-y-auto"
+                  style={{ background: dark ? "#0F172A" : "#F1F5F9" }}>
 
                 {/* Top bar */}
                 <div className="sticky top-0 z-30 h-16 flex items-center justify-between px-8"
-                     style={{ background: "rgba(241,245,249,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid #E2E8F0" }}>
+                     style={{
+                         background:     dark ? "rgba(15,23,42,0.95)" : "rgba(241,245,249,0.95)",
+                         backdropFilter: "blur(12px)",
+                         borderBottom:   `1px solid ${dark ? "#1E293B" : "#E2E8F0"}`,
+                     }}>
 
                     {/* Breadcrumb */}
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-bold" style={{ color: "#94A3B8" }}>Admin</span>
                         <Breadcrumb size={14} style={{ color: "#CBD5E1" }} />
-                        <span className="text-sm font-extrabold" style={{ color: "#0F172A" }}>
-              {currentPage?.label ?? "Overview"}
-            </span>
+                        <span className="text-sm font-extrabold"
+                              style={{ color: dark ? "#F1F5F9" : "#0F172A" }}>
+                            {currentPage?.label ?? "Overview"}
+                        </span>
                     </div>
 
                     {/* Right */}
                     <div className="flex items-center gap-3">
+
+                        {/* Theme toggle */}
+                        <button onClick={toggleTheme}
+                                className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
+                                title={dark ? "Switch to light mode" : "Switch to dark mode"}
+                                style={{
+                                    background: dark ? "#1E293B" : "#E2E8F0",
+                                    color:      dark ? "#94A3B8" : "#64748B",
+                                }}>
+                            {dark ? <Sun size={15} /> : <Moon size={15} />}
+                        </button>
+
+                        {/* Admin avatar */}
                         <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black text-white"
                              style={{ background: "#1E293B" }}>
                             A
