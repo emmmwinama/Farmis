@@ -73,7 +73,7 @@ export async function POST(req: Request) {
 
     const invitedUser = await prisma.user.findUnique({ where: { email } });
     if (!invitedUser) {
-        return NextResponse.json({ error: "No Farmio account found with that email address." }, { status: 404 });
+        return NextResponse.json({ error: "No AgriVault account found with that email address." }, { status: 404 });
     }
 
     const existing = await prisma.teamMember.findFirst({

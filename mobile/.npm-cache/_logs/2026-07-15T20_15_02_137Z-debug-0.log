@@ -1,0 +1,1228 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.13.0
+2 info using node@v26.1.0
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\emmanuel.mwinama\Code\Farmis\mobile\.npmrc
+5 silly config load:file:C:\Users\emmanuel.mwinama\.npmrc
+6 silly config load:file:C:\Users\emmanuel.mwinama\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" ".\\.npm-cache"
+9 verbose logfile logs-max:10 dir:C:\Users\emmanuel.mwinama\Code\Farmis\mobile\.npm-cache\_logs\2026-07-15T20_15_02_137Z-
+10 verbose logfile C:\Users\emmanuel.mwinama\Code\Farmis\mobile\.npm-cache\_logs\2026-07-15T20_15_02_137Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4395630592 maxSize:1098907648 maxEntrySize:549453824
+13 silly idealTree buildDeps
+14 silly fetch manifest @react-native/debugger-frontend@0.86.0
+15 silly packumentCache full:https://registry.npmjs.org/@react-native%2fdebugger-frontend cache-miss
+16 http fetch GET https://registry.npmjs.org/@react-native%2fdebugger-frontend attempt 1 failed with ENOTFOUND
+17 http fetch GET https://registry.npmjs.org/@react-native%2fdebugger-frontend attempt 2 failed with ENOTFOUND
+18 http fetch GET https://registry.npmjs.org/@react-native%2fdebugger-frontend attempt 3 failed with ENOTFOUND
+19 http fetch GET 200 https://registry.npmjs.org/@react-native%2fdebugger-frontend 99040ms (cache stale)
+20 silly packumentCache full:https://registry.npmjs.org/@react-native%2fdebugger-frontend set size:1998582 disposed:false
+21 silly placeDep node_modules/@react-native/dev-middleware @react-native/debugger-frontend@0.86.0 OK for: @react-native/dev-middleware@0.86.0 want: 0.86.0
+22 silly fetch manifest expo-font@~57.0.1
+23 silly packumentCache full:https://registry.npmjs.org/expo-font cache-miss
+24 http fetch GET https://registry.npmjs.org/expo-font attempt 1 failed with ENOTFOUND
+25 http fetch GET https://registry.npmjs.org/expo-font attempt 2 failed with ENOTFOUND
+26 http fetch GET https://registry.npmjs.org/expo-font attempt 3 failed with ENOTFOUND
+27 http fetch GET 200 https://registry.npmjs.org/expo-font 106182ms (cache stale)
+28 silly packumentCache full:https://registry.npmjs.org/expo-font set size:964330 disposed:false
+29 silly fetch manifest expo@*
+30 silly packumentCache full:https://registry.npmjs.org/expo cache-miss
+31 http fetch GET 200 https://registry.npmjs.org/expo 725ms (cache revalidated)
+32 silly packumentCache full:https://registry.npmjs.org/expo set size:3927571 disposed:false
+33 silly fetch manifest @expo/metro-runtime@*
+34 silly packumentCache full:https://registry.npmjs.org/@expo%2fmetro-runtime cache-miss
+35 http fetch GET 200 https://registry.npmjs.org/@expo%2fmetro-runtime 1430ms (cache revalidated)
+36 silly packumentCache full:https://registry.npmjs.org/@expo%2fmetro-runtime set size:756211 disposed:false
+37 silly fetch manifest react@*
+38 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+39 http fetch GET 200 https://registry.npmjs.org/react 161ms (cache revalidated)
+40 silly packumentCache full:https://registry.npmjs.org/react set size:6796788 disposed:false
+41 silly fetch manifest react-dom@*
+42 silly packumentCache full:https://registry.npmjs.org/react-dom cache-miss
+43 http fetch GET 200 https://registry.npmjs.org/react-dom 2070ms (cache revalidated)
+44 silly packumentCache full:https://registry.npmjs.org/react-dom set size:9106365 disposed:false
+45 silly fetch manifest react-native@*
+46 silly packumentCache full:https://registry.npmjs.org/react-native cache-miss
+47 http fetch GET https://registry.npmjs.org/react-native attempt 1 failed with ECONNRESET
+48 http fetch GET 200 https://registry.npmjs.org/react-native 43828ms (cache revalidated)
+49 silly packumentCache full:https://registry.npmjs.org/react-native set size:15499313 disposed:false
+50 silly fetch manifest @react-native/jest-preset@0.86.0
+51 silly packumentCache full:https://registry.npmjs.org/@react-native%2fjest-preset cache-miss
+52 http fetch GET 200 https://registry.npmjs.org/@react-native%2fjest-preset 338ms (cache revalidated)
+53 silly packumentCache full:https://registry.npmjs.org/@react-native%2fjest-preset set size:268799 disposed:false
+54 silly fetch manifest @types/react@^19.1.1
+55 silly packumentCache full:https://registry.npmjs.org/@types%2freact cache-miss
+56 http fetch GET 200 https://registry.npmjs.org/@types%2freact 155ms (cache revalidated)
+57 silly packumentCache full:https://registry.npmjs.org/@types%2freact set size:2632776 disposed:false
+58 silly fetch manifest react-native-web@*
+59 silly packumentCache full:https://registry.npmjs.org/react-native-web cache-miss
+60 http fetch GET 200 https://registry.npmjs.org/react-native-web 12769ms (cache revalidated)
+61 silly packumentCache full:https://registry.npmjs.org/react-native-web set size:1090416 disposed:false
+62 silly fetch manifest react-native-webview@*
+63 silly packumentCache full:https://registry.npmjs.org/react-native-webview cache-miss
+64 http fetch GET 200 https://registry.npmjs.org/react-native-webview 428ms (cache revalidated)
+65 silly packumentCache full:https://registry.npmjs.org/react-native-webview set size:1379763 disposed:false
+66 silly fetch manifest expo-modules-core@~57.0.5
+67 silly packumentCache full:https://registry.npmjs.org/expo-modules-core cache-miss
+68 http fetch GET 200 https://registry.npmjs.org/expo-modules-core 1063ms (cache revalidated)
+69 silly packumentCache full:https://registry.npmjs.org/expo-modules-core set size:1389792 disposed:false
+70 silly fetch manifest react-native-worklets@^0.7.4 || ^0.8.0 || ^0.9.0 || ^0.10.0
+71 silly packumentCache full:https://registry.npmjs.org/react-native-worklets cache-miss
+72 http fetch GET 200 https://registry.npmjs.org/react-native-worklets 138ms (cache revalidated)
+73 silly packumentCache full:https://registry.npmjs.org/react-native-worklets set size:2954654 disposed:false
+74 silly fetch manifest @babel/core@*
+75 silly packumentCache full:https://registry.npmjs.org/@babel%2fcore cache-miss
+76 http fetch GET 200 https://registry.npmjs.org/@babel%2fcore 169ms (cache revalidated)
+77 silly packumentCache full:https://registry.npmjs.org/@babel%2fcore set size:788258 disposed:false
+78 silly fetch manifest @react-native/metro-config@*
+79 silly packumentCache full:https://registry.npmjs.org/@react-native%2fmetro-config cache-miss
+80 http fetch GET 200 https://registry.npmjs.org/@react-native%2fmetro-config 157ms (cache revalidated)
+81 silly packumentCache full:https://registry.npmjs.org/@react-native%2fmetro-config set size:2287267 disposed:false
+82 silly placeDep node_modules/expo expo-font@57.0.1 CONFLICT for: expo@57.0.6 want: ~57.0.1
+83 silly placeDep node_modules/expo expo-modules-core@57.0.5 OK for: expo@57.0.6 want: ~57.0.5
+84 silly fetch manifest lightningcss-darwin-x64@1.32.0
+85 silly packumentCache full:https://registry.npmjs.org/lightningcss-darwin-x64 cache-miss
+86 http fetch GET 200 https://registry.npmjs.org/lightningcss-darwin-x64 115ms (cache revalidated)
+87 silly packumentCache full:https://registry.npmjs.org/lightningcss-darwin-x64 set size:78694 disposed:false
+88 silly fetch manifest lightningcss-linux-x64-gnu@1.32.0
+89 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-x64-gnu cache-miss
+90 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-x64-gnu 133ms (cache revalidated)
+91 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-x64-gnu set size:80105 disposed:false
+92 silly fetch manifest lightningcss-win32-arm64-msvc@1.32.0
+93 silly packumentCache full:https://registry.npmjs.org/lightningcss-win32-arm64-msvc cache-miss
+94 http fetch GET 200 https://registry.npmjs.org/lightningcss-win32-arm64-msvc 427ms (cache revalidated)
+95 silly packumentCache full:https://registry.npmjs.org/lightningcss-win32-arm64-msvc set size:26629 disposed:false
+96 silly fetch manifest lightningcss-darwin-arm64@1.32.0
+97 silly packumentCache full:https://registry.npmjs.org/lightningcss-darwin-arm64 cache-miss
+98 http fetch GET 200 https://registry.npmjs.org/lightningcss-darwin-arm64 152ms (cache revalidated)
+99 silly packumentCache full:https://registry.npmjs.org/lightningcss-darwin-arm64 set size:79276 disposed:false
+100 silly fetch manifest lightningcss-linux-arm64-gnu@1.32.0
+101 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm64-gnu cache-miss
+102 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-arm64-gnu 440ms (cache revalidated)
+103 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm64-gnu set size:80669 disposed:false
+104 silly fetch manifest lightningcss-linux-arm-gnueabihf@1.32.0
+105 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf cache-miss
+106 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf 140ms (cache revalidated)
+107 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm-gnueabihf set size:80903 disposed:false
+108 silly fetch manifest lightningcss-linux-arm64-musl@1.32.0
+109 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm64-musl cache-miss
+110 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-arm64-musl 142ms (cache revalidated)
+111 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-arm64-musl set size:80887 disposed:false
+112 silly fetch manifest lightningcss-linux-x64-musl@1.32.0
+113 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-x64-musl cache-miss
+114 http fetch GET 200 https://registry.npmjs.org/lightningcss-linux-x64-musl 156ms (cache revalidated)
+115 silly packumentCache full:https://registry.npmjs.org/lightningcss-linux-x64-musl set size:80313 disposed:false
+116 silly fetch manifest lightningcss-freebsd-x64@1.32.0
+117 silly packumentCache full:https://registry.npmjs.org/lightningcss-freebsd-x64 cache-miss
+118 http fetch GET 200 https://registry.npmjs.org/lightningcss-freebsd-x64 183ms (cache revalidated)
+119 silly packumentCache full:https://registry.npmjs.org/lightningcss-freebsd-x64 set size:42877 disposed:false
+120 silly fetch manifest lightningcss-android-arm64@1.32.0
+121 silly packumentCache full:https://registry.npmjs.org/lightningcss-android-arm64 cache-miss
+122 http fetch GET 200 https://registry.npmjs.org/lightningcss-android-arm64 149ms (cache revalidated)
+123 silly packumentCache full:https://registry.npmjs.org/lightningcss-android-arm64 set size:7671 disposed:false
+124 silly placeDep ROOT lightningcss-android-arm64@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+125 silly placeDep ROOT lightningcss-darwin-arm64@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+126 silly placeDep ROOT lightningcss-darwin-x64@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+127 silly placeDep ROOT lightningcss-freebsd-x64@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+128 silly placeDep ROOT lightningcss-linux-arm-gnueabihf@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+129 silly placeDep ROOT lightningcss-linux-arm64-gnu@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+130 silly placeDep ROOT lightningcss-linux-arm64-musl@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+131 silly placeDep ROOT lightningcss-linux-x64-gnu@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+132 silly placeDep ROOT lightningcss-linux-x64-musl@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+133 silly placeDep ROOT lightningcss-win32-arm64-msvc@1.32.0 OK for: lightningcss@1.32.0 want: 1.32.0
+134 silly fetch manifest hermes-compiler@250829098.0.14
+135 silly packumentCache full:https://registry.npmjs.org/hermes-compiler cache-miss
+136 http fetch GET 200 https://registry.npmjs.org/hermes-compiler 142ms (cache revalidated)
+137 silly packumentCache full:https://registry.npmjs.org/hermes-compiler set size:161695 disposed:false
+138 silly placeDep node_modules/react-native hermes-compiler@250829098.0.14 OK for: react-native@0.86.0 want: 250829098.0.14
+139 silly reify mark retired [
+139 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo-modules-core'
+139 silly reify ]
+140 silly reify mark retired [
+140 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\hermes-compiler'
+140 silly reify ]
+141 silly reify mark retired [
+141 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-frontend'
+141 silly reify ]
+142 silly reify mark retired [
+142 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\agent-cli-detector',
+142 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\agent-cli-detector',
+142 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\agent-cli-detector.cmd',
+142 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\agent-cli-detector.ps1'
+142 silly reify ]
+143 silly reify mark retired [
+143 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\semver',
+143 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.bin\\semver',
+143 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.bin\\semver.cmd',
+143 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.bin\\semver.ps1'
+143 silly reify ]
+144 silly reify mark retired [
+144 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\acorn',
+144 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\acorn',
+144 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\acorn.cmd',
+144 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\acorn.ps1'
+144 silly reify ]
+145 silly reify mark retired [
+145 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\baseline-browser-mapping',
+145 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\baseline-browser-mapping',
+145 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\baseline-browser-mapping.cmd',
+145 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\baseline-browser-mapping.ps1'
+145 silly reify ]
+146 silly reify mark retired [
+146 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\browserslist',
+146 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\browserslist',
+146 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\browserslist.cmd',
+146 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\browserslist.ps1'
+146 silly reify ]
+147 silly reify mark retired [
+147 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\chrome-launcher',
+147 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\print-chrome-path',
+147 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\print-chrome-path.cmd',
+147 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\print-chrome-path.ps1'
+147 silly reify ]
+148 silly reify mark retired [
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo',
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo',
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo.cmd',
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo.ps1',
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo-modules-autolinking',
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo-modules-autolinking.cmd',
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo-modules-autolinking.ps1',
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\fingerprint',
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\fingerprint.cmd',
+148 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\fingerprint.ps1'
+148 silly reify ]
+149 silly reify mark retired [
+149 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo-modules-autolinking',
+149 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo-modules-autolinking',
+149 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo-modules-autolinking.cmd',
+149 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo-modules-autolinking.ps1'
+149 silly reify ]
+150 silly reify mark retired [
+150 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\image-size',
+150 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\image-size',
+150 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\image-size.cmd',
+150 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\image-size.ps1'
+150 silly reify ]
+151 silly reify mark retired [
+151 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\is-docker',
+151 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\is-docker',
+151 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\is-docker.cmd',
+151 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\is-docker.ps1'
+151 silly reify ]
+152 silly reify mark retired [
+152 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\js-yaml',
+152 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\js-yaml',
+152 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\js-yaml.cmd',
+152 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\js-yaml.ps1'
+152 silly reify ]
+153 silly reify mark retired [
+153 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\json5',
+153 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\json5',
+153 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\json5.cmd',
+153 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\json5.ps1'
+153 silly reify ]
+154 silly reify mark retired [
+154 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\jsesc',
+154 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\jsesc',
+154 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\jsesc.cmd',
+154 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\jsesc.ps1'
+154 silly reify ]
+155 silly reify mark retired [
+155 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\lan-network',
+155 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\lan-network',
+155 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\lan-network.cmd',
+155 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\lan-network.ps1'
+155 silly reify ]
+156 silly reify mark retired [
+156 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\loose-envify',
+156 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\loose-envify',
+156 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\loose-envify.cmd',
+156 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\loose-envify.ps1'
+156 silly reify ]
+157 silly reify mark retired [
+157 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\metro',
+157 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro',
+157 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro.cmd',
+157 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro.ps1'
+157 silly reify ]
+158 silly reify mark retired [
+158 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\metro-symbolicate',
+158 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro-symbolicate',
+158 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro-symbolicate.cmd',
+158 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro-symbolicate.ps1'
+158 silly reify ]
+159 silly reify mark retired [
+159 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\mime',
+159 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mime',
+159 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mime.cmd',
+159 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mime.ps1'
+159 silly reify ]
+160 silly reify mark retired [
+160 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\mkdirp',
+160 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mkdirp',
+160 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mkdirp.cmd',
+160 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mkdirp.ps1'
+160 silly reify ]
+161 silly reify mark retired [
+161 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\nanoid',
+161 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\nanoid',
+161 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\nanoid.cmd',
+161 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\nanoid.ps1'
+161 silly reify ]
+162 silly reify mark retired [
+162 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\react-native',
+162 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\react-native',
+162 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\react-native.cmd',
+162 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\react-native.ps1'
+162 silly reify ]
+163 silly reify mark retired [
+163 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\regjsparser',
+163 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\regjsparser',
+163 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\regjsparser.cmd',
+163 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\regjsparser.ps1'
+163 silly reify ]
+164 silly reify mark retired [
+164 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\resolve',
+164 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\resolve',
+164 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\resolve.cmd',
+164 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\resolve.ps1'
+164 silly reify ]
+165 silly reify mark retired [
+165 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\semver',
+165 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\semver',
+165 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\semver.cmd',
+165 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\semver.ps1'
+165 silly reify ]
+166 silly reify mark retired [
+166 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\terser',
+166 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\terser',
+166 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\terser.cmd',
+166 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\terser.ps1'
+166 silly reify ]
+167 silly reify mark retired [
+167 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\update-browserslist-db',
+167 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\update-browserslist-db',
+167 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\update-browserslist-db.cmd',
+167 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\update-browserslist-db.ps1'
+167 silly reify ]
+168 silly reify mark retired [
+168 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\uuid',
+168 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\uuid',
+168 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\uuid.cmd',
+168 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\uuid.ps1'
+168 silly reify ]
+169 silly reify mark retired [
+169 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\which',
+169 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\node-which',
+169 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\node-which.cmd',
+169 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\node-which.ps1'
+169 silly reify ]
+170 silly reify mark retired [
+170 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\yaml',
+170 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\yaml',
+170 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\yaml.cmd',
+170 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\yaml.ps1'
+170 silly reify ]
+171 silly reify mark retired [
+171 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\semver',
+171 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.bin\\semver',
+171 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.bin\\semver.cmd',
+171 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.bin\\semver.ps1'
+171 silly reify ]
+172 silly reify mark retired [
+172 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\semver',
+172 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.bin\\semver',
+172 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.bin\\semver.cmd',
+172 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.bin\\semver.ps1'
+172 silly reify ]
+173 silly reify mark retired [
+173 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\semver',
+173 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.bin\\semver',
+173 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.bin\\semver.cmd',
+173 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.bin\\semver.ps1'
+173 silly reify ]
+174 silly reify mark retired [
+174 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\semver',
+174 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.bin\\semver',
+174 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.bin\\semver.cmd',
+174 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.bin\\semver.ps1'
+174 silly reify ]
+175 silly reify mark retired [
+175 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\parser',
+175 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\parser',
+175 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\parser.cmd',
+175 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\parser.ps1'
+175 silly reify ]
+176 silly reify mark retired [
+176 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\semver',
+176 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.bin\\semver',
+176 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.bin\\semver.cmd',
+176 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.bin\\semver.ps1'
+176 silly reify ]
+177 silly reify mark retired [
+177 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@expo\\fingerprint',
+177 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\fingerprint',
+177 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\fingerprint.cmd',
+177 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\fingerprint.ps1'
+177 silly reify ]
+178 silly reify mark retired [
+178 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@expo\\xcpretty',
+178 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\excpretty',
+178 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\excpretty.cmd',
+178 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\excpretty.ps1'
+178 silly reify ]
+179 silly reify mark retired [
+179 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\typescript',
+179 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsc',
+179 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsc.cmd',
+179 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsc.ps1',
+179 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsserver',
+179 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsserver.cmd',
+179 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsserver.ps1'
+179 silly reify ]
+180 silly reify mark retired [
+180 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\fb-dotslash',
+180 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.bin\\dotslash',
+180 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.bin\\dotslash.cmd',
+180 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.bin\\dotslash.ps1'
+180 silly reify ]
+181 silly reify moves {
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo-modules-core': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.expo-modules-core-6mZXIKsX',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\hermes-compiler': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.hermes-compiler-Aj6HW2wf',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-frontend': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\.debugger-frontend-54BTUH1Q',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\agent-cli-detector': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.agent-cli-detector-KHTjQb0B',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\agent-cli-detector': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.agent-cli-detector-bqOfU0JM',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\agent-cli-detector.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.agent-cli-detector.cmd-2WQf00hn',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\agent-cli-detector.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.agent-cli-detector.ps1-rREdl3ye',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.semver-af8CoV02',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.bin\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.bin\\.semver-513ztzVH',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.bin\\.semver.cmd-x3ffGe2b',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\babel-plugin-polyfill-corejs2\\node_modules\\.bin\\.semver.ps1-99DrFGZ1',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\acorn': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.acorn-fsQNhDhF',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\acorn': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.acorn-OkW04Ddl',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\acorn.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.acorn.cmd-DgouiIsb',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\acorn.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.acorn.ps1-2oYc8IGW',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\baseline-browser-mapping': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.baseline-browser-mapping-E4M30pLM',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\baseline-browser-mapping': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.baseline-browser-mapping-h1EJ9u83',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\baseline-browser-mapping.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.baseline-browser-mapping.cmd-M521m7K9',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\baseline-browser-mapping.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.baseline-browser-mapping.ps1-1epfsJ06',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\browserslist': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.browserslist-knQ5xDRz',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\browserslist': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.browserslist-DwY0LMYf',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\browserslist.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.browserslist.cmd-qiyxZaMf',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\browserslist.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.browserslist.ps1-jgJFoH0w',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\chrome-launcher': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.chrome-launcher-lRD1PYyV',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\print-chrome-path': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.print-chrome-path-X8ZuhAWc',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\print-chrome-path.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.print-chrome-path.cmd-sJ96aDem',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\print-chrome-path.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.print-chrome-path.ps1-PfQnl6gB',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.expo-O2KtJO2g',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.expo-sliG52pE',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.expo.cmd-t3NXeQbG',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.expo.ps1-oGObZzXh',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo-modules-autolinking': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.expo-modules-autolinking-CkI0eBYx',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo-modules-autolinking.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.expo-modules-autolinking.cmd-q9T0mjy6',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\expo-modules-autolinking.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.expo-modules-autolinking.ps1-vYhwwurz',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\fingerprint': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.fingerprint-kwDCPmFQ',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\fingerprint.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.fingerprint.cmd-LSNKQtqP',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\fingerprint.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.fingerprint.ps1-N9ObFqXM',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo-modules-autolinking': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.expo-modules-autolinking-sOmy3H2G',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\image-size': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.image-size-kHM0CQce',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\image-size': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.image-size-PYPjw8BU',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\image-size.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.image-size.cmd-neLptuOD',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\image-size.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.image-size.ps1-pttWgU7z',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\is-docker': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.is-docker-J0wWW7Yk',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\is-docker': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.is-docker-emz3NBam',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\is-docker.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.is-docker.cmd-w4xb8bZy',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\is-docker.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.is-docker.ps1-8QTE0wet',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\js-yaml': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.js-yaml-M4PqiPWM',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\js-yaml': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.js-yaml-qvRt1O7D',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\js-yaml.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.js-yaml.cmd-gDBy6BG9',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\js-yaml.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.js-yaml.ps1-hg1FlAqa',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\json5': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.json5-EOPtTJlh',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\json5': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.json5-q1F8TLgc',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\json5.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.json5.cmd-dAuWF8sk',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\json5.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.json5.ps1-mT4zrVgc',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\jsesc': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.jsesc-edzmUzSV',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\jsesc': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.jsesc-vEb8sqo8',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\jsesc.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.jsesc.cmd-nFtYbWVc',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\jsesc.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.jsesc.ps1-lploog5l',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\lan-network': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.lan-network-hPb7PGR2',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\lan-network': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.lan-network-05PAt0YE',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\lan-network.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.lan-network.cmd-TxOogGFR',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\lan-network.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.lan-network.ps1-sADRzz7h',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\loose-envify': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.loose-envify-BH1jgwEG',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\loose-envify': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.loose-envify-JVGf0IOv',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\loose-envify.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.loose-envify.cmd-gPfPwae7',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\loose-envify.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.loose-envify.ps1-jRjCC9u2',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\metro': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.metro-RmabqAAa',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.metro-Kvl58IPv',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.metro.cmd-hp1TJ3aP',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.metro.ps1-tDIbPKaH',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\metro-symbolicate': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.metro-symbolicate-a8xm1Y1z',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro-symbolicate': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.metro-symbolicate-oPO9MJ9z',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro-symbolicate.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.metro-symbolicate.cmd-c2JDOpnL',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\metro-symbolicate.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.metro-symbolicate.ps1-wugFZBIe',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\mime': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.mime-K2Yf891M',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mime': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.mime-jm03Zs2y',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mime.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.mime.cmd-aXobNSno',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mime.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.mime.ps1-CVbg9RYD',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\mkdirp': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.mkdirp-ULYqNyIM',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mkdirp': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.mkdirp-JJTjGi1j',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mkdirp.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.mkdirp.cmd-LCyPmgwq',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\mkdirp.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.mkdirp.ps1-rFHVfRwl',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\nanoid': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.nanoid-TqJmJOkX',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\nanoid': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.nanoid-rVICkFDO',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\nanoid.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.nanoid.cmd-NeBB1LWp',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\nanoid.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.nanoid.ps1-gPaBmkwI',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\react-native': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.react-native-1yFqDm8b',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\react-native': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.react-native-aBCYCHy4',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\react-native.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.react-native.cmd-fU5GsACR',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\react-native.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.react-native.ps1-uqQdTCPn',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\regjsparser': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.regjsparser-mE8jV83U',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\regjsparser': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.regjsparser-8E05S7HK',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\regjsparser.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.regjsparser.cmd-4k5MOHgZ',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\regjsparser.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.regjsparser.ps1-di7iGSmc',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\resolve': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.resolve-cdF4dJYp',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\resolve': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.resolve-86LQKdkA',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\resolve.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.resolve.cmd-VZjrh1Ha',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\resolve.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.resolve.ps1-5Bepfk2j',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.semver-pAnpRG3N',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.semver-jufhytZg',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.semver.cmd-1KTIiWEJ',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.semver.ps1-3xnUEAAf',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\terser': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.terser-MARodS0j',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\terser': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.terser-5urjiXWM',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\terser.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.terser.cmd-ki14hrWV',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\terser.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.terser.ps1-ftDOiJO7',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\update-browserslist-db': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.update-browserslist-db-SVcGqoFd',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\update-browserslist-db': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.update-browserslist-db-UgvqGrYG',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\update-browserslist-db.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.update-browserslist-db.cmd-HHTVJtRB',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\update-browserslist-db.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.update-browserslist-db.ps1-VOsMMGrX',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\uuid': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.uuid-7ggvBhkS',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\uuid': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.uuid-eSSDlZND',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\uuid.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.uuid.cmd-5vuJTrDc',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\uuid.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.uuid.ps1-dhmfqGCk',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\which': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.which-3IHdb1Bv',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\node-which': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.node-which-OTGRknNc',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\node-which.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.node-which.cmd-WgAIO43n',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\node-which.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.node-which.ps1-97hZGJVc',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\yaml': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.yaml-Fv1AN3MT',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\yaml': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.yaml-rucHUm5C',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\yaml.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.yaml.cmd-8NRzzRs3',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\yaml.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.yaml.ps1-VbM5lzp3',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.semver-Tgx7xvpB',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.bin\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.bin\\.semver-oCkeWGwH',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.bin\\.semver.cmd-4ZzLUCIC',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\core\\node_modules\\.bin\\.semver.ps1-KhY3BqV8',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.semver-7ziPSASm',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.bin\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.bin\\.semver-9RY8Psk1',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.bin\\.semver.cmd-nCy4v73s',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-compilation-targets\\node_modules\\.bin\\.semver.ps1-sE3eHU0P',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.semver-syvrie9o',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.bin\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.bin\\.semver-GY5chqDo',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.bin\\.semver.cmd-dNXvlqmc',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-class-features-plugin\\node_modules\\.bin\\.semver.ps1-bu4v2vEm',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.semver-gRsGBTJT',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.bin\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.bin\\.semver-1rY5qVQl',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.bin\\.semver.cmd-gMQZdYT4',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\helper-create-regexp-features-plugin\\node_modules\\.bin\\.semver.ps1-Ehq4SUqP',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\parser': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\.parser-lUdRbB9r',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\parser': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.parser-drRnIAc3',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\parser.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.parser.cmd-MJOS6tRL',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\parser.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.parser.ps1-y67bN4Cq',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.semver-SL2Ccsb3',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.bin\\semver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.bin\\.semver-zYcbbyo1',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.bin\\semver.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.bin\\.semver.cmd-Elp1xDh8',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.bin\\semver.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@babel\\plugin-transform-runtime\\node_modules\\.bin\\.semver.ps1-LDizFRbN',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@expo\\fingerprint': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@expo\\.fingerprint-W51QVYBD',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@expo\\xcpretty': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@expo\\.xcpretty-beJM9jMd',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\excpretty': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.excpretty-XQHKaLxb',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\excpretty.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.excpretty.cmd-3BNr2uH9',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\excpretty.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.excpretty.ps1-dX6UfQox',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\typescript': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.typescript-FPtfLX6H',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsc': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.tsc-HV1Bpb8r',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsc.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.tsc.cmd-9fN6XUH5',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsc.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.tsc.ps1-fiibecEd',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsserver': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.tsserver-lnZywURw',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsserver.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.tsserver.cmd-Fe6Przx4',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\tsserver.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\.bin\\.tsserver.ps1-quzKb2S9',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\fb-dotslash': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.fb-dotslash-cVeb5zu6',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.bin\\dotslash': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.bin\\.dotslash-zubexSkS',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.bin\\dotslash.cmd': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.bin\\.dotslash.cmd-Y1UG2pEM',
+181 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.bin\\dotslash.ps1': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\@react-native\\debugger-shell\\node_modules\\.bin\\.dotslash.ps1-K1kcG5pr'
+181 silly reify }
+182 silly audit bulk request {
+182 silly audit   acorn: [ '8.17.0' ],
+182 silly audit   'abort-controller': [ '3.0.0' ],
+182 silly audit   'agent-base': [ '7.1.4' ],
+182 silly audit   accepts: [ '2.0.0', '1.3.8' ],
+182 silly audit   'agent-cli-detector': [ '0.1.2' ],
+182 silly audit   anser: [ '1.4.10' ],
+182 silly audit   'ansi-escapes': [ '4.3.2' ],
+182 silly audit   'type-fest': [ '0.21.3', '0.7.1' ],
+182 silly audit   'ansi-regex': [ '5.0.1', '4.1.1' ],
+182 silly audit   'ansi-styles': [ '4.3.0', '3.2.1', '5.2.0' ],
+182 silly audit   arg: [ '5.0.2' ],
+182 silly audit   argparse: [ '2.0.1' ],
+182 silly audit   asap: [ '2.0.6' ],
+182 silly audit   'babel-plugin-polyfill-corejs3': [ '0.13.0' ],
+182 silly audit   'babel-plugin-polyfill-corejs2': [ '0.4.17' ],
+182 silly audit   semver: [ '6.3.1', '7.8.5' ],
+182 silly audit   'babel-plugin-polyfill-regenerator': [ '0.6.8' ],
+182 silly audit   'babel-plugin-react-compiler': [ '1.0.0' ],
+182 silly audit   'babel-plugin-react-native-web': [ '0.21.2' ],
+182 silly audit   'babel-plugin-syntax-hermes-parser': [ '0.36.0' ],
+182 silly audit   'hermes-estree': [ '0.36.0', '0.36.1', '0.35.0' ],
+182 silly audit   'hermes-parser': [ '0.36.0', '0.36.1', '0.35.0' ],
+182 silly audit   'babel-plugin-transform-flow-enums': [ '0.0.2' ],
+182 silly audit   'balanced-match': [ '4.0.4' ],
+182 silly audit   'base64-js': [ '1.5.1' ],
+182 silly audit   'baseline-browser-mapping': [ '2.10.43' ],
+182 silly audit   'bplist-creator': [ '0.1.0' ],
+182 silly audit   'big-integer': [ '1.6.52' ],
+182 silly audit   'bplist-parser': [ '0.3.1' ],
+182 silly audit   braces: [ '3.0.3' ],
+182 silly audit   'brace-expansion': [ '5.0.7' ],
+182 silly audit   browserslist: [ '4.28.6' ],
+182 silly audit   bser: [ '2.1.1' ],
+182 silly audit   'buffer-from': [ '1.1.2' ],
+182 silly audit   bytes: [ '3.1.2' ],
+182 silly audit   camelcase: [ '6.3.0' ],
+182 silly audit   chalk: [ '4.1.2', '2.4.2' ],
+182 silly audit   'caniuse-lite': [ '1.0.30001805' ],
+182 silly audit   'chrome-launcher': [ '0.15.2' ],
+182 silly audit   'chromium-edge-launcher': [ '0.3.0' ],
+182 silly audit   'ci-info': [ '2.0.0', '3.9.0' ],
+182 silly audit   'cli-cursor': [ '2.1.0' ],
+182 silly audit   'cli-spinners': [ '2.9.2' ],
+182 silly audit   cliui: [ '8.0.1' ],
+182 silly audit   'color-convert': [ '2.0.1', '1.9.3' ],
+182 silly audit   commander: [ '7.2.0', '12.1.0', '2.20.3' ],
+182 silly audit   'color-name': [ '1.1.4', '1.1.3' ],
+182 silly audit   compressible: [ '2.0.18' ],
+182 silly audit   compression: [ '1.8.1' ],
+182 silly audit   debug: [ '2.6.9', '4.4.3', '3.2.7' ],
+182 silly audit   negotiator: [ '0.6.4', '0.6.3', '1.0.0' ],
+182 silly audit   ms: [ '2.0.0', '2.1.3' ],
+182 silly audit   connect: [ '3.7.0' ],
+182 silly audit   'convert-source-map': [ '2.0.0' ],
+182 silly audit   'core-js-compat': [ '3.49.0' ],
+182 silly audit   'cross-spawn': [ '7.0.6' ],
+182 silly audit   csstype: [ '3.2.3' ],
+182 silly audit   deepmerge: [ '4.3.1' ],
+182 silly audit   defaults: [ '1.0.4' ],
+182 silly audit   depd: [ '2.0.0' ],
+182 silly audit   destroy: [ '1.2.0' ],
+182 silly audit   'detect-libc': [ '2.1.2' ],
+182 silly audit   'dnssd-advertise': [ '1.1.6' ],
+182 silly audit   'ee-first': [ '1.1.1' ],
+182 silly audit   'electron-to-chromium': [ '1.5.392' ],
+182 silly audit   'emoji-regex': [ '8.0.0' ],
+182 silly audit   encodeurl: [ '1.0.2', '2.0.0' ],
+182 silly audit   'error-stack-parser': [ '2.1.4' ],
+182 silly audit   'es-errors': [ '1.3.0' ],
+182 silly audit   escalade: [ '3.2.0' ],
+182 silly audit   'escape-html': [ '1.0.3' ],
+182 silly audit   'escape-string-regexp': [ '4.0.0', '1.0.5' ],
+182 silly audit   etag: [ '1.8.1' ],
+182 silly audit   'event-target-shim': [ '5.0.1' ],
+182 silly audit   expo: [ '57.0.6' ],
+182 silly audit   'expo-asset': [ '57.0.5' ],
+182 silly audit   'babel-preset-expo': [ '57.0.3' ],
+182 silly audit   'expo-constants': [ '57.0.5' ],
+182 silly audit   'expo-file-system': [ '57.0.1' ],
+182 silly audit   'expo-keep-awake': [ '57.0.1' ],
+182 silly audit   'mime-db': [ '1.52.0', '1.54.0' ],
+182 silly audit   'mime-types': [ '2.1.35', '3.0.2' ],
+182 silly audit   ws: [ '8.21.1', '7.5.12' ],
+182 silly audit   picomatch: [ '4.0.5', '2.3.2' ],
+182 silly audit   '@expo/cli': [ '57.0.8' ],
+182 silly audit   '@expo/router-server': [ '57.0.3' ],
+182 silly audit   '@expo/dom-webview': [ '57.0.1' ],
+182 silly audit   '@expo/metro-config': [ '57.0.5' ],
+182 silly audit   '@expo/ws-tunnel': [ '2.0.0' ],
+182 silly audit   '@expo/log-box': [ '57.0.1' ],
+182 silly audit   'expo-modules-autolinking': [ '57.0.7' ],
+182 silly audit   'expo-server': [ '57.0.1' ],
+182 silly audit   'expo-secure-store': [ '57.0.1' ],
+182 silly audit   'expo-status-bar': [ '57.0.1' ],
+182 silly audit   'exponential-backoff': [ '3.1.3' ],
+182 silly audit   'fb-watchman': [ '2.0.2' ],
+182 silly audit   'fetch-nodeshim': [ '0.4.10' ],
+182 silly audit   'fill-range': [ '7.1.1' ],
+182 silly audit   finalhandler: [ '1.1.2' ],
+182 silly audit   'flow-enums-runtime': [ '0.0.6' ],
+182 silly audit   fontfaceobserver: [ '2.3.0' ],
+182 silly audit   fresh: [ '0.5.2' ],
+182 silly audit   'function-bind': [ '1.1.2' ],
+182 silly audit   gensync: [ '1.0.0-beta.2' ],
+182 silly audit   'get-caller-file': [ '2.0.5' ],
+182 silly audit   getenv: [ '2.0.0' ],
+182 silly audit   glob: [ '13.0.6' ],
+182 silly audit   'graceful-fs': [ '4.2.11' ],
+182 silly audit   'has-flag': [ '4.0.0', '3.0.0' ],
+182 silly audit   hasown: [ '2.0.4' ],
+182 silly audit   'hosted-git-info': [ '7.0.2' ],
+182 silly audit   'lru-cache': [ '10.4.3', '5.1.1', '11.5.2' ],
+182 silly audit   'http-errors': [ '2.0.1' ],
+182 silly audit   statuses: [ '2.0.2', '1.5.0' ],
+182 silly audit   'https-proxy-agent': [ '7.0.6' ],
+182 silly audit   ignore: [ '5.3.2' ],
+182 silly audit   'image-size': [ '1.2.1' ],
+182 silly audit   inherits: [ '2.0.4' ],
+182 silly audit   invariant: [ '2.2.4' ],
+182 silly audit   'is-core-module': [ '2.16.2' ],
+182 silly audit   'is-docker': [ '2.2.1' ],
+182 silly audit   'is-fullwidth-code-point': [ '3.0.0' ],
+182 silly audit   'is-number': [ '7.0.0' ],
+182 silly audit   'is-wsl': [ '2.2.0' ],
+182 silly audit   isexe: [ '2.0.0' ],
+182 silly audit   'jest-get-type': [ '29.6.3' ],
+182 silly audit   'jest-util': [ '29.7.0' ],
+182 silly audit   'jest-validate': [ '29.7.0' ],
+182 silly audit   'jest-worker': [ '29.7.0' ],
+182 silly audit   'supports-color': [ '8.1.1', '5.5.0', '7.2.0' ],
+182 silly audit   'jimp-compact': [ '0.16.1' ],
+182 silly audit   'js-tokens': [ '4.0.0' ],
+182 silly audit   'js-yaml': [ '4.3.0' ],
+182 silly audit   'jsc-safe-url': [ '0.2.4' ],
+182 silly audit   jsesc: [ '3.1.0' ],
+182 silly audit   json5: [ '2.2.3' ],
+182 silly audit   kleur: [ '3.0.3' ],
+182 silly audit   'lan-network': [ '0.2.1' ],
+182 silly audit   leven: [ '3.1.0' ],
+182 silly audit   'lighthouse-logger': [ '1.4.2' ],
+182 silly audit   lightningcss: [ '1.32.0' ],
+182 silly audit   'lightningcss-win32-x64-msvc': [ '1.32.0' ],
+182 silly audit   'lodash.debounce': [ '4.0.8' ],
+182 silly audit   'lodash.throttle': [ '4.1.1' ],
+182 silly audit   'log-symbols': [ '2.2.0' ],
+182 silly audit   'loose-envify': [ '1.4.0' ],
+182 silly audit   marky: [ '1.3.0' ],
+182 silly audit   makeerror: [ '1.0.12' ],
+182 silly audit   'memoize-one': [ '5.2.1' ],
+182 silly audit   'merge-stream': [ '2.0.0' ],
+182 silly audit   metro: [ '0.84.4' ],
+182 silly audit   'metro-babel-transformer': [ '0.84.4' ],
+182 silly audit   'metro-cache': [ '0.84.4' ],
+182 silly audit   'metro-cache-key': [ '0.84.4' ],
+182 silly audit   'metro-config': [ '0.84.4' ],
+182 silly audit   'metro-core': [ '0.84.4' ],
+182 silly audit   'metro-file-map': [ '0.84.4' ],
+182 silly audit   'metro-minify-terser': [ '0.84.4' ],
+182 silly audit   'metro-resolver': [ '0.84.4' ],
+182 silly audit   'metro-runtime': [ '0.84.4' ],
+182 silly audit   'metro-source-map': [ '0.84.4' ],
+182 silly audit   'metro-symbolicate': [ '0.84.4' ],
+182 silly audit   'metro-transform-plugins': [ '0.84.4' ],
+182 silly audit   'metro-transform-worker': [ '0.84.4' ],
+182 silly audit   micromatch: [ '4.0.8' ],
+182 silly audit   mime: [ '1.6.0' ],
+182 silly audit   minimatch: [ '10.2.5' ],
+182 silly audit   minipass: [ '7.1.3' ],
+182 silly audit   'mimic-fn': [ '1.2.0' ],
+182 silly audit   mkdirp: [ '1.0.4' ],
+182 silly audit   multitars: [ '1.0.0' ],
+182 silly audit   nanoid: [ '3.3.16' ],
+182 silly audit   'node-int64': [ '0.4.0' ],
+182 silly audit   'node-releases': [ '2.0.51' ],
+182 silly audit   'node-forge': [ '1.4.0' ],
+182 silly audit   nullthrows: [ '1.1.1' ],
+182 silly audit   ob1: [ '0.84.4' ],
+182 silly audit   'on-finished': [ '2.3.0', '2.4.1' ],
+182 silly audit   'on-headers': [ '1.1.0' ],
+182 silly audit   onetime: [ '2.0.1' ],
+182 silly audit   'npm-package-arg': [ '11.0.3' ],
+182 silly audit   open: [ '7.4.2' ],
+182 silly audit   ora: [ '3.4.0' ],
+182 silly audit   'strip-ansi': [ '5.2.0', '6.0.1' ],
+182 silly audit   'parse-png': [ '2.1.0' ],
+182 silly audit   parseurl: [ '1.3.3' ],
+182 silly audit   'path-key': [ '3.1.1' ],
+182 silly audit   'path-parse': [ '1.0.7' ],
+182 silly audit   'path-scurry': [ '2.0.2' ],
+182 silly audit   picocolors: [ '1.1.1' ],
+182 silly audit   plist: [ '3.1.1' ],
+182 silly audit   '@xmldom/xmldom': [ '0.9.10', '0.8.13' ],
+182 silly audit   pngjs: [ '3.4.0' ],
+182 silly audit   'pretty-format': [ '29.7.0' ],
+182 silly audit   postcss: [ '8.5.19' ],
+182 silly audit   progress: [ '2.0.3' ],
+182 silly audit   'proc-log': [ '4.2.0' ],
+182 silly audit   promise: [ '8.3.0' ],
+182 silly audit   prompts: [ '2.4.2' ],
+182 silly audit   queue: [ '6.0.2' ],
+182 silly audit   'range-parser': [ '1.2.1' ],
+182 silly audit   react: [ '19.2.3' ],
+182 silly audit   'react-devtools-core': [ '6.1.5' ],
+182 silly audit   'react-is': [ '18.3.1' ],
+182 silly audit   'react-native': [ '0.86.0' ],
+182 silly audit   'react-refresh': [ '0.14.2' ],
+182 silly audit   regenerate: [ '1.4.2' ],
+182 silly audit   'regenerate-unicode-properties': [ '10.2.2' ],
+182 silly audit   'regenerator-runtime': [ '0.13.11' ],
+182 silly audit   'regexpu-core': [ '6.4.0' ],
+182 silly audit   regjsgen: [ '0.8.0' ],
+182 silly audit   'require-directory': [ '2.1.1' ],
+182 silly audit   resolve: [ '1.22.12' ],
+182 silly audit   'resolve-from': [ '5.0.0' ],
+182 silly audit   regjsparser: [ '0.13.2' ],
+182 silly audit   'restore-cursor': [ '2.0.0' ],
+182 silly audit   'resolve-workspace-root': [ '2.0.1' ],
+182 silly audit   'safe-buffer': [ '5.2.1' ],
+182 silly audit   sax: [ '1.6.0' ],
+182 silly audit   scheduler: [ '0.27.0' ],
+182 silly audit   send: [ '0.19.2' ],
+182 silly audit   'serialize-error': [ '2.1.0' ],
+182 silly audit   'serve-static': [ '1.16.3' ],
+182 silly audit   setprototypeof: [ '1.2.0' ],
+182 silly audit   'shebang-command': [ '2.0.0' ],
+182 silly audit   'shebang-regex': [ '3.0.0' ],
+182 silly audit   'shell-quote': [ '1.10.0' ],
+182 silly audit   'simple-plist': [ '1.3.1' ],
+182 silly audit   'signal-exit': [ '3.0.7' ],
+182 silly audit   sisteransi: [ '1.0.5' ],
+182 silly audit   slugify: [ '1.6.9' ],
+182 silly audit   'source-map': [ '0.5.7', '0.6.1' ],
+182 silly audit   'source-map-js': [ '1.2.1' ],
+182 silly audit   'source-map-support': [ '0.5.21' ],
+182 silly audit   stackframe: [ '1.3.4' ],
+182 silly audit   'stacktrace-parser': [ '0.1.11' ],
+182 silly audit   'stream-buffers': [ '2.2.0' ],
+182 silly audit   'string-width': [ '4.2.3' ],
+182 silly audit   'structured-headers': [ '0.4.1' ],
+182 silly audit   'supports-hyperlinks': [ '2.3.0' ],
+182 silly audit   'supports-preserve-symlinks-flag': [ '1.0.0' ],
+182 silly audit   'terminal-link': [ '2.1.1' ],
+182 silly audit   terser: [ '5.49.0' ],
+182 silly audit   throat: [ '5.0.0' ],
+182 silly audit   tinyglobby: [ '0.2.17' ],
+182 silly audit   fdir: [ '6.5.0' ],
+182 silly audit   tmpl: [ '1.0.5' ],
+182 silly audit   'to-regex-range': [ '5.0.1' ],
+182 silly audit   toidentifier: [ '1.0.1' ],
+182 silly audit   typescript: [ '6.0.3' ],
+182 silly audit   toqr: [ '0.1.1' ],
+182 silly audit   'undici-types': [ '8.3.0' ],
+182 silly audit   'unicode-canonical-property-names-ecmascript': [ '2.0.1' ],
+182 silly audit   'unicode-match-property-ecmascript': [ '2.0.0' ],
+182 silly audit   'unicode-match-property-value-ecmascript': [ '2.2.1' ],
+182 silly audit   'unicode-property-aliases-ecmascript': [ '2.2.0' ],
+182 silly audit   unpipe: [ '1.0.0' ],
+182 silly audit   'update-browserslist-db': [ '1.2.3' ],
+182 silly audit   'utils-merge': [ '1.0.1' ],
+182 silly audit   uuid: [ '7.0.3' ],
+182 silly audit   vary: [ '1.1.2' ],
+182 silly audit   'validate-npm-package-name': [ '5.0.1' ],
+182 silly audit   vlq: [ '1.0.1' ],
+182 silly audit   wcwidth: [ '1.0.1' ],
+182 silly audit   walker: [ '1.0.8' ],
+182 silly audit   'whatwg-fetch': [ '3.6.20' ],
+182 silly audit   'whatwg-url-minimum': [ '0.1.2' ],
+182 silly audit   which: [ '2.0.2' ],
+182 silly audit   'wrap-ansi': [ '7.0.0' ],
+182 silly audit   xcode: [ '3.0.1' ],
+182 silly audit   xml2js: [ '0.6.0' ],
+182 silly audit   xmlbuilder: [ '11.0.1', '15.1.1' ],
+182 silly audit   y18n: [ '5.0.8' ],
+182 silly audit   yallist: [ '3.1.1' ],
+182 silly audit   yaml: [ '2.9.0' ],
+182 silly audit   yargs: [ '17.7.3' ],
+182 silly audit   'yargs-parser': [ '21.1.1' ],
+182 silly audit   zod: [ '3.25.76' ],
+182 silly audit   clone: [ '1.0.4' ],
+182 silly audit   'expo-modules-jsi': [ '57.0.3' ],
+182 silly audit   '@babel/code-frame': [ '7.29.7' ],
+182 silly audit   '@babel/core': [ '7.29.7' ],
+182 silly audit   '@babel/compat-data': [ '7.29.7' ],
+182 silly audit   '@babel/helper-annotate-as-pure': [ '7.29.7' ],
+182 silly audit   '@babel/generator': [ '7.29.7' ],
+182 silly audit   '@babel/helper-compilation-targets': [ '7.29.7' ],
+182 silly audit   '@babel/helper-create-class-features-plugin': [ '7.29.7' ],
+182 silly audit   '@babel/helper-create-regexp-features-plugin': [ '7.29.7' ],
+182 silly audit   '@babel/helper-define-polyfill-provider': [ '0.6.8' ],
+182 silly audit   '@babel/helper-globals': [ '7.29.7' ],
+182 silly audit   '@babel/helper-member-expression-to-functions': [ '7.29.7' ],
+182 silly audit   '@babel/helper-module-imports': [ '7.29.7' ],
+182 silly audit   '@babel/helper-module-transforms': [ '7.29.7' ],
+182 silly audit   '@babel/helper-optimise-call-expression': [ '7.29.7' ],
+182 silly audit   '@babel/helper-plugin-utils': [ '7.29.7' ],
+182 silly audit   '@babel/helper-remap-async-to-generator': [ '7.29.7' ],
+182 silly audit   '@babel/helper-replace-supers': [ '7.29.7' ],
+182 silly audit   '@babel/helper-string-parser': [ '7.29.7' ],
+182 silly audit   '@babel/helper-skip-transparent-expression-wrappers': [ '7.29.7' ],
+182 silly audit   '@babel/helper-validator-option': [ '7.29.7' ],
+182 silly audit   '@babel/helper-wrap-function': [ '7.29.7' ],
+182 silly audit   '@babel/helpers': [ '7.29.7' ],
+182 silly audit   '@babel/helper-validator-identifier': [ '7.29.7' ],
+182 silly audit   '@babel/parser': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-proposal-export-default-from': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-proposal-decorators': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-syntax-decorators': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-syntax-dynamic-import': [ '7.8.3' ],
+182 silly audit   '@babel/plugin-syntax-export-default-from': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-syntax-flow': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-syntax-jsx': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-syntax-nullish-coalescing-operator': [ '7.8.3' ],
+182 silly audit   '@babel/plugin-syntax-optional-chaining': [ '7.8.3' ],
+182 silly audit   '@babel/plugin-syntax-typescript': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-async-generator-functions': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-async-to-generator': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-block-scoping': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-class-properties': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-class-static-block': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-classes': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-destructuring': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-export-namespace-from': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-flow-strip-types': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-for-of': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-logical-assignment-operators': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-modules-commonjs': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-named-capturing-groups-regex': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-nullish-coalescing-operator': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-object-rest-spread': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-optional-catch-binding': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-optional-chaining': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-parameters': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-private-methods': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-private-property-in-object': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-react-display-name': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-react-jsx-development': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-react-pure-annotations': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-typescript': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-runtime': [ '7.29.7' ],
+182 silly audit   '@babel/plugin-transform-unicode-regex': [ '7.29.7' ],
+182 silly audit   '@babel/preset-typescript': [ '7.29.7' ],
+182 silly audit   '@babel/template': [ '7.29.7' ],
+182 silly audit   '@babel/traverse': [ '7.29.7' ],
+182 silly audit   '@babel/runtime': [ '7.29.7' ],
+182 silly audit   '@babel/types': [ '7.29.7' ],
+182 silly audit   '@expo/code-signing-certificates': [ '0.0.6' ],
+182 silly audit   '@expo/config': [ '57.0.5' ],
+182 silly audit   '@babel/plugin-transform-react-jsx': [ '7.29.7' ],
+182 silly audit   '@expo/config-plugins': [ '57.0.5' ],
+182 silly audit   '@expo/config-types': [ '57.0.2' ],
+182 silly audit   '@expo/devtools': [ '57.0.1' ],
+182 silly audit   '@expo/devcert': [ '1.2.1' ],
+182 silly audit   '@expo/env': [ '2.4.2' ],
+182 silly audit   '@expo/expo-modules-macros-plugin': [ '0.6.1' ],
+182 silly audit   '@expo/fingerprint': [ '0.20.5' ],
+182 silly audit   '@expo/inline-modules': [ '0.1.3' ],
+182 silly audit   '@expo/image-utils': [ '0.11.3' ],
+182 silly audit   '@expo/json-file': [ '11.0.1' ],
+182 silly audit   '@expo/metro': [ '56.0.0' ],
+182 silly audit   '@expo/local-build-cache-provider': [ '57.0.4' ],
+182 silly audit   '@expo/metro-file-map': [ '57.0.1' ],
+182 silly audit   '@expo/osascript': [ '2.7.1' ],
+182 silly audit   '@expo/package-manager': [ '1.13.1' ],
+182 silly audit   '@expo/schema-utils': [ '57.0.2' ],
+182 silly audit   '@expo/prebuild-config': [ '57.0.7' ],
+182 silly audit   '@expo/require-utils': [ '57.0.3' ],
+182 silly audit   '@expo/sdk-runtime-versions': [ '1.0.0' ],
+182 silly audit   '@expo/plist': [ '0.8.1' ],
+182 silly audit   '@expo/spawn-async': [ '1.8.0' ],
+182 silly audit   '@expo/sudo-prompt': [ '9.3.2' ],
+182 silly audit   '@expo/xcpretty': [ '4.4.4' ],
+182 silly audit   '@isaacs/ttlcache': [ '1.4.1' ],
+182 silly audit   '@jest/schemas': [ '29.6.3' ],
+182 silly audit   '@jest/types': [ '29.6.3' ],
+182 silly audit   '@jridgewell/gen-mapping': [ '0.3.13' ],
+182 silly audit   '@jridgewell/resolve-uri': [ '3.1.2' ],
+182 silly audit   '@jridgewell/remapping': [ '2.3.5' ],
+182 silly audit   '@jridgewell/source-map': [ '0.3.11' ],
+182 silly audit   '@jridgewell/sourcemap-codec': [ '1.5.5' ],
+182 silly audit   '@jridgewell/trace-mapping': [ '0.3.31' ],
+182 silly audit   '@react-native/babel-plugin-codegen': [ '0.86.0' ],
+182 silly audit   '@react-native/assets-registry': [ '0.86.0' ],
+182 silly audit   '@react-native/codegen': [ '0.86.0' ],
+182 silly audit   '@react-native/community-cli-plugin': [ '0.86.0' ],
+182 silly audit   '@react-native/debugger-shell': [ '0.86.0' ],
+182 silly audit   'fb-dotslash': [ '0.5.8' ],
+182 silly audit   '@react-native/dev-middleware': [ '0.86.0' ],
+182 silly audit   '@react-native/gradle-plugin': [ '0.86.0' ],
+182 silly audit   '@react-native/js-polyfills': [ '0.86.0' ],
+182 silly audit   '@react-native/normalize-colors': [ '0.86.0' ],
+182 silly audit   '@react-native/virtualized-lists': [ '0.86.0' ],
+182 silly audit   '@sinclair/typebox': [ '0.27.10' ],
+182 silly audit   '@types/istanbul-lib-coverage': [ '2.0.6' ],
+182 silly audit   '@types/istanbul-lib-report': [ '3.0.3' ],
+182 silly audit   '@types/istanbul-reports': [ '3.0.4' ],
+182 silly audit   '@types/node': [ '26.1.1' ],
+182 silly audit   '@types/yargs': [ '17.0.35' ],
+182 silly audit   '@types/react': [ '19.2.17' ],
+182 silly audit   '@ungap/structured-clone': [ '1.3.3' ],
+182 silly audit   '@types/yargs-parser': [ '21.0.3' ],
+182 silly audit   '@react-native/debugger-frontend': [ '0.86.0' ],
+182 silly audit   'expo-font': [ '57.0.1' ],
+182 silly audit   'expo-modules-core': [ '57.0.5' ],
+182 silly audit   'lightningcss-android-arm64': [ '1.32.0' ],
+182 silly audit   'lightningcss-darwin-arm64': [ '1.32.0' ],
+182 silly audit   'lightningcss-darwin-x64': [ '1.32.0' ],
+182 silly audit   'lightningcss-freebsd-x64': [ '1.32.0' ],
+182 silly audit   'lightningcss-linux-arm-gnueabihf': [ '1.32.0' ],
+182 silly audit   'lightningcss-linux-arm64-gnu': [ '1.32.0' ],
+182 silly audit   'lightningcss-linux-arm64-musl': [ '1.32.0' ],
+182 silly audit   'lightningcss-linux-x64-gnu': [ '1.32.0' ],
+182 silly audit   'lightningcss-linux-x64-musl': [ '1.32.0' ],
+182 silly audit   'lightningcss-win32-arm64-msvc': [ '1.32.0' ],
+182 silly audit   'hermes-compiler': [ '250829098.0.14' ]
+182 silly audit }
+183 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fxcpretty cache-miss
+184 silly packumentCache corgi:https://registry.npmjs.org/typescript cache-miss
+185 silly packumentCache corgi:https://registry.npmjs.org/@expo%2ffingerprint cache-miss
+186 silly packumentCache corgi:https://registry.npmjs.org/@babel%2fparser cache-miss
+187 silly packumentCache corgi:https://registry.npmjs.org/yaml cache-miss
+188 silly packumentCache corgi:https://registry.npmjs.org/which cache-miss
+189 silly packumentCache corgi:https://registry.npmjs.org/uuid cache-miss
+190 silly packumentCache corgi:https://registry.npmjs.org/update-browserslist-db cache-miss
+191 silly packumentCache corgi:https://registry.npmjs.org/terser cache-miss
+192 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+193 silly packumentCache corgi:https://registry.npmjs.org/resolve cache-miss
+194 silly packumentCache corgi:https://registry.npmjs.org/regjsparser cache-miss
+195 silly packumentCache corgi:https://registry.npmjs.org/react-native cache-miss
+196 silly packumentCache corgi:https://registry.npmjs.org/nanoid cache-miss
+197 silly packumentCache corgi:https://registry.npmjs.org/mime cache-miss
+198 silly packumentCache corgi:https://registry.npmjs.org/mkdirp cache-miss
+199 silly packumentCache corgi:https://registry.npmjs.org/metro cache-miss
+200 silly packumentCache corgi:https://registry.npmjs.org/loose-envify cache-miss
+201 silly packumentCache corgi:https://registry.npmjs.org/metro-symbolicate cache-miss
+202 silly packumentCache corgi:https://registry.npmjs.org/lan-network cache-miss
+203 silly packumentCache corgi:https://registry.npmjs.org/jsesc cache-miss
+204 silly packumentCache corgi:https://registry.npmjs.org/json5 cache-miss
+205 silly packumentCache corgi:https://registry.npmjs.org/is-docker cache-miss
+206 silly packumentCache corgi:https://registry.npmjs.org/js-yaml cache-miss
+207 silly packumentCache corgi:https://registry.npmjs.org/expo cache-miss
+208 silly packumentCache corgi:https://registry.npmjs.org/image-size cache-miss
+209 silly packumentCache corgi:https://registry.npmjs.org/expo-modules-autolinking cache-miss
+210 silly packumentCache corgi:https://registry.npmjs.org/chrome-launcher cache-miss
+211 silly packumentCache corgi:https://registry.npmjs.org/browserslist cache-miss
+212 silly packumentCache corgi:https://registry.npmjs.org/baseline-browser-mapping cache-miss
+213 silly packumentCache corgi:https://registry.npmjs.org/acorn cache-miss
+214 silly packumentCache corgi:https://registry.npmjs.org/agent-cli-detector cache-miss
+215 silly packumentCache corgi:https://registry.npmjs.org/fb-dotslash cache-miss
+216 http cache @react-native/debugger-frontend@https://registry.npmjs.org/@react-native/debugger-frontend/-/debugger-frontend-0.86.0.tgz 0ms (cache hit)
+217 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+218 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+219 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+220 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+221 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+222 silly packumentCache corgi:https://registry.npmjs.org/semver cache-miss
+223 http cache hermes-compiler@https://registry.npmjs.org/hermes-compiler/-/hermes-compiler-250829098.0.14.tgz 0ms (cache hit)
+224 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fcli cache-miss
+225 silly tarball no local data for hermes-compiler@https://registry.npmjs.org/hermes-compiler/-/hermes-compiler-250829098.0.14.tgz. Extracting by manifest.
+226 http cache expo-modules-core@https://registry.npmjs.org/expo-modules-core/-/expo-modules-core-57.0.5.tgz 0ms (cache hit)
+227 http cache expo-font@https://registry.npmjs.org/expo-font/-/expo-font-57.0.1.tgz 0ms (cache hit)
+228 silly tarball no local data for expo-modules-core@https://registry.npmjs.org/expo-modules-core/-/expo-modules-core-57.0.5.tgz. Extracting by manifest.
+229 silly tarball no local data for expo-font@https://registry.npmjs.org/expo-font/-/expo-font-57.0.1.tgz. Extracting by manifest.
+230 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 1886ms
+231 silly audit report {
+231 silly audit report   uuid: [
+231 silly audit report     {
+231 silly audit report       id: 1119441,
+231 silly audit report       url: 'https://github.com/advisories/GHSA-w5hq-g745-h8pq',
+231 silly audit report       title: 'uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided',
+231 silly audit report       severity: 'moderate',
+231 silly audit report       vulnerable_versions: '<11.1.1',
+231 silly audit report       cwe: [Array],
+231 silly audit report       cvss: [Object]
+231 silly audit report     }
+231 silly audit report   ]
+231 silly audit report }
+232 silly packumentCache corgi:https://registry.npmjs.org/uuid cache-miss
+233 http fetch GET 200 https://registry.npmjs.org/regjsparser 4400ms (cache miss)
+234 silly packumentCache corgi:https://registry.npmjs.org/regjsparser set size:undefined disposed:false
+235 http cache https://registry.npmjs.org/regjsparser/-/regjsparser-0.13.2.tgz 18ms (cache hit)
+236 http fetch GET 200 https://registry.npmjs.org/uuid 13254ms (cache revalidated)
+237 silly packumentCache corgi:https://registry.npmjs.org/uuid set size:82973 disposed:false
+238 http cache https://registry.npmjs.org/uuid/-/uuid-7.0.3.tgz 7ms (cache hit)
+239 http fetch GET 200 https://registry.npmjs.org/which 13358ms (cache miss)
+240 silly packumentCache corgi:https://registry.npmjs.org/which set size:undefined disposed:false
+241 http cache https://registry.npmjs.org/which/-/which-2.0.2.tgz 8ms (cache hit)
+242 http fetch GET 200 https://registry.npmjs.org/resolve 13990ms (cache miss)
+243 silly packumentCache corgi:https://registry.npmjs.org/resolve set size:undefined disposed:false
+244 http fetch GET 200 https://registry.npmjs.org/semver 13992ms (cache miss)
+245 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+246 http cache https://registry.npmjs.org/resolve/-/resolve-1.22.12.tgz 11ms (cache hit)
+247 http cache https://registry.npmjs.org/semver/-/semver-7.8.5.tgz 12ms (cache hit)
+248 http fetch GET 200 https://registry.npmjs.org/update-browserslist-db 15790ms (cache miss)
+249 silly packumentCache corgi:https://registry.npmjs.org/update-browserslist-db set size:undefined disposed:false
+250 http cache https://registry.npmjs.org/update-browserslist-db/-/update-browserslist-db-1.2.3.tgz 7ms (cache hit)
+251 http fetch GET 200 https://registry.npmjs.org/yaml 19606ms (cache miss)
+252 silly packumentCache corgi:https://registry.npmjs.org/yaml set size:undefined disposed:false
+253 http cache https://registry.npmjs.org/yaml/-/yaml-2.9.0.tgz 9ms (cache hit)
+254 http fetch GET 200 https://registry.npmjs.org/jsesc 20307ms (cache miss)
+255 silly packumentCache corgi:https://registry.npmjs.org/jsesc set size:undefined disposed:false
+256 http cache https://registry.npmjs.org/jsesc/-/jsesc-3.1.0.tgz 5ms (cache hit)
+257 http fetch GET 200 https://registry.npmjs.org/loose-envify 20316ms (cache miss)
+258 silly packumentCache corgi:https://registry.npmjs.org/loose-envify set size:undefined disposed:false
+259 http cache https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz 8ms (cache hit)
+260 http fetch GET https://registry.npmjs.org/metro attempt 1 failed with ECONNRESET
+261 http fetch GET 200 https://registry.npmjs.org/metro-symbolicate 22680ms (cache miss)
+262 silly packumentCache corgi:https://registry.npmjs.org/metro-symbolicate set size:undefined disposed:false
+263 http fetch GET 200 https://registry.npmjs.org/nanoid 22683ms (cache miss)
+264 silly packumentCache corgi:https://registry.npmjs.org/nanoid set size:undefined disposed:false
+265 http cache https://registry.npmjs.org/metro-symbolicate/-/metro-symbolicate-0.84.4.tgz 10ms (cache hit)
+266 http cache https://registry.npmjs.org/nanoid/-/nanoid-3.3.16.tgz 8ms (cache hit)
+267 http fetch GET 200 https://registry.npmjs.org/expo 23081ms (cache revalidated)
+268 silly packumentCache corgi:https://registry.npmjs.org/expo set size:1808952 disposed:false
+269 http cache https://registry.npmjs.org/expo/-/expo-57.0.6.tgz 26ms (cache hit)
+270 http fetch GET 200 https://registry.npmjs.org/lan-network 23413ms (cache miss)
+271 silly packumentCache corgi:https://registry.npmjs.org/lan-network set size:undefined disposed:false
+272 http cache https://registry.npmjs.org/lan-network/-/lan-network-0.2.1.tgz 70ms (cache hit)
+273 http fetch GET 200 https://registry.npmjs.org/mime 23685ms (cache miss)
+274 silly packumentCache corgi:https://registry.npmjs.org/mime set size:undefined disposed:false
+275 http cache https://registry.npmjs.org/mime/-/mime-1.6.0.tgz 7ms (cache hit)
+276 http fetch GET 200 https://registry.npmjs.org/@expo%2ffingerprint 33064ms (cache miss)
+277 silly packumentCache corgi:https://registry.npmjs.org/@expo%2ffingerprint set size:undefined disposed:false
+278 http fetch GET https://registry.npmjs.org/image-size attempt 1 failed with ECONNRESET
+279 http fetch GET 200 https://registry.npmjs.org/js-yaml 35683ms (cache miss)
+280 silly packumentCache corgi:https://registry.npmjs.org/js-yaml set size:undefined disposed:false
+281 http cache https://registry.npmjs.org/js-yaml/-/js-yaml-4.3.0.tgz 9ms (cache hit)
+282 http fetch GET 200 https://registry.npmjs.org/baseline-browser-mapping 47788ms (cache miss)
+283 silly packumentCache corgi:https://registry.npmjs.org/baseline-browser-mapping set size:undefined disposed:false
+284 http cache https://registry.npmjs.org/baseline-browser-mapping/-/baseline-browser-mapping-2.10.43.tgz 9ms (cache hit)
+285 http fetch GET 200 https://registry.npmjs.org/agent-cli-detector 48755ms (cache miss)
+286 silly packumentCache corgi:https://registry.npmjs.org/agent-cli-detector set size:undefined disposed:false
+287 http cache https://registry.npmjs.org/agent-cli-detector/-/agent-cli-detector-0.1.2.tgz 6ms (cache hit)
+288 http fetch GET 200 https://registry.npmjs.org/@babel%2fparser 50867ms (cache miss)
+289 silly packumentCache corgi:https://registry.npmjs.org/@babel%2fparser set size:undefined disposed:false
+290 http fetch GET 200 https://registry.npmjs.org/semver 51746ms (cache miss)
+291 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+292 http cache https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 6ms (cache hit)
+293 http fetch GET https://registry.npmjs.org/json5 attempt 1 failed with ECONNRESET
+294 http fetch GET 200 https://registry.npmjs.org/fb-dotslash 67195ms (cache miss)
+295 silly packumentCache corgi:https://registry.npmjs.org/fb-dotslash set size:undefined disposed:false
+296 http cache https://registry.npmjs.org/fb-dotslash/-/fb-dotslash-0.5.8.tgz 115ms (cache hit)
+297 http fetch GET 200 https://registry.npmjs.org/is-docker 67806ms (cache miss)
+298 silly packumentCache corgi:https://registry.npmjs.org/is-docker set size:undefined disposed:false
+299 http cache https://registry.npmjs.org/is-docker/-/is-docker-2.2.1.tgz 4ms (cache hit)
+300 http fetch GET 200 https://registry.npmjs.org/acorn 67872ms (cache miss)
+301 silly packumentCache corgi:https://registry.npmjs.org/acorn set size:undefined disposed:false
+302 http cache https://registry.npmjs.org/acorn/-/acorn-8.17.0.tgz 6ms (cache hit)
+303 http fetch GET 200 https://registry.npmjs.org/semver 68175ms (cache miss)
+304 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+305 http cache https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 5ms (cache hit)
+306 http fetch GET 200 https://registry.npmjs.org/@expo%2fcli 68282ms (cache revalidated)
+307 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fcli set size:1709196 disposed:false
+308 http fetch GET 200 https://registry.npmjs.org/json5 72927ms attempt #2 (cache miss)
+309 silly packumentCache corgi:https://registry.npmjs.org/json5 set size:undefined disposed:false
+310 http cache https://registry.npmjs.org/json5/-/json5-2.2.3.tgz 8ms (cache hit)
+311 http fetch GET 200 https://registry.npmjs.org/semver 74019ms (cache miss)
+312 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+313 http cache https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 5ms (cache hit)
+314 http fetch GET 200 https://registry.npmjs.org/semver 75795ms (cache miss)
+315 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+316 http cache https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 9ms (cache hit)
+317 http fetch GET 200 https://registry.npmjs.org/terser 82081ms (cache miss)
+318 silly packumentCache corgi:https://registry.npmjs.org/terser set size:undefined disposed:false
+319 http cache https://registry.npmjs.org/terser/-/terser-5.49.0.tgz 13ms (cache hit)
+320 http fetch GET 200 https://registry.npmjs.org/uuid 80767ms (cache revalidated)
+321 silly packumentCache corgi:https://registry.npmjs.org/uuid set size:82973 disposed:false
+322 silly packumentCache corgi:https://registry.npmjs.org/uuid dispose
+323 silly packumentCache corgi:https://registry.npmjs.org/xcode cache-miss
+324 http fetch GET 200 https://registry.npmjs.org/@expo/fingerprint/-/fingerprint-0.20.5.tgz 50522ms (cache revalidated)
+325 http fetch GET 200 https://registry.npmjs.org/@babel/parser/-/parser-7.29.7.tgz 37284ms (cache revalidated)
+326 http fetch GET https://registry.npmjs.org/@expo/cli/-/cli-57.0.8.tgz attempt 1 failed with ECONNRESET
+327 http fetch GET 200 https://registry.npmjs.org/semver 91289ms (cache miss)
+328 silly packumentCache corgi:https://registry.npmjs.org/semver set size:undefined disposed:false
+329 http cache https://registry.npmjs.org/semver/-/semver-6.3.1.tgz 6ms (cache hit)
+330 http fetch GET https://registry.npmjs.org/xcode attempt 1 failed with ECONNRESET
+331 http fetch GET 200 https://registry.npmjs.org/chrome-launcher 107268ms (cache miss)
+332 silly packumentCache corgi:https://registry.npmjs.org/chrome-launcher set size:undefined disposed:false
+333 http cache https://registry.npmjs.org/chrome-launcher/-/chrome-launcher-0.15.2.tgz 6ms (cache hit)
+334 http fetch GET 200 https://registry.npmjs.org/@expo/cli/-/cli-57.0.8.tgz 43317ms (cache revalidated)
+335 http fetch GET 200 https://registry.npmjs.org/browserslist 112020ms (cache miss)
+336 silly packumentCache corgi:https://registry.npmjs.org/browserslist set size:undefined disposed:false
+337 http fetch GET 200 https://registry.npmjs.org/image-size 112022ms attempt #2 (cache miss)
+338 silly packumentCache corgi:https://registry.npmjs.org/image-size set size:undefined disposed:false
+339 http cache https://registry.npmjs.org/browserslist/-/browserslist-4.28.6.tgz 9ms (cache hit)
+340 http cache https://registry.npmjs.org/image-size/-/image-size-1.2.1.tgz 8ms (cache hit)
+341 http fetch GET 200 https://registry.npmjs.org/xcode 43575ms (cache revalidated)
+342 silly packumentCache corgi:https://registry.npmjs.org/xcode set size:1850340 disposed:false
+343 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fconfig-plugins cache-miss
+344 http fetch GET 200 https://registry.npmjs.org/metro 135560ms attempt #2 (cache miss)
+345 silly packumentCache corgi:https://registry.npmjs.org/metro set size:undefined disposed:false
+346 http cache https://registry.npmjs.org/metro/-/metro-0.84.4.tgz 12ms (cache hit)
+347 http fetch GET 200 https://registry.npmjs.org/typescript 159917ms (cache miss)
+348 silly packumentCache corgi:https://registry.npmjs.org/typescript set size:undefined disposed:false
+349 http cache https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz 368ms (cache hit)
+350 http fetch GET 200 https://registry.npmjs.org/@expo%2fconfig-plugins 49085ms (cache revalidated)
+351 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fconfig-plugins set size:429825 disposed:false
+352 silly packumentCache corgi:https://registry.npmjs.org/expo cache-miss
+353 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fcli cache-miss
+354 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fconfig cache-miss
+355 silly packumentCache corgi:https://registry.npmjs.org/@expo%2finline-modules cache-miss
+356 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fprebuild-config cache-miss
+357 warn cleanup Failed to remove some directories [
+357 warn cleanup   [
+357 warn cleanup     'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo',
+357 warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\emmanuel.mwinama\Code\Farmis\mobile\node_modules\expo\node_modules\@expo\cli\static\shims\react-native-web\dist\exports'] {
+357 warn cleanup       errno: -4048,
+357 warn cleanup       code: 'EPERM',
+357 warn cleanup       syscall: 'rmdir',
+357 warn cleanup       path: 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo\\node_modules\\@expo\\cli\\static\\shims\\react-native-web\\dist\\exports'
+357 warn cleanup     }
+357 warn cleanup   ],
+357 warn cleanup   [
+357 warn cleanup     '\\\\?\\C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo',
+357 warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\emmanuel.mwinama\Code\Farmis\mobile\node_modules\expo\node_modules\@expo\cli'] {
+357 warn cleanup       errno: -4048,
+357 warn cleanup       code: 'EPERM',
+357 warn cleanup       syscall: 'rmdir',
+357 warn cleanup       path: 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo\\node_modules\\@expo\\cli'
+357 warn cleanup     }
+357 warn cleanup   ]
+357 warn cleanup ]
+358 http cache https://registry.npmjs.org/expo 158ms (cache hit)
+359 silly packumentCache corgi:https://registry.npmjs.org/expo set size:1808952 disposed:false
+360 http cache https://registry.npmjs.org/@expo%2fcli 820ms (cache hit)
+361 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fcli set size:1709196 disposed:false
+362 http fetch GET 200 https://registry.npmjs.org/@expo%2fprebuild-config 1880ms (cache revalidated)
+363 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fprebuild-config set size:402528 disposed:false
+364 http fetch GET 200 https://registry.npmjs.org/@expo%2fconfig 2158ms (cache miss)
+365 silly packumentCache corgi:https://registry.npmjs.org/@expo%2fconfig set size:undefined disposed:false
+366 verbose type system
+367 verbose stack FetchError: Invalid response body while trying to fetch https://registry.npmjs.org/@expo%2fxcpretty: read ECONNRESET
+367 verbose stack     at C:\Program Files\nodejs\node_modules\npm\node_modules\minipass-fetch\lib\body.js:174:15
+367 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+367 verbose stack     at async Response.json (C:\Program Files\nodejs\node_modules\npm\node_modules\minipass-fetch\lib\body.js:75:17)
+367 verbose stack     at async RegistryFetcher.packument (C:\Program Files\nodejs\node_modules\npm\node_modules\pacote\lib\registry.js:98:25)
+367 verbose stack     at async RegistryFetcher.manifest (C:\Program Files\nodejs\node_modules\npm\node_modules\pacote\lib\registry.js:128:23)
+367 verbose stack     at async RegistryFetcher.resolve (C:\Program Files\nodejs\node_modules\npm\node_modules\pacote\lib\registry.js:55:5)
+367 verbose stack     at async #extractOrLink (C:\Program Files\nodejs\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:736:7)
+367 verbose stack     at async C:\Program Files\nodejs\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:660:7
+367 verbose stack     at async Promise.allSettled (index 3)
+367 verbose stack     at async #reifyPackages (C:\Program Files\nodejs\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:317:11)
+368 error code ECONNRESET
+369 error syscall read
+370 error errno ECONNRESET
+371 error network Invalid response body while trying to fetch https://registry.npmjs.org/@expo%2fxcpretty: read ECONNRESET
+372 error network This is a problem related to network connectivity.
+372 error network In most cases you are behind a proxy or have bad network settings.
+372 error network
+372 error network If you are behind a proxy, please make sure that the 'proxy' config is set properly.  See: 'npm help config'
+373 silly unfinished npm timer reify 1784146504055
+374 silly unfinished npm timer reify:audit 1784146777964
+375 silly unfinished npm timer reify:unpack 1784146777994
+376 silly unfinished npm timer reifyNode:node_modules/@expo/xcpretty 1784146777994
+377 silly unfinished npm timer reifyNode:node_modules/@babel/helper-create-class-features-plugin/node_modules/semver 1784146777994
+378 silly unfinished npm timer reifyNode:node_modules/react-native 1784146777994
+379 silly unfinished npm timer reifyNode:node_modules/react-native/node_modules/hermes-compiler 1784146777994
+380 silly unfinished npm timer reifyNode:node_modules/mkdirp 1784146777994
+381 silly unfinished npm timer reifyNode:node_modules/expo-modules-autolinking 1784146777994
+382 silly unfinished npm timer reifyNode:node_modules/expo/node_modules/expo-modules-core 1784146777994
+383 silly unfinished npm timer reifyNode:node_modules/expo/node_modules/expo-font 1784146777994
+384 silly unfinished npm timer auditReport:init 1784146779879
+385 silly unfinished npm timer metavuln:calculate:security-advisory:@expo/config:SUoYJgTZ+2u8vjlFpBWQAhMVEWjpF2fLyzJfYQmk3T9qtt1bmQo09YVFRdCW14oDwcLx0sNFW9TpAuHnaXJkdw== 1784146953347
+386 silly unfinished npm timer metavuln:calculate:security-advisory:@expo/inline-modules:SUoYJgTZ+2u8vjlFpBWQAhMVEWjpF2fLyzJfYQmk3T9qtt1bmQo09YVFRdCW14oDwcLx0sNFW9TpAuHnaXJkdw== 1784146953347
+387 silly unfinished npm timer metavuln:packument:@expo/inline-modules 1784146953347
+388 silly unfinished npm timer metavuln:cache:put:security-advisory:@expo/config:Lb1t/+K3V8U29OP3Nq+/G1MBjNdVQZDt6c9vWYjf88KvTA31NLTDPWyP9z0BSPDFpbOR+o6JO5ZDKFx+Gaj8qg== 1784146955753
+389 verbose cwd C:\Users\emmanuel.mwinama\Code\Farmis\mobile
+390 verbose os Windows_NT 10.0.26200
+391 verbose node v26.1.0
+392 verbose npm  v11.13.0
+393 verbose exit 1
+394 verbose code 1
+395 error A complete log of this run can be found in: C:\Users\emmanuel.mwinama\Code\Farmis\mobile\.npm-cache\_logs\2026-07-15T20_15_02_137Z-debug-0.log

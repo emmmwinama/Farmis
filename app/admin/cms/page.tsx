@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
     Save, Plus, Trash2, Loader2, X, Check,
-    FileText, Star, Zap, BarChart2, Tag,
+    FileText, Star, Zap, Tag,
     Edit3, Eye, RefreshCw, ChevronDown, ChevronUp,
 } from "lucide-react";
 
@@ -12,14 +12,12 @@ function fmtDate(d: string) {
     return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-type CmsTab = "content" | "features" | "testimonials" | "impact" | "pitch" | "tiers";
+type CmsTab = "content" | "features" | "testimonials" | "tiers";
 
 const TABS: { key: CmsTab; label: string; icon: any }[] = [
     { key: "content",      label: "Site content",  icon: FileText },
     { key: "features",     label: "Features",      icon: Zap },
     { key: "testimonials", label: "Testimonials",  icon: Star },
-    { key: "impact",       label: "Impact stats",  icon: BarChart2 },
-    { key: "pitch",        label: "Pitch content", icon: Tag },
     { key: "tiers",        label: "Tiers",         icon: Tag },
 ];
 
@@ -284,7 +282,7 @@ function TestimonialsSection() {
     const [loading,  setLoading]  = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editing,  setEditing]  = useState<any>(null);
-    const [form, setForm] = useState({ name: "", role: "", company: "", content: "", rating: "5", avatar: "👨🏿‍🌾", isActive: true });
+    const [form, setForm] = useState({ name: "", role: "", company: "", content: "", rating: "5", avatar: "AV", isActive: true });
     const [saving,   setSaving]   = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -296,12 +294,12 @@ function TestimonialsSection() {
 
     const openAdd = () => {
         setEditing(null);
-        setForm({ name: "", role: "", company: "", content: "", rating: "5", avatar: "👨🏿‍🌾", isActive: true });
+        setForm({ name: "", role: "", company: "", content: "", rating: "5", avatar: "AV", isActive: true });
         setShowForm(true);
     };
     const openEdit = (t: any) => {
         setEditing(t);
-        setForm({ name: t.name, role: t.role ?? "", company: t.company ?? "", content: t.content, rating: String(t.rating ?? 5), avatar: t.avatar ?? "👨🏿‍🌾", isActive: t.isActive });
+        setForm({ name: t.name, role: t.role ?? "", company: t.company ?? "", content: t.content, rating: String(t.rating ?? 5), avatar: t.avatar ?? "U3‍Harvest", isActive: t.isActive });
         setShowForm(true);
     };
 
@@ -323,7 +321,7 @@ function TestimonialsSection() {
         setDeletingId(null); load();
     };
 
-    const AVATARS = ["👨🏿‍🌾", "👩🏾‍🌾", "🧑🏾‍🌾", "👨🏾‍🌾", "👩🏿‍🌾", "🧑🏿‍🌾"];
+    const AVATARS = ["AV", "FM", "GB", "JP", "MW", "AG"];
 
     return (
         <div>
@@ -344,10 +342,10 @@ function TestimonialsSection() {
                              style={{ background: "white", border: "1px solid #E2E8F0" }}>
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-2xl">{t.avatar ?? "👨🏿‍🌾"}</span>
+                                    <span className="w-10 h-10 rounded-2xl flex items-center justify-center text-xs font-black" style={{ background: "#E0F2FE", color: "#075985" }}>{t.avatar ?? "AV"}</span>
                                     <div>
                                         <p className="text-sm font-bold" style={{ color: "#0F172A" }}>{t.name}</p>
-                                        <p className="text-xs" style={{ color: "#64748B" }}>{t.role}{t.company ? ` · ${t.company}` : ""}</p>
+                                        <p className="text-xs" style={{ color: "#64748B" }}>{t.role}{t.company ? ` - ${t.company}` : ""}</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-1.5">
@@ -369,7 +367,7 @@ function TestimonialsSection() {
                             <div className="flex items-center justify-between">
                                 <div className="flex gap-0.5">
                                     {Array.from({ length: t.rating ?? 5 }).map((_, i) => (
-                                        <Star key={i} size={12} fill="#F59E0B" style={{ color: "#F59E0B" }} />
+                                        <Star key={i} size={12} fill="#06B6D4" style={{ color: "#06B6D4" }} />
                                     ))}
                                 </div>
                                 <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${t.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
@@ -425,9 +423,9 @@ function TestimonialsSection() {
                                     <button key={n} type="button" onClick={() => setForm((f) => ({ ...f, rating: String(n) }))}
                                             className="w-9 h-9 rounded-xl text-sm font-black transition-all"
                                             style={{
-                                                background: parseInt(form.rating) >= n ? "#FEF3C7" : "#F8FAFC",
-                                                border:     `1.5px solid ${parseInt(form.rating) >= n ? "#FCD34D" : "#E2E8F0"}`,
-                                                color:      parseInt(form.rating) >= n ? "#D97706" : "#94A3B8",
+                                                background: parseInt(form.rating) >= n ? "#E0F2FE" : "#F8FAFC",
+                                                border:     `1.5px solid ${parseInt(form.rating) >= n ? "#7DD3FC" : "#E2E8F0"}`,
+                                                color:      parseInt(form.rating) >= n ? "#0284C7" : "#94A3B8",
                                             }}>
                                         {n}
                                     </button>
@@ -447,290 +445,6 @@ function TestimonialsSection() {
 }
 
 // ── Impact stats section ────────────────────────────────────────────────────
-function ImpactStatsSection() {
-    const [stats,    setStats]    = useState<any[]>([]);
-    const [loading,  setLoading]  = useState(true);
-    const [showForm, setShowForm] = useState(false);
-    const [editing,  setEditing]  = useState<any>(null);
-    const [form, setForm] = useState({ icon: "📊", value: "", label: "", source: "", color: "#1a3d1f", sortOrder: "0", isActive: true });
-    const [saving,   setSaving]   = useState(false);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
-
-    const load = () => {
-        setLoading(true);
-        fetch("/api/admin/cms/impact").then((r) => r.json()).then((d) => { setStats(d); setLoading(false); });
-    };
-    useEffect(() => { load(); }, []);
-
-    const openAdd = () => {
-        setEditing(null);
-        setForm({ icon: "📊", value: "", label: "", source: "", color: "#1a3d1f", sortOrder: String(stats.length), isActive: true });
-        setShowForm(true);
-    };
-    const openEdit = (s: any) => {
-        setEditing(s);
-        setForm({ icon: s.icon, value: s.value, label: s.label, source: s.source ?? "", color: s.color ?? "#1a3d1f", sortOrder: String(s.sortOrder), isActive: s.isActive });
-        setShowForm(true);
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); setSaving(true);
-        const url    = editing ? `/api/admin/cms/impact/${editing.id}` : "/api/admin/cms/impact";
-        const method = editing ? "PATCH" : "POST";
-        await fetch(url, {
-            method, headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...form, sortOrder: parseInt(form.sortOrder) }),
-        });
-        setSaving(false); setShowForm(false); load();
-    };
-
-    const handleDelete = async (id: string) => {
-        if (!confirm("Delete this stat?")) return;
-        setDeletingId(id);
-        await fetch(`/api/admin/cms/impact/${id}`, { method: "DELETE" });
-        setDeletingId(null); load();
-    };
-
-    const ACCENT_COLORS = ["#DC2626", "#D97706", "#16A34A", "#2563EB", "#9333EA", "#0891B2", "#EA580C", "#1a3d1f"];
-
-    return (
-        <div>
-            <div className="flex items-center justify-between mb-5">
-                <p className="text-sm" style={{ color: "#64748B" }}>
-                    These stats appear on the landing page problem section and investor pitch
-                </p>
-                <button onClick={openAdd}
-                        className="flex items-center gap-2 h-9 px-4 rounded-xl text-sm font-bold text-white"
-                        style={{ background: "#0F766E" }}>
-                    <Plus size={14} /> Add stat
-                </button>
-            </div>
-
-            {loading ? (
-                <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin" style={{ color: "#0F766E" }} /></div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {stats.map((s) => (
-                        <div key={s.id} className="rounded-2xl p-5 flex items-start gap-4"
-                             style={{ background: "white", border: "1px solid #E2E8F0" }}>
-                            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-                                 style={{ background: `${s.color}15` }}>
-                                {s.icon}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-xl font-black mb-0.5" style={{ color: s.color }}>{s.value}</p>
-                                <p className="text-sm font-semibold leading-snug mb-1" style={{ color: "#0F172A" }}>{s.label}</p>
-                                {s.source && <p className="text-[10px]" style={{ color: "#94A3B8" }}>Source: {s.source}</p>}
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                                <button onClick={() => openEdit(s)}
-                                        className="w-7 h-7 rounded-lg flex items-center justify-center"
-                                        style={{ background: "#F1F5F9", color: "#64748B" }}>
-                                    <Edit3 size={12} />
-                                </button>
-                                <button onClick={() => handleDelete(s.id)} disabled={deletingId === s.id}
-                                        className="w-7 h-7 rounded-lg flex items-center justify-center"
-                                        style={{ background: "#FFF1F2", color: "#E11D48" }}>
-                                    {deletingId === s.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {showForm && (
-                <Modal title={editing ? "Edit impact stat" : "Add impact stat"} onClose={() => setShowForm(false)}>
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        <div className="grid grid-cols-4 gap-3">
-                            <div>
-                                <label className="block text-xs font-bold mb-1" style={{ color: "#94A3B8" }}>Icon</label>
-                                <input value={form.icon} onChange={(e) => setForm((f) => ({ ...f, icon: e.target.value }))}
-                                       style={{ ...inp, textAlign: "center", fontSize: "20px" }} maxLength={2} />
-                            </div>
-                            <div className="col-span-3">
-                                <label className="block text-xs font-bold mb-1" style={{ color: "#94A3B8" }}>Value (e.g. 67%, MWK 2.1T) *</label>
-                                <input value={form.value} onChange={(e) => setForm((f) => ({ ...f, value: e.target.value }))}
-                                       required placeholder="67%" style={inp} />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold mb-1" style={{ color: "#94A3B8" }}>Label (description) *</label>
-                            <textarea value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
-                                      required rows={2} style={{ ...inp, resize: "none" }}
-                                      placeholder="of smallholder farmers in Malawi keep no formal financial records" />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold mb-1" style={{ color: "#94A3B8" }}>Source</label>
-                            <input value={form.source} onChange={(e) => setForm((f) => ({ ...f, source: e.target.value }))}
-                                   placeholder="World Bank, 2023" style={inp} />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold mb-1.5" style={{ color: "#94A3B8" }}>Accent colour</label>
-                            <div className="flex gap-2 flex-wrap">
-                                {ACCENT_COLORS.map((c) => (
-                                    <button key={c} type="button" onClick={() => setForm((f) => ({ ...f, color: c }))}
-                                            className="w-8 h-8 rounded-lg transition-all"
-                                            style={{
-                                                background:   c,
-                                                outline:      form.color === c ? `3px solid ${c}` : "none",
-                                                outlineOffset: "2px",
-                                                transform:    form.color === c ? "scale(1.15)" : "scale(1)",
-                                            }} />
-                                ))}
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
-                            <p className="text-sm font-semibold" style={{ color: "#0F172A" }}>Active (visible on landing page)</p>
-                            <Toggle value={form.isActive} onChange={(v) => setForm((f) => ({ ...f, isActive: v }))} />
-                        </div>
-                        <ModalActions onCancel={() => setShowForm(false)} saving={saving} label={editing ? "Update" : "Add stat"} />
-                    </form>
-                </Modal>
-            )}
-        </div>
-    );
-}
-
-// ── Pitch content section ───────────────────────────────────────────────────
-function PitchContentSection() {
-    const [sections, setSections] = useState<any[]>([]);
-    const [loading,  setLoading]  = useState(true);
-    const [expanded, setExpanded] = useState<string | null>("hook");
-    const [saving,   setSaving]   = useState<string | null>(null);
-    const [saved,    setSaved]    = useState<string | null>(null);
-    const [localContent, setLocalContent] = useState<Record<string, any>>({});
-
-    const load = () => {
-        setLoading(true);
-        fetch("/api/admin/cms/pitch").then((r) => r.json()).then((d) => {
-            setSections(Array.isArray(d) ? d : []);
-            const map: Record<string, any> = {};
-            if (Array.isArray(d)) d.forEach((s: any) => { map[s.key] = s.content; });
-            setLocalContent(map);
-            setLoading(false);
-        });
-    };
-    useEffect(() => { load(); }, []);
-
-    const saveSection = async (key: string, title: string) => {
-        setSaving(key);
-        await fetch("/api/admin/cms/pitch", {
-            method:  "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ key, title, content: localContent[key] }),
-        });
-        setSaving(null); setSaved(key);
-        setTimeout(() => setSaved(null), 2000);
-    };
-
-    const SECTION_KEYS = [
-        { key: "hook",     label: "The Hook",               desc: "Opening statement that captures attention" },
-        { key: "problem",  label: "The Problem",             desc: "Data-backed pain points" },
-        { key: "solution", label: "The Solution",            desc: "What Farmio does" },
-        { key: "market",   label: "Market Opportunity",      desc: "TAM/SAM/SOM and market drivers" },
-        { key: "model",    label: "Business Model",          desc: "Revenue streams and unit economics" },
-        { key: "traction", label: "Traction & Validation",   desc: "Current metrics and milestones" },
-        { key: "ask",      label: "The Ask",                 desc: "Funding amount and use of funds" },
-    ];
-
-    if (loading) {
-        return <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin" style={{ color: "#0F766E" }} /></div>;
-    }
-
-    return (
-        <div className="flex flex-col gap-3">
-            <div className="rounded-xl p-4 mb-2" style={{ background: "#ECFDF5", border: "1px solid #6EE7B7" }}>
-                <p className="text-sm font-semibold" style={{ color: "#065F46" }}>
-                    💡 These sections power the <strong>/pitch</strong> investor page. Edit the JSON content carefully —
-                    it drives all the text, stats and data on the pitch page.
-                </p>
-            </div>
-
-            {SECTION_KEYS.map(({ key, label, desc }) => {
-                const section = sections.find((s) => s.key === key);
-                const isOpen  = expanded === key;
-
-                return (
-                    <div key={key} className="rounded-2xl overflow-hidden"
-                         style={{ background: "white", border: "1px solid #E2E8F0" }}>
-                        <button
-                            className="w-full flex items-center justify-between px-5 py-4"
-                            onClick={() => setExpanded(isOpen ? null : key)}>
-                            <div className="flex items-center gap-3 text-left">
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black text-white"
-                                     style={{ background: "#0F766E" }}>
-                                    {key.slice(0, 2).toUpperCase()}
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold" style={{ color: "#0F172A" }}>{label}</p>
-                                    <p className="text-xs" style={{ color: "#94A3B8" }}>{desc}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {saved === key && <span className="text-xs font-bold" style={{ color: "#059669" }}>✓ Saved</span>}
-                                {isOpen ? <ChevronUp size={16} style={{ color: "#94A3B8" }} /> : <ChevronDown size={16} style={{ color: "#94A3B8" }} />}
-                            </div>
-                        </button>
-
-                        {isOpen && (
-                            <div className="px-5 pb-5 border-t" style={{ borderColor: "#F1F5F9" }}>
-                                <div className="mt-4">
-                                    <label className="block text-xs font-bold mb-2" style={{ color: "#94A3B8" }}>
-                                        Content (JSON) — edit carefully
-                                    </label>
-                                    <textarea
-                                        value={typeof localContent[key] === "string"
-                                            ? localContent[key]
-                                            : JSON.stringify(localContent[key] ?? {}, null, 2)}
-                                        onChange={(e) => {
-                                            try {
-                                                const parsed = JSON.parse(e.target.value);
-                                                setLocalContent((prev) => ({ ...prev, [key]: parsed }));
-                                            } catch {
-                                                // Allow invalid JSON while typing
-                                            }
-                                        }}
-                                        rows={14}
-                                        className="w-full font-mono text-xs rounded-xl p-4"
-                                        style={{
-                                            background:  "#0F172A",
-                                            color:       "#E2E8F0",
-                                            border:      "1px solid #1E293B",
-                                            resize:      "vertical",
-                                            outline:     "none",
-                                        }}
-                                    />
-                                    <p className="text-[10px] mt-1" style={{ color: "#94A3B8" }}>
-                                        Valid JSON required. Changes auto-parse as you type.
-                                    </p>
-                                </div>
-                                <div className="flex justify-end mt-4">
-                                    <button
-                                        onClick={() => saveSection(key, section?.title ?? label)}
-                                        disabled={saving === key}
-                                        className="flex items-center gap-2 h-9 px-5 rounded-xl text-sm font-bold"
-                                        style={{
-                                            background: saved === key ? "#ECFDF5" : "#0F766E",
-                                            color:      saved === key ? "#059669" : "white",
-                                        }}>
-                                        {saving === key
-                                            ? <><Loader2 size={13} className="animate-spin" /> Saving...</>
-                                            : saved === key
-                                                ? <><Check size={13} /> Saved</>
-                                                : <><Save size={13} /> Save section</>}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                );
-            })}
-        </div>
-    );
-}
-
-// ── Tiers quick view ────────────────────────────────────────────────────────
 function TiersSection() {
     const [tiers,   setTiers]   = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -850,7 +564,7 @@ export default function AdminCMSPage() {
                         Site Content Management
                     </h1>
                     <p className="text-sm mt-1" style={{ color: "#94A3B8" }}>
-                        All changes appear live on the landing page and pitch deck
+                        All changes appear live on the landing page
                     </p>
                 </div>
                 <a href="/landing" target="_blank"
@@ -881,9 +595,8 @@ export default function AdminCMSPage() {
             {tab === "content"      && <SiteContentSection />}
             {tab === "features"     && <FeaturesSection />}
             {tab === "testimonials" && <TestimonialsSection />}
-            {tab === "impact"       && <ImpactStatsSection />}
-            {tab === "pitch"        && <PitchContentSection />}
             {tab === "tiers"        && <TiersSection />}
         </div>
     );
 }
+

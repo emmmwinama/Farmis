@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
                             <rect x="7.5" y="11" width="3" height="5" rx="1" fill="#1a3d1f"/>
                         </svg>
                     </div>
-                    <h1 className="text-xl font-medium text-white">Farmio Admin</h1>
+                    <h1 className="text-xl font-medium text-white">AgriVault Admin</h1>
                     <p className="text-sm text-[#4a7a50] mt-1">Restricted access</p>
                 </div>
 
@@ -57,7 +57,7 @@ export default function AdminLoginPage() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="admin@farmio.app"
+                                placeholder="admin@agrivault.app"
                                 required
                                 className="w-full h-12 px-4 text-sm bg-[#111d13] border border-[#2d5c35] rounded-xl outline-none focus:border-[#3d8c47] transition-colors text-white placeholder-[#2d5c35]"
                             />

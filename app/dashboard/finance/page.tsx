@@ -160,7 +160,7 @@ export default function FinancePage() {
                 {[
                     { label: "Income",   value: `MWK ${fmt(data?.income ?? 0)}`,            color: "#16A34A", Icon: TrendingUp   },
                     { label: "Expenses", value: `MWK ${fmt(data?.expense ?? 0)}`,           color: "#DC2626", Icon: TrendingDown },
-                    { label: "Overhead", value: `MWK ${fmt(totalOverheadCost)}`,            color: "#D97706", Icon: Wallet       },
+                    { label: "Overhead", value: `MWK ${fmt(totalOverheadCost)}`,            color: "#0284C7", Icon: Wallet       },
                     { label: "Net",      value: `MWK ${fmt(Math.abs(data?.net ?? 0))}`,     color: netPositive ? "#2563EB" : "#DC2626", Icon: netPositive ? TrendingUp : TrendingDown },
                 ].map(({ label, value, color, Icon }) => (
                     <div key={label} className="rounded-2xl p-5"

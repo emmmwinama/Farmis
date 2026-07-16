@@ -10,8 +10,11 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-    title: "Farmio - Farm Management System",
-    description: "Manage your farm operations efficiently",
+    title: "AgriVault - Farm Management System",
+    description: "Secure farm records, analytics, exports, and finance-ready evidence.",
+    icons: {
+        icon: "/agrivault-mark.svg",
+    },
 };
 
 export default function RootLayout({

@@ -6,38 +6,34 @@
   :root {
     --font-nunito: 'Nunito', sans-serif;
 
-    /* Light theme warm palette */
-    --bg-page:       #F7F6F2;
+    /* Light theme neutral product palette */
+    --bg-page:       #F8FAFC;
     --bg-card:       #FFFFFF;
-    --bg-card-hover: #FDFCFA;
-    --bg-subtle:     #F5F3EE;
-    --bg-muted:      #EDE9E0;
+    --bg-card-hover: #F8FAFC;
+    --bg-subtle:     #F1F5F9;
+    --bg-muted:      #E2E8F0;
 
-    --border:        #E8E4DC;
-    --border-strong: #D5CFC4;
+    --border:        #E2E8F0;
+    --border-strong: #CBD5E1;
 
-    --text-primary:  #1C1917;
-    --text-secondary:#57534E;
-    --text-muted:    #A8A29E;
-    --text-hint:     #C4BDB5;
+    --text-primary:  #0F172A;
+    --text-secondary:#475569;
+    --text-muted:    #64748B;
+    --text-hint:     #94A3B8;
 
-    --farm-green:    #1a3d1f;
-    --farm-mid:      #2d6a35;
-    --farm-light:    #3d8c47;
-    --farm-pale:     #EBF5EC;
-    --farm-accent:   #52b85e;
-
-    --amber:         #D97706;
-    --amber-light:   #FEF3C7;
-    --amber-pale:    #FFFBEB;
+    --farm-green:    #0F766E;
+    --farm-mid:      #15803D;
+    --farm-light:    #22C55E;
+    --farm-pale:     #ECFDF5;
+    --farm-accent:   #14B8A6;
 
     --success-bg:    #F0FDF4;
     --success-text:  #166534;
     --success-border:#BBF7D0;
 
-    --warning-bg:    #FFFBEB;
-    --warning-text:  #92400E;
-    --warning-border:#FDE68A;
+    --warning-bg:    #F0F9FF;
+    --warning-text:  #075985;
+    --warning-border:#BAE6FD;
 
     --error-bg:      #FFF1F2;
     --error-text:    #9F1239;
@@ -49,37 +45,33 @@
   }
 
   .dark {
-    --bg-page:       #0F1A10;
-    --bg-card:       #1a2d1c;
-    --bg-card-hover: #1f3522;
-    --bg-subtle:     #162518;
-    --bg-muted:      #1a2d1c;
+    --bg-page:       #0B1120;
+    --bg-card:       #111827;
+    --bg-card-hover: #1F2937;
+    --bg-subtle:     #0F172A;
+    --bg-muted:      #1E293B;
 
-    --border:        #2d5c35;
-    --border-strong: #3d8c47;
+    --border:        #1E293B;
+    --border-strong: #334155;
 
-    --text-primary:  #F0EDE8;
-    --text-secondary:#9DC89E;
-    --text-muted:    #4a7a50;
-    --text-hint:     #2d5c35;
+    --text-primary:  #F8FAFC;
+    --text-secondary:#CBD5E1;
+    --text-muted:    #94A3B8;
+    --text-hint:     #64748B;
 
-    --farm-green:    #3d8c47;
-    --farm-mid:      #52b85e;
-    --farm-light:    #7dd68a;
-    --farm-pale:     #162518;
-    --farm-accent:   #7dd68a;
-
-    --amber:         #F59E0B;
-    --amber-light:   #451A03;
-    --amber-pale:    #1C1200;
+    --farm-green:    #2DD4BF;
+    --farm-mid:      #22C55E;
+    --farm-light:    #86EFAC;
+    --farm-pale:     #042F2E;
+    --farm-accent:   #5EEAD4;
 
     --success-bg:    #052E16;
     --success-text:  #86EFAC;
     --success-border:#166534;
 
-    --warning-bg:    #1C0A00;
-    --warning-text:  #FCD34D;
-    --warning-border:#92400E;
+    --warning-bg:    #082F49;
+    --warning-text:  #7DD3FC;
+    --warning-border:#075985;
 
     --error-bg:      #1A000A;
     --error-text:    #FDA4AF;
@@ -101,6 +93,11 @@
     color: var(--text-primary);
   }
 
+  :focus-visible {
+    outline: 3px solid rgba(20,184,166,0.35);
+    outline-offset: 2px;
+  }
+
   * {
     font-family: var(--font-nunito), system-ui, sans-serif;
     border-color: var(--border);
@@ -119,7 +116,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 1rem;
-    box-shadow: 0 1px 3px rgba(28,25,23,0.06);
+    box-shadow: 0 1px 2px rgba(15,23,42,0.05);
   }
 
   .card-hover {
@@ -127,22 +124,22 @@
   }
 
   .card-hover:hover {
-    box-shadow: 0 4px 16px rgba(28,25,23,0.10);
+    box-shadow: 0 10px 24px rgba(15,23,42,0.08);
     transform: translateY(-1px);
   }
 
   /* Stat card */
   .stat-card {
-    background: linear-gradient(145deg, #FFFFFF 0%, #FAFAF7 100%);
+    background: linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 100%);
     border: 1px solid var(--border);
     border-radius: 1rem;
-    box-shadow: 0 1px 3px rgba(28,25,23,0.06);
+    box-shadow: 0 1px 3px rgba(15,23,42,0.06);
     padding: 1.25rem;
   }
 
   .dark .stat-card {
-    background: linear-gradient(145deg, #1a2d1c 0%, #162518 100%);
-    border-color: #2d5c35;
+    background: linear-gradient(145deg, #111827 0%, #0F172A 100%);
+    border-color: #334155;
   }
 
   /* Input */
@@ -161,11 +158,11 @@
 
   .input:focus {
     border-color: var(--farm-green);
-    box-shadow: 0 0 0 3px rgba(26,61,31,0.08);
+    box-shadow: 0 0 0 3px rgba(14,116,144,0.12);
   }
 
   .dark .input:focus {
-    box-shadow: 0 0 0 3px rgba(61,140,71,0.15);
+    box-shadow: 0 0 0 3px rgba(34,211,238,0.16);
   }
 
   /* Button primary */
@@ -179,15 +176,15 @@
     font-size: 0.875rem;
     font-weight: 700;
     color: white;
-    background: linear-gradient(135deg, #1a3d1f 0%, #2d6a35 100%);
+    background: linear-gradient(135deg, #0F766E 0%, #2563EB 100%);
     border-radius: 0.75rem;
     transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(26,61,31,0.25);
+    box-shadow: 0 2px 8px rgba(37,99,235,0.22);
   }
 
   .btn-primary:hover {
-    background: linear-gradient(135deg, #2d6a35 0%, #3d8c47 100%);
-    box-shadow: 0 4px 16px rgba(26,61,31,0.35);
+    background: linear-gradient(135deg, #0891B2 0%, #1D4ED8 100%);
+    box-shadow: 0 4px 16px rgba(37,99,235,0.3);
     transform: translateY(-1px);
   }
 
@@ -230,7 +227,7 @@
   }
 
   .badge-green  { background: var(--success-bg); color: var(--success-text); }
-  .badge-amber  { background: var(--warning-bg); color: var(--warning-text); }
+  .badge-sky    { background: var(--warning-bg); color: var(--warning-text); }
   .badge-red    { background: var(--error-bg);   color: var(--error-text); }
   .badge-blue   { background: var(--info-bg);    color: var(--info-text); }
   .badge-warm   { background: var(--bg-muted);   color: var(--text-secondary); }
@@ -337,7 +334,7 @@
   /* Slide-over panel */
   .panel {
     background: var(--bg-card);
-    box-shadow: -8px 0 40px rgba(28,25,23,0.12);
+    box-shadow: -8px 0 40px rgba(15,23,42,0.12);
   }
 
   /* Empty state */
@@ -402,7 +399,7 @@
 
   /* Gradient text */
   .text-gradient-green {
-    background: linear-gradient(135deg, #1a3d1f, #3d8c47);
+    background: linear-gradient(135deg, #0F766E, #2563EB);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -417,7 +414,8 @@
   }
 
   .dark .glass {
-    background: rgba(26,45,28,0.7);
-    border-color: rgba(61,140,71,0.2);
+    background: rgba(15,23,42,0.72);
+    border-color: rgba(56,189,248,0.16);
   }
 }
+

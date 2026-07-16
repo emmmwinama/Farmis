@@ -6,32 +6,32 @@ import {
 } from "lucide-react";
 
 const ZONE_COLORS = [
-    "#16A34A", "#2563EB", "#D97706", "#DC2626",
+    "#16A34A", "#2563EB", "#0284C7", "#DC2626",
     "#9333EA", "#0891B2", "#EA580C", "#65A30D",
 ];
 
 const ZONE_TYPES = [
-    { value: "crop",           label: "Crop zone",      icon: "🌱" },
-    { value: "soil_good",      label: "Good soil",      icon: "🟤" },
-    { value: "soil_poor",      label: "Poor drainage",  icon: "💧" },
-    { value: "soil_rocky",     label: "Rocky area",     icon: "🪨" },
-    { value: "infrastructure", label: "Infrastructure", icon: "🏗️" },
-    { value: "empty",          label: "Unplanted",      icon: "⬜" },
+    { value: "crop",           label: "Crop zone",      icon: "CR" },
+    { value: "soil_good",      label: "Good soil",      icon: "SG" },
+    { value: "soil_poor",      label: "Poor drainage",  icon: "DR" },
+    { value: "soil_rocky",     label: "Rocky area",     icon: "RK" },
+    { value: "infrastructure", label: "Infrastructure", icon: "IN" },
+    { value: "empty",          label: "Unplanted",      icon: "UP" },
 ];
 
 const MARKER_TYPES = [
-    { value: "borehole",   label: "Borehole",     icon: "💧" },
-    { value: "irrigation", label: "Irrigation",   icon: "🚿" },
-    { value: "shed",       label: "Storage shed", icon: "🏠" },
-    { value: "road",       label: "Road/path",    icon: "🛤️" },
-    { value: "gate",       label: "Gate",         icon: "🚪" },
-    { value: "tree",       label: "Tree/shade",   icon: "🌳" },
-    { value: "other",      label: "Other",        icon: "📍" },
+    { value: "borehole",   label: "Borehole",     icon: "BH" },
+    { value: "irrigation", label: "Irrigation",   icon: "IR" },
+    { value: "shed",       label: "Storage shed", icon: "SH" },
+    { value: "road",       label: "Road/path",    icon: "RD" },
+    { value: "gate",       label: "Gate",         icon: "GT" },
+    { value: "tree",       label: "Tree/shade",   icon: "TR" },
+    { value: "other",      label: "Other",        icon: "MK" },
 ];
 
 function fmtHa(ha: number | null | undefined) {
-    if (!ha || ha === 0) return "—";
-    if (ha < 0.01) return `${Math.round(ha * 10000)} m²`;
+    if (!ha || ha === 0) return "-";
+    if (ha < 0.01) return `${Math.round(ha * 10000)} sqm`;
     return `${ha.toFixed(4)} ha`;
 }
 
@@ -98,7 +98,7 @@ export default function FieldMapComponent({
         type: "borehole", label: "", notes: "",
     });
 
-    // ── Init Leaflet ──────────────────────────────────────────────────────────
+    // -- Init Leaflet ----------------------------------------------------------
     useEffect(() => {
         if (!mapRef.current) return;
 
@@ -138,12 +138,12 @@ export default function FieldMapComponent({
 
             const osm = L.tileLayer(
                 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                { attribution: "© OpenStreetMap contributors", maxZoom: 22 }
+                { attribution: "OpenStreetMap contributors", maxZoom: 22 }
             ).addTo(map);
 
             const sat = L.tileLayer(
                 "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-                { attribution: "Tiles © Esri", maxZoom: 19 }
+                { attribution: "Tiles Esri", maxZoom: 19 }
             );
 
             const bGrp = L.featureGroup().addTo(map);
@@ -189,7 +189,7 @@ export default function FieldMapComponent({
         };
     }, []);
 
-    // ── Re-render when data changes ───────────────────────────────────────────
+    // -- Re-render when data changes -------------------------------------------
     useEffect(() => {
         if (!mapObj.current || !leafletRef.current) return;
         renderAll(
@@ -201,7 +201,7 @@ export default function FieldMapComponent({
         );
     }, [boundary, zones, markers]);
 
-    // ── Sync mode to map ──────────────────────────────────────────────────────
+    // -- Sync mode to map ------------------------------------------------------
     useEffect(() => {
         if (!mapObj.current) return;
         (mapObj.current as any).__mode = mode;
@@ -209,7 +209,7 @@ export default function FieldMapComponent({
             mode === "add_marker" ? "crosshair" : "";
     }, [mode]);
 
-    // ── Render all layers ─────────────────────────────────────────────────────
+    // -- Render all layers -----------------------------------------------------
     function renderAll(L: any, map: any, bGrp: any, zGrp: any, mGrp: any) {
         bGrp.clearLayers();
         zGrp.clearLayers();
@@ -241,7 +241,7 @@ export default function FieldMapComponent({
         markers.forEach((m) => {
             const mt = MARKER_TYPES.find((t) => t.value === m.type);
             const icon = L.divIcon({
-                html: `<div style="background:#1a3d1f;color:white;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:13px"><span style="transform:rotate(45deg)">${mt?.icon ?? "📍"}</span></div>`,
+                html: `<div style="background:#1a3d1f;color:white;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:11px;font-weight:800;letter-spacing:0"><span style="transform:rotate(45deg)">${mt?.icon ?? "MK"}</span></div>`,
                 className: "", iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -30],
             });
             L.marker([m.lat, m.lng], { icon })
@@ -250,7 +250,7 @@ export default function FieldMapComponent({
         });
     }
 
-    // ── Draw boundary ─────────────────────────────────────────────────────────
+    // -- Draw boundary ---------------------------------------------------------
     const startDrawBoundary = async () => {
         if (!mapObj.current || !leafletRef.current) return;
         const L   = leafletRef.current;
@@ -277,7 +277,7 @@ export default function FieldMapComponent({
         });
     };
 
-    // ── Draw zone ─────────────────────────────────────────────────────────────
+    // -- Draw zone -------------------------------------------------------------
     const startDrawZone = async () => {
         if (!mapObj.current || !leafletRef.current) return;
         if (!boundary) { setError("Draw the field boundary first"); setTimeout(() => setError(""), 3000); return; }
@@ -297,7 +297,7 @@ export default function FieldMapComponent({
         });
     };
 
-    // ── Measure ───────────────────────────────────────────────────────────────
+    // -- Measure ---------------------------------------------------------------
     const startMeasure = async () => {
         if (!mapObj.current || !leafletRef.current) return;
         const L   = leafletRef.current;
@@ -306,7 +306,7 @@ export default function FieldMapComponent({
         setMeasureArea(null);
         try { await import("leaflet-draw"); await import("leaflet-draw/dist/leaflet.draw.css" as any); } catch {}
         const drawCtrl = new (L as any).Draw.Polygon(map, {
-            shapeOptions: { color: "#D97706", weight: 2, fillColor: "#D97706", fillOpacity: 0.2 },
+            shapeOptions: { color: "#0284C7", weight: 2, fillColor: "#0284C7", fillOpacity: 0.2 },
         });
         drawCtrl.enable();
         map.once("draw:created", (e: any) => {
@@ -317,7 +317,7 @@ export default function FieldMapComponent({
         });
     };
 
-    // ── Save zone ─────────────────────────────────────────────────────────────
+    // -- Save zone -------------------------------------------------------------
     const saveZone = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!pendingZoneGeo) return;
@@ -331,7 +331,7 @@ export default function FieldMapComponent({
         } finally { setSaving(false); }
     };
 
-    // ── Save marker ───────────────────────────────────────────────────────────
+    // -- Save marker -----------------------------------------------------------
     const saveMarker = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!pendingMarkerLatLng) return;
@@ -372,7 +372,7 @@ export default function FieldMapComponent({
         setSatellite((p) => !p);
     };
 
-    // ── Render ────────────────────────────────────────────────────────────────
+    // -- Render ----------------------------------------------------------------
     return (
         <div className="flex flex-1 min-h-0">
 
@@ -384,10 +384,10 @@ export default function FieldMapComponent({
                 {mode !== "view" && (
                     <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] rounded-full px-5 py-2.5 text-sm font-bold text-white pointer-events-none"
                          style={{ background: "rgba(26,61,31,0.92)", backdropFilter: "blur(8px)", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}>
-                        {mode === "draw_boundary" && "✏️ Click to draw boundary points · Double-click to finish"}
-                        {mode === "draw_zone"     && "✏️ Click to draw zone points · Double-click to finish"}
-                        {mode === "add_marker"    && "📍 Click anywhere on the map to place marker"}
-                        {mode === "measure"       && "📐 Click to draw area · Double-click to finish"}
+                        {mode === "draw_boundary" && "Click to draw boundary points - double-click to finish"}
+                        {mode === "draw_zone"     && "Click to draw zone points - double-click to finish"}
+                        {mode === "add_marker"    && "Click anywhere on the map to place marker"}
+                        {mode === "measure"       && "Click to draw area - double-click to finish"}
                     </div>
                 )}
 
@@ -401,7 +401,7 @@ export default function FieldMapComponent({
                                 {fmtHa(measureArea)} {fmtAc(measureArea)}
                             </p>
                             <p className="text-xs" style={{ color: "#64748B" }}>
-                                {Math.round(measureArea * 10000).toLocaleString()} m²
+                                {Math.round(measureArea * 10000).toLocaleString()} sqm
                             </p>
                         </div>
                         <button onClick={() => { setMeasureArea(null); drawnItems.current?.clearLayers(); }}
@@ -415,9 +415,9 @@ export default function FieldMapComponent({
                 {/* Error */}
                 {error && (
                     <div className="absolute top-4 right-4 z-[1000] rounded-xl px-4 py-3 flex items-center gap-2"
-                         style={{ background: "#FFFBEB", border: "1.5px solid #FDE68A" }}>
-                        <AlertTriangle size={14} style={{ color: "#D97706" }} />
-                        <p className="text-sm font-semibold" style={{ color: "#92400E" }}>{error}</p>
+                         style={{ background: "#F0F9FF", border: "1.5px solid #BAE6FD" }}>
+                        <AlertTriangle size={14} style={{ color: "#0284C7" }} />
+                        <p className="text-sm font-semibold" style={{ color: "#075985" }}>{error}</p>
                     </div>
                 )}
 
@@ -457,9 +457,9 @@ export default function FieldMapComponent({
                     <button onClick={() => setMode(mode === "add_marker" ? "view" : "add_marker")} disabled={saving}
                             className="flex items-center gap-2 h-9 px-3 rounded-xl text-xs font-bold disabled:opacity-40"
                             style={{
-                                background: mode === "add_marker" ? "#D97706" : "white",
-                                color:      mode === "add_marker" ? "white"   : "#D97706",
-                                border: "1.5px solid #D97706", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                background: mode === "add_marker" ? "#0284C7" : "white",
+                                color:      mode === "add_marker" ? "white"   : "#0284C7",
+                                border: "1.5px solid #0284C7", boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                             }}>
                         <MapPin size={13} />
                         {mode === "add_marker" ? "Click map..." : "Add marker"}
@@ -537,18 +537,18 @@ export default function FieldMapComponent({
                                     </p>
                                     <p className="text-xs" style={{ color: "#166534" }}>
                                         {fmtAc(boundary.areaHa)}
-                                        {boundary.areaHa ? ` · ${Math.round(boundary.areaHa * 10000).toLocaleString()} m²` : ""}
+                                        {boundary.areaHa ? `  -  ${Math.round(boundary.areaHa * 10000).toLocaleString()} sqm` : ""}
                                     </p>
                                     {boundary.centroidLat && (
                                         <p className="text-[10px] mt-0.5" style={{ color: "#166534", opacity: 0.7 }}>
-                                            {boundary.centroidLat.toFixed(5)}°, {boundary.centroidLng.toFixed(5)}°
+                                            {boundary.centroidLat.toFixed(5)} deg, {boundary.centroidLng.toFixed(5)} deg
                                         </p>
                                     )}
                                 </div>
                             ) : (
                                 <div className="rounded-xl p-5 text-center"
                                      style={{ background: "var(--bg-subtle)", border: "1.5px dashed var(--border)" }}>
-                                    <p className="text-3xl mb-2">🗺️</p>
+                                    <Layers size={28} className="mx-auto mb-2" style={{ color: "var(--text-hint)" }} />
                                     <p className="text-xs font-bold mb-1" style={{ color: "var(--text-primary)" }}>
                                         No boundary drawn
                                     </p>
@@ -608,7 +608,7 @@ export default function FieldMapComponent({
                         <div className="flex flex-col gap-2">
                             {markers.length === 0 ? (
                                 <div className="text-center py-8">
-                                    <p className="text-3xl mb-2">📍</p>
+                                    <MapPin size={28} className="mx-auto mb-2" style={{ color: "var(--text-hint)" }} />
                                     <p className="text-xs font-semibold" style={{ color: "var(--text-muted)" }}>
                                         No markers yet. Click "Add marker" then click the map.
                                     </p>
@@ -618,11 +618,14 @@ export default function FieldMapComponent({
                                 return (
                                     <div key={m.id} className="rounded-xl p-3 flex gap-3"
                                          style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
-                                        <span className="text-xl">{mt?.icon ?? "📍"}</span>
+                                        <span className="w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black"
+                                              style={{ background: "var(--bg-card)", color: "var(--text-secondary)" }}>
+                                            {mt?.icon ?? "MK"}
+                                        </span>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>{m.label}</p>
                                             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                                                {mt?.label} · {m.lat.toFixed(5)}, {m.lng.toFixed(5)}
+                                                {mt?.label}  -  {m.lat.toFixed(5)}, {m.lng.toFixed(5)}
                                             </p>
                                             {m.notes && (
                                                 <p className="text-[10px] mt-0.5" style={{ color: "var(--text-muted)" }}>{m.notes}</p>
@@ -670,10 +673,10 @@ export default function FieldMapComponent({
                                     How to use
                                 </p>
                                 {[
-                                    "1. Draw boundary — trace your field outline",
-                                    "2. Add zones — section by crop or soil type",
-                                    "3. Add markers — pin boreholes, sheds, gates",
-                                    "4. Measure — calculate any area on map",
+                                    "1. Draw boundary - trace your field outline",
+                                    "2. Add zones - section by crop or soil type",
+                                    "3. Add markers - pin boreholes, sheds, gates",
+                                    "4. Measure - calculate any area on map",
                                     "5. Toggle satellite for better accuracy",
                                 ].map((t, i) => (
                                     <p key={i} className="text-[11px] mb-1" style={{ color: "#166534" }}>{t}</p>
@@ -736,7 +739,7 @@ export default function FieldMapComponent({
                                         <option value="">Not linked</option>
                                         {cropFields.map((cf: any) => (
                                             <option key={cf.id} value={cf.id}>
-                                                {cf.cropTypeName} — {cf.variety}
+                                                {cf.cropTypeName} - {cf.variety}
                                             </option>
                                         ))}
                                     </select>

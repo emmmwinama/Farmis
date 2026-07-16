@@ -15,8 +15,8 @@ const ROLE_BADGE: Record<string, { bg: string; color: string }> = {
   Supervisor:       { bg: "#EFF6FF", color: "#1E3A8A" },
   "General Worker": { bg: "#F8FAFC", color: "#475569" },
   Irrigator:        { bg: "#ECFEFF", color: "#164E63" },
-  Sprayer:          { bg: "#FFF7ED", color: "#9A3412" },
-  Harvester:        { bg: "#FFFBEB", color: "#854F0B" },
+  Sprayer:          { bg: "#F0F9FF", color: "#9A3412" },
+  Harvester:        { bg: "#F0F9FF", color: "#075985" },
 };
 
 const AVATAR_COLORS = [
@@ -24,7 +24,7 @@ const AVATAR_COLORS = [
   { bg: "#0F766E", text: "#fff" },
   { bg: "#1E3A8A", text: "#fff" },
   { bg: "#3C3489", text: "#fff" },
-  { bg: "#854F0B", text: "#fff" },
+  { bg: "#075985", text: "#fff" },
   { bg: "#9A3412", text: "#fff" },
 ];
 

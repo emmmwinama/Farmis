@@ -47,6 +47,7 @@ export async function GET(req: Request) {
     const fieldId = searchParams.get("fieldId");
     const type = searchParams.get("type");
     const season = searchParams.get("season");
+    const cropState = searchParams.get("cropState") ?? "active";
 
     const fieldIds = (
         await prisma.field.findMany({
@@ -60,6 +61,11 @@ export async function GET(req: Request) {
             fieldId: fieldId ? fieldId : { in: fieldIds },
             ...(type ? { activityType: type } : {}),
             ...(season ? { cropField: { season } } : {}),
+            ...(cropState === "active"
+                ? { OR: [{ cropFieldId: null }, { cropField: { isArchived: false, status: { not: "Harvested" } } }] }
+                : cropState === "archived"
+                    ? { cropField: { OR: [{ isArchived: true }, { status: "Harvested" }] } }
+                    : {}),
         },
         include: {
             field: true,
@@ -83,6 +89,8 @@ export async function GET(req: Request) {
         cropName: a.cropField?.cropType?.name ?? null,
         cropVariety: a.cropField?.variety ?? null,
         season: a.cropField?.season ?? null,
+        cropStatus: a.cropField?.status ?? null,
+        cropArchived: a.cropField?.isArchived ?? false,
         responsibleEmployee: a.responsibleEmployee
             ? { id: a.responsibleEmployee.id, name: a.responsibleEmployee.name, role: a.responsibleEmployee.role }
             : null,
@@ -126,6 +134,11 @@ export async function GET(req: Request) {
     return NextResponse.json({
         activities: result,
         allSeasons: allSeasons.map((s) => s.season),
+        allFields: await prisma.field.findMany({
+            where: { farmId: farm.id },
+            select: { id: true, name: true },
+            orderBy: { name: "asc" },
+        }),
         byType: aggregateByType(result),
         byField: aggregateByField(result),
         bySeason: aggregateBySeason(result),

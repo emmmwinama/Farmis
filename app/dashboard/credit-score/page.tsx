@@ -58,15 +58,15 @@ const GRADE_CONFIG: Record<
         label: "Good",
     },
     C: {
-        color: "text-amber-700 dark:text-amber-400",
-        bg: "bg-amber-50 dark:bg-amber-900/30",
-        ring: "ring-amber-500",
+        color: "text-sky-700 dark:text-sky-400",
+        bg: "bg-sky-50 dark:bg-sky-900/30",
+        ring: "ring-sky-500",
         label: "Fair",
     },
     D: {
-        color: "text-orange-700 dark:text-orange-400",
-        bg: "bg-orange-50 dark:bg-orange-900/30",
-        ring: "ring-orange-500",
+        color: "text-cyan-700 dark:text-cyan-400",
+        bg: "bg-cyan-50 dark:bg-cyan-900/30",
+        ring: "ring-cyan-500",
         label: "Developing",
     },
     F: {
@@ -227,7 +227,7 @@ export default function CreditScorePage() {
                                                         : pct >= 50
                                                             ? "bg-blue-500"
                                                             : pct >= 25
-                                                                ? "bg-amber-500"
+                                                                ? "bg-sky-500"
                                                                 : "bg-red-400"
                                                 }`}
                                                 style={{ width: `${pct}%` }}
@@ -291,13 +291,13 @@ export default function CreditScorePage() {
                         {data.recommendations.map((rec: string, i: number) => (
                             <div
                                 key={i}
-                                className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl"
+                                className="flex items-start gap-3 p-4 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-xl"
                             >
-                                <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0 text-xs font-bold text-amber-700 dark:text-amber-400">
+                                <div className="w-6 h-6 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center flex-shrink-0 text-xs font-bold text-sky-700 dark:text-sky-400">
                                     {i + 1}
                                 </div>
 
-                                <p className="text-sm text-amber-900 dark:text-amber-300">
+                                <p className="text-sm text-sky-900 dark:text-sky-300">
                                     {rec}
                                 </p>
                             </div>

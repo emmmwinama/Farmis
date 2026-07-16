@@ -13,7 +13,7 @@ function FarmMapInner({ data }: { data: any }) {
     const [mapReady,      setMapReady]      = useState(false);
 
     const FIELD_COLORS = [
-        "#16A34A", "#2563EB", "#D97706", "#9333EA",
+        "#16A34A", "#2563EB", "#0284C7", "#9333EA",
         "#DC2626", "#0891B2", "#EA580C", "#65A30D",
     ];
 
@@ -138,7 +138,7 @@ function FarmMapInner({ data }: { data: any }) {
         // Markers
         (data.markers ?? []).forEach((m: any) => {
             const icon = L.divIcon({
-                html: `<div style="width:26px;height:26px;background:#1a3d1f;border:2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">📍</div>`,
+                html: `<div style="width:26px;height:26px;background:#1a3d1f;border:2px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">Pin</div>`,
                 className: "", iconSize: [26, 26], iconAnchor: [13, 13],
             });
             const mk = L.marker([m.lat, m.lng], { icon })
@@ -191,7 +191,7 @@ function FarmMapInner({ data }: { data: any }) {
                     <div className="absolute bottom-6 left-4 z-[1000] rounded-2xl p-4"
                          style={{ background: "white", border: "1px solid #E2E8F0", boxShadow: "0 4px 16px rgba(0,0,0,0.1)", maxWidth: "260px" }}>
                         <p className="text-xs font-extrabold mb-2" style={{ color: "#64748B" }}>
-                            📍 {unmappedFields.length} field{unmappedFields.length !== 1 ? "s" : ""} not yet mapped
+                            Pin {unmappedFields.length} field{unmappedFields.length !== 1 ? "s" : ""} not yet mapped
                         </p>
                         <div className="flex flex-col gap-1.5">
                             {unmappedFields.map((f: any) => (
@@ -210,7 +210,7 @@ function FarmMapInner({ data }: { data: any }) {
                     <div className="absolute inset-0 flex items-center justify-center z-[1000]">
                         <div className="rounded-2xl p-8 text-center"
                              style={{ background: "white", border: "1px solid #E2E8F0" }}>
-                            <p className="text-4xl mb-3">🗺️</p>
+                            <p className="text-4xl mb-3">Map</p>
                             <p className="font-bold mb-1" style={{ color: "#0F172A" }}>No fields yet</p>
                             <p className="text-sm mb-4" style={{ color: "#94A3B8" }}>Add fields to your farm first</p>
                             <Link href="/dashboard/fields"
@@ -319,7 +319,7 @@ const FarmMapDynamic = dynamic(
         loading: () => (
             <div className="flex-1 flex items-center justify-center" style={{ background: "#f0f4f0" }}>
                 <div className="flex flex-col items-center gap-3">
-                    <div className="text-4xl">🗺️</div>
+                    <div className="text-4xl">Map</div>
                     <Loader2 size={20} className="animate-spin" style={{ color: "#1a3d1f" }} />
                     <p className="text-sm font-semibold" style={{ color: "#666" }}>Loading map...</p>
                 </div>
@@ -351,7 +351,7 @@ export default function FarmMapPage() {
     if (loading) return (
         <div className="flex items-center justify-center h-screen" style={{ background: "var(--bg-page)" }}>
             <div className="flex flex-col items-center gap-3">
-                <div className="text-4xl">🗺️</div>
+                <div className="text-4xl">Map</div>
                 <Loader2 size={20} className="animate-spin" style={{ color: "#1a3d1f" }} />
                 <p className="text-sm font-semibold" style={{ color: "var(--text-muted)" }}>Loading farm map...</p>
             </div>
@@ -361,7 +361,7 @@ export default function FarmMapPage() {
     if (error) return (
         <div className="flex items-center justify-center h-screen" style={{ background: "var(--bg-page)" }}>
             <div className="rounded-2xl p-8 text-center" style={{ background: "white", border: "1px solid #E2E8F0" }}>
-                <p className="text-4xl mb-3">⚠️</p>
+                <p className="text-4xl mb-3">Warning</p>
                 <p className="font-bold mb-1" style={{ color: "#0F172A" }}>Could not load map</p>
                 <p className="text-sm mb-4" style={{ color: "#94A3B8" }}>{error}</p>
                 <button onClick={() => window.location.reload()}

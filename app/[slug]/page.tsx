@@ -10,7 +10,7 @@ function renderMarkdown(content: string) {
             if (line.startsWith("### ")) return <h3 key={i} className="text-xl font-medium text-slate-900 dark:text-white mt-8 mb-3">{line.slice(4)}</h3>;
             if (line.startsWith("## ")) return <h2 key={i} className="text-2xl font-medium text-slate-900 dark:text-white mt-10 mb-4">{line.slice(3)}</h2>;
             if (line.startsWith("# ")) return <h1 key={i} className="text-3xl font-medium text-slate-900 dark:text-white mt-12 mb-6">{line.slice(2)}</h1>;
-            if (line.startsWith("- ✅ ")) return <div key={i} className="flex items-center gap-2 mb-2"><span className="text-green-500">✅</span><span className="text-slate-600 dark:text-slate-400">{line.slice(5)}</span></div>;
+            if (line.startsWith("- OK ")) return <div key={i} className="flex items-center gap-2 mb-2"><span className="text-green-500">OK</span><span className="text-slate-600 dark:text-slate-400">{line.slice(5)}</span></div>;
             if (line.startsWith("- ")) return <li key={i} className="text-slate-600 dark:text-slate-400 mb-1 ml-4">{line.slice(2)}</li>;
             if (line.startsWith("**") && line.endsWith("**")) return <strong key={i} className="text-slate-900 dark:text-white">{line.slice(2, -2)}</strong>;
             if (line === "") return <div key={i} className="h-3" />;
@@ -38,20 +38,20 @@ export default async function CmsPageRoute({ params }: { params: { slug: string 
                                 <rect x="7.5" y="11" width="3" height="5" rx="1" fill="#1a3d1f"/>
                             </svg>
                         </div>
-                        <span className="font-medium text-slate-900 dark:text-white">farmio</span>
+                        <span className="font-medium text-slate-900 dark:text-white">agrivault</span>
                     </Link>
                     <Link href="/" className="text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">← Back to home</Link>
                 </div>
             </nav>
 
             <div className="max-w-3xl mx-auto px-6 py-16">
-                <div className="prose-farmio">
+                <div className="prose-agrivault">
                     {renderMarkdown(page.content)}
                 </div>
             </div>
 
             <footer className="border-t border-slate-100 dark:border-slate-800 py-8 px-6 text-center">
-                <p className="text-xs text-slate-400">© 2025 Farmio Ltd. <Link href="/privacy" className="hover:text-slate-700 dark:hover:text-white">Privacy</Link> · <Link href="/terms" className="hover:text-slate-700 dark:hover:text-white">Terms</Link></p>
+                <p className="text-xs text-slate-400">© 2025 AgriVault Ltd. <Link href="/privacy" className="hover:text-slate-700 dark:hover:text-white">Privacy</Link> · <Link href="/terms" className="hover:text-slate-700 dark:hover:text-white">Terms</Link></p>
             </footer>
         </div>
     );

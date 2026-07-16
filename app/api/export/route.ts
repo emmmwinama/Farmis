@@ -34,7 +34,7 @@ export async function GET(req: Request) {
             include: { field: true, cropField: { include: { cropType: true } } },
             orderBy: { date: "desc" },
         });
-        filename = `farmio-transactions-${Date.now()}.csv`;
+        filename = `agrivault-transactions-${Date.now()}.csv`;
         csv = toCSV(
             ["Date", "Type", "Category", "Description", "Amount (MWK)", "Season", "Field", "Crop"],
             transactions.map((t) => [
@@ -64,7 +64,7 @@ export async function GET(req: Request) {
                 },
             },
         });
-        filename = `farmio-activities-${Date.now()}.csv`;
+        filename = `agrivault-activities-${Date.now()}.csv`;
         const rows: any[] = [];
         for (const field of fields) {
             for (const cf of field.cropFields) {
@@ -98,7 +98,7 @@ export async function GET(req: Request) {
             where: { farmId: farm.id },
             include: { cropFields: { include: { cropType: true, yields: true } } },
         });
-        filename = `farmio-yields-${Date.now()}.csv`;
+        filename = `agrivault-yields-${Date.now()}.csv`;
         const rows: any[] = [];
         for (const field of fields) {
             for (const cf of field.cropFields) {
@@ -129,7 +129,7 @@ export async function GET(req: Request) {
             where: { farmId: farm.id },
             include: { sales: true, cropField: { include: { cropType: true } } },
         });
-        filename = `farmio-inventory-${Date.now()}.csv`;
+        filename = `agrivault-inventory-${Date.now()}.csv`;
         csv = toCSV(
             ["Name", "Category", "Unit", "Quantity", "Season", "Crop", "Total Sold", "Revenue (MWK)"],
             items.map((i) => [
@@ -147,7 +147,7 @@ export async function GET(req: Request) {
 
     else if (type === "employees") {
         const employees = await prisma.employee.findMany({ where: { farmId: farm.id } });
-        filename = `farmio-employees-${Date.now()}.csv`;
+        filename = `agrivault-employees-${Date.now()}.csv`;
         csv = toCSV(
             ["Name", "Role", "Pay Rate (MWK)", "Pay Unit", "Phone", "Active"],
             employees.map((e) => [e.name, e.role, e.payRate, e.payRateUnit, e.phone ?? "", e.isActive ? "Yes" : "No"])

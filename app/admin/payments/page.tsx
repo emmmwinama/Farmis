@@ -130,7 +130,7 @@ export default function AdminPaymentsPage() {
                     <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
                         p.status === "success" ? "bg-green-900/40 text-green-400" :
                             p.status === "failed"  ? "bg-red-900/40 text-red-400" :
-                                "bg-amber-900/40 text-amber-400"
+                                "bg-sky-900/40 text-sky-400"
                     }`}>
                       {p.status}
                     </span>

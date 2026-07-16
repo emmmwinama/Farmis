@@ -48,7 +48,7 @@ export default function LivestockHealthPage() {
             <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="stat-card">
                     <p className="metric-label">Upcoming procedures</p>
-                    <p className="metric-value" style={{ color: "#D97706" }}>{data?.upcoming?.length ?? 0}</p>
+                    <p className="metric-value" style={{ color: "#0284C7" }}>{data?.upcoming?.length ?? 0}</p>
                 </div>
                 <div className="stat-card">
                     <p className="metric-label">Total records</p>
@@ -112,8 +112,8 @@ export default function LivestockHealthPage() {
                             <div key={h.id} className="card p-5 flex items-start gap-4 card-hover">
                                 <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                                      style={{
-                                         background: isOverdue ? "var(--error-bg)" : isDueSoon ? "#FEF3C7" : "var(--success-bg)",
-                                         color:      isOverdue ? "var(--error-text)" : isDueSoon ? "#D97706" : "#166534",
+                                         background: isOverdue ? "var(--error-bg)" : isDueSoon ? "#E0F2FE" : "var(--success-bg)",
+                                         color:      isOverdue ? "var(--error-text)" : isDueSoon ? "#0284C7" : "#166534",
                                      }}>
                                     {isOverdue ? <AlertTriangle size={18} /> : isDueSoon ? <Clock size={18} /> : <CheckCircle size={18} />}
                                 </div>
@@ -122,7 +122,7 @@ export default function LivestockHealthPage() {
                                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                                         <span className="badge badge-green">{h.type}</span>
                                         {h.nextDueDate && (
-                                            <span className={`badge ${isOverdue ? "badge-red" : isDueSoon ? "badge-amber" : "badge-warm"}`}>
+                                            <span className={`badge ${isOverdue ? "badge-red" : isDueSoon ? "badge-sky" : "badge-warm"}`}>
                         {isOverdue
                             ? `Overdue by ${Math.abs(days!)} days`
                             : days === 0

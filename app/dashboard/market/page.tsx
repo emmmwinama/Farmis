@@ -19,7 +19,7 @@ const UNIT_LABELS: Record<string, string> = {
 const REC_CONFIG: Record<string, { label: string; bg: string; color: string; Icon: any }> = {
     sell_now:   { label: "Sell now",           bg: "#ECFDF5", color: "#166534", Icon: CheckCircle },
     acceptable: { label: "Acceptable margin",  bg: "#EFF6FF", color: "#1E3A8A", Icon: CheckCircle },
-    hold:       { label: "Consider holding",   bg: "#FFFBEB", color: "#854F0B", Icon: Clock       },
+    hold:       { label: "Consider holding",   bg: "#F0F9FF", color: "#075985", Icon: Clock       },
     no_data:    { label: "No price data",      bg: "#F8FAFC", color: "#475569", Icon: AlertCircle },
 };
 
@@ -370,7 +370,7 @@ export default function MarketPage() {
                                                             {[...item.marketPrices].sort((a: any, b: any) => b.profitPerKg - a.profitPerKg).map((mp: any, i: number) => {
                                                                 const marginGood = mp.marginPct >= 20;
                                                                 const marginOk   = mp.marginPct >= 0;
-                                                                const marginCol  = marginGood ? "#16A34A" : marginOk ? "#D97706" : "#DC2626";
+                                                                const marginCol  = marginGood ? "#16A34A" : marginOk ? "#0284C7" : "#DC2626";
                                                                 return (
                                                                     <tr key={i}
                                                                         style={{ borderBottom: "1px solid var(--border)" }}

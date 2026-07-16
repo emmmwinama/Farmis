@@ -1,21 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET ?? "farmio-mobile-secret-key-2024";
-
-function getSession(req: NextRequest) {
-    try {
-        const auth = req.headers.get("Authorization") ?? "";
-        if (!auth.startsWith("Bearer ")) return null;
-        return jwt.verify(auth.slice(7), JWT_SECRET) as {
-            userId: string; farmId: string; email: string; role: string;
-        };
-    } catch { return null; }
-}
+import { getMobileSession } from "@/lib/mobileAuth";
+import { checkLimit } from "@/lib/subscription";
 
 export async function GET(req: NextRequest) {
-    const session = getSession(req);
+    const session = getMobileSession(req);
     if (!session?.farmId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
@@ -75,8 +64,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    const session = getSession(req);
+    const session = getMobileSession(req);
     if (!session?.farmId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    try {
+        await checkLimit(session.userId, "Transactions");
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 403 });
+    }
 
     const body = await req.json();
     const { type, category, amount, date, description, season, fieldId, cropFieldId } = body;

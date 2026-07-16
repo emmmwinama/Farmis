@@ -12,23 +12,23 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; d
     Active:      { label: "Active",      bg: "#F0FDF4", text: "#14532D", dot: "#22C55E" },
     Sold:        { label: "Sold",        bg: "#EFF6FF", text: "#1E3A8A", dot: "#3B82F6" },
     Deceased:    { label: "Deceased",    bg: "#FFF1F2", text: "#9F1239", dot: "#E11D48" },
-    Slaughtered: { label: "Slaughtered", bg: "#FFFBEB", text: "#78350F", dot: "#F59E0B" },
+    Slaughtered: { label: "Slaughtered", bg: "#F0F9FF", text: "#0C4A6E", dot: "#06B6D4" },
 };
 
-const SEX_ICONS: Record<string, string> = { Male: "♂", Female: "♀", Unknown: "?" };
+const SEX_ICONS: Record<string, string> = { Male: "M", Female: "F", Unknown: "?" };
 
 const ACQ_TYPES = ["Born on farm", "Purchased", "Donated", "Gifted"];
 const STATUSES  = ["Active", "Sold", "Deceased", "Slaughtered"];
 const CATEGORIES = ["Large livestock", "Small livestock", "Poultry", "Aquaculture", "Other"];
 const DEFAULT_TYPES = [
-    { name: "Cattle",   category: "Large livestock", icon: "🐄" },
-    { name: "Goats",    category: "Small livestock", icon: "🐐" },
-    { name: "Sheep",    category: "Small livestock", icon: "🐑" },
-    { name: "Pigs",     category: "Small livestock", icon: "🐖" },
-    { name: "Chickens", category: "Poultry",         icon: "🐔" },
-    { name: "Ducks",    category: "Poultry",         icon: "🦆" },
-    { name: "Rabbits",  category: "Small livestock", icon: "🐇" },
-    { name: "Fish",     category: "Aquaculture",     icon: "🐟" },
+    { name: "Cattle",   category: "Large livestock", icon: "Cattle" },
+    { name: "Goats",    category: "Small livestock", icon: "Goat" },
+    { name: "Sheep",    category: "Small livestock", icon: "Sheep" },
+    { name: "Pigs",     category: "Small livestock", icon: "Pig" },
+    { name: "Chickens", category: "Poultry",         icon: "Chicken" },
+    { name: "Ducks",    category: "Poultry",         icon: "Duck" },
+    { name: "Rabbits",  category: "Small livestock", icon: "Rabbit" },
+    { name: "Fish",     category: "Aquaculture",     icon: "Fish" },
 ];
 
 function fmt(n: number) { return new Intl.NumberFormat("en-MW").format(Math.round(n)); }
@@ -42,7 +42,7 @@ const emptyAnimalForm = {
     acquisitionType: "Born on farm", acquisitionCost: "", weight: "", notes: "",
 };
 
-const emptyTypeForm = { name: "", category: "Large livestock", icon: "🐄" };
+const emptyTypeForm = { name: "", category: "Large livestock", icon: "Cattle" };
 
 export default function LivestockPage() {
     const [data, setData]             = useState<any>(null);
@@ -180,7 +180,7 @@ export default function LivestockPage() {
                     { label: "Total animals",    value: String(stats?.totals?.total    ?? 0), color: "#1a3d1f" },
                     { label: "Active",           value: String(stats?.totals?.active   ?? 0), color: "#16A34A" },
                     { label: "Total expenses",   value: `MWK ${fmt(stats?.financial?.totalExpenses   ?? 0)}`, color: "#DC2626" },
-                    { label: "Total revenue",    value: `MWK ${fmt(stats?.financial?.totalRevenue + stats?.financial?.totalProduction ?? 0)}`, color: "#2563EB" },
+                    { label: "Total revenue",    value: `MWK ${fmt((stats?.financial?.totalRevenue ?? 0) + (stats?.financial?.totalProduction ?? 0))}`, color: "#2563EB" },
                 ].map(({ label, value, color }) => (
                     <div key={label} className="stat-card">
                         <p className="metric-label">{label}</p>
@@ -192,16 +192,16 @@ export default function LivestockPage() {
             {/* Upcoming health alerts */}
             {(stats?.upcomingHealthCount ?? 0) > 0 && (
                 <div className="rounded-2xl p-4 mb-6 flex items-center gap-3"
-                     style={{ background: "#FFFBEB", border: "1.5px solid #FDE68A" }}>
+                     style={{ background: "#F0F9FF", border: "1.5px solid #BAE6FD" }}>
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                         style={{ background: "#FEF3C7" }}>
-                        <AlertTriangle size={16} style={{ color: "#D97706" }} />
+                         style={{ background: "#E0F2FE" }}>
+                        <AlertTriangle size={16} style={{ color: "#0284C7" }} />
                     </div>
                     <div className="flex-1">
-                        <p className="text-sm font-bold" style={{ color: "#92400E" }}>
+                        <p className="text-sm font-bold" style={{ color: "#075985" }}>
                             {stats.upcomingHealthCount} health procedure{stats.upcomingHealthCount !== 1 ? "s" : ""} due in the next 30 days
                         </p>
-                        <p className="text-xs" style={{ color: "#A16207" }}>
+                        <p className="text-xs" style={{ color: "#0369A1" }}>
                             {stats.upcomingHealth.slice(0, 2).map((h: any) => `${h.type} due ${fmtDate(h.nextDueDate)}`).join(" · ")}
                         </p>
                     </div>
@@ -278,7 +278,7 @@ export default function LivestockPage() {
                      style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
                     <div className="empty-state">
                         <div className="empty-icon">
-                            <span className="text-3xl">🐄</span>
+                            <span className="text-3xl">Cattle</span>
                         </div>
                         <p className="section-title mb-2">No animals found</p>
                         <p className="section-subtitle mb-6">
@@ -332,8 +332,8 @@ export default function LivestockPage() {
                                              onClick={(e) => { e.stopPropagation(); }}>
                                             {hasHealthAlert && (
                                                 <div className="w-6 h-6 rounded-lg flex items-center justify-center"
-                                                     style={{ background: "#FEF3C7" }}>
-                                                    <Heart size={11} style={{ color: "#D97706" }} />
+                                                     style={{ background: "#E0F2FE" }}>
+                                                    <Heart size={11} style={{ color: "#0284C7" }} />
                                                 </div>
                                             )}
                                             <button onClick={(e) => { e.stopPropagation(); openEdit(animal); }}
@@ -560,7 +560,7 @@ export default function LivestockPage() {
                                 <label className="form-label">Name *</label>
                                 <div className="flex gap-2">
                                     <input value={typeForm.icon} onChange={(e) => setTypeForm((f) => ({ ...f, icon: e.target.value }))}
-                                           className="input w-16 text-center text-xl" placeholder="🐄" maxLength={2} />
+                                           className="input w-16 text-center text-xl" placeholder="Cattle" maxLength={2} />
                                     <input value={typeForm.name} onChange={(e) => setTypeForm((f) => ({ ...f, name: e.target.value }))}
                                            placeholder="e.g. Donkeys" required className="input flex-1" />
                                 </div>
@@ -596,3 +596,4 @@ export default function LivestockPage() {
         </div>
     );
 }
+

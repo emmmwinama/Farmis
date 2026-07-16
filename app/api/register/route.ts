@@ -1,19 +1,32 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { getClientIp, isRateLimited } from "@/lib/rateLimit";
+import { getTrialEndDate } from "@/lib/tiers";
 
 export async function POST(req: Request) {
     try {
-        const { name, email, password } = await req.json();
+        const ip = getClientIp(req);
+        if (isRateLimited(`register:${ip}`, 5, 60 * 1000)) {
+            return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429 });
+        }
 
-        if (!name || !email || !password) {
+        const { name, email, password } = await req.json();
+        const cleanName = typeof name === "string" ? name.trim().slice(0, 120) : "";
+        const cleanEmail = typeof email === "string" ? email.trim().toLowerCase().slice(0, 254) : "";
+
+        if (!cleanName || !cleanEmail || typeof password !== "string") {
             return NextResponse.json(
                 { error: "All fields are required" },
                 { status: 400 }
             );
         }
 
-        const existing = await prisma.user.findUnique({ where: { email } });
+        if (password.length < 8) {
+            return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
+        }
+
+        const existing = await prisma.user.findUnique({ where: { email: cleanEmail } });
         if (existing) {
             return NextResponse.json(
                 { error: "Email already registered" },
@@ -25,12 +38,12 @@ export async function POST(req: Request) {
 
         const user = await prisma.user.create({
             data: {
-                name,
-                email,
+                name: cleanName,
+                email: cleanEmail,
                 password: hashed,
                 farms: {
                     create: {
-                        name: `${name}'s Farm`,
+                        name: `${cleanName}'s Farm`,
                         location: "Not set",
                     },
                 },
@@ -38,17 +51,23 @@ export async function POST(req: Request) {
         });
 
         // After user creation, add:
-        const freeTier = await prisma.subscriptionTier.findFirst({
-            where: { name: "Free" },
-        });
+        const trialTier =
+            await prisma.subscriptionTier.findFirst({ where: { name: "Trial" } }) ??
+            await prisma.subscriptionTier.findFirst({
+                where: { priceMonthly: 0, isActive: true },
+                orderBy: { sortOrder: "asc" },
+            });
 
-        if (freeTier) {
+        if (trialTier) {
+            const trialEndsAt = getTrialEndDate();
             await prisma.subscription.create({
                 data: {
                     userId: user.id,
-                    tierId: freeTier.id,
-                    status: "active",
+                    tierId: trialTier.id,
+                    status: "trial",
                     billingCycle: "monthly",
+                    endDate: trialEndsAt,
+                    trialEndsAt,
                 },
             });
         }

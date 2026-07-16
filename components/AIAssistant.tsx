@@ -69,7 +69,7 @@ export default function AIAssistant() {
         if (open && messages.length === 0) {
             setMessages([{
                 role: "assistant",
-                content: "Hi! I'm your Farmio AI assistant. I have full context about your farm — fields, crops, yields, costs and finances. What would you like to know?",
+                content: "Hi! I'm your AgriVault AI assistant. I have full context about your farm — fields, crops, yields, costs and finances. What would you like to know?",
             }]);
         }
         if (open) {
@@ -115,7 +115,7 @@ export default function AIAssistant() {
     const reset = () => {
         setMessages([{
             role: "assistant",
-            content: "Hi! I'm your Farmio AI assistant. I have full context about your farm — fields, crops, yields, costs and finances. What would you like to know?",
+            content: "Hi! I'm your AgriVault AI assistant. I have full context about your farm — fields, crops, yields, costs and finances. What would you like to know?",
         }]);
     };
 
@@ -147,7 +147,7 @@ export default function AIAssistant() {
                                 <Sparkles size={16} className="text-white" />
                             </div>
                             <div>
-                                <p className="text-sm font-semibold text-white">Farmio AI</p>
+                                <p className="text-sm font-semibold text-white">AgriVault AI</p>
                                 <p className="text-xs text-white/70">Farm-aware assistant</p>
                             </div>
                         </div>

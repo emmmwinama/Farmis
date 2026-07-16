@@ -14,8 +14,8 @@ function daysLeft(d: string | null | undefined): { label: string; color: string 
     if (!d) return { label: "No expiry", color: "#94A3B8" };
     const diff = Math.ceil((new Date(d).getTime() - Date.now()) / 86400000);
     if (diff < 0)   return { label: `Expired ${Math.abs(diff)}d ago`, color: "#DC2626" };
-    if (diff === 0) return { label: "Expires today",                   color: "#D97706" };
-    if (diff <= 7)  return { label: `${diff}d left`,                   color: "#D97706" };
+    if (diff === 0) return { label: "Expires today",                   color: "#0284C7" };
+    if (diff <= 7)  return { label: `${diff}d left`,                   color: "#0284C7" };
     if (diff <= 30) return { label: `${diff}d left`,                   color: "#2563EB" };
     return               { label: `${diff}d left`,                     color: "#16A34A" };
 }
@@ -23,7 +23,7 @@ function daysLeft(d: string | null | undefined): { label: string; color: string 
 const STATUS_CFG: Record<string, { bg: string; color: string }> = {
     active:    { bg: "#ECFDF5", color: "#059669" },
     trial:     { bg: "#EFF6FF", color: "#2563EB" },
-    suspended: { bg: "#FFF7ED", color: "#D97706" },
+    suspended: { bg: "#F0F9FF", color: "#0284C7" },
     expired:   { bg: "#FEF2F2", color: "#DC2626" },
 };
 
@@ -173,9 +173,9 @@ export default function AdminSubscriptionsPage() {
                 {[
                     { label: "Active",        value: totalActive,    color: "#059669" },
                     { label: "Trial",         value: totalTrial,     color: "#2563EB" },
-                    { label: "Suspended",     value: totalSuspended, color: "#D97706" },
+                    { label: "Suspended",     value: totalSuspended, color: "#0284C7" },
                     { label: "Expired",       value: totalExpired,   color: "#DC2626" },
-                    { label: "Expiring (7d)", value: expiringSoon,   color: expiringSoon > 0 ? "#D97706" : "#94A3B8" },
+                    { label: "Expiring (7d)", value: expiringSoon,   color: expiringSoon > 0 ? "#0284C7" : "#94A3B8" },
                 ].map(({ label, value, color }) => (
                     <div key={label} className="rounded-2xl p-5"
                          style={{ background: "white", border: "1px solid #E2E8F0", boxShadow: "0 1px 3px rgba(15,23,42,0.06)" }}>

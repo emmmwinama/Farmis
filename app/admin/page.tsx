@@ -9,7 +9,7 @@ function fmtDate(d: string) {
     return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-const CARD_ACCENTS = ["#0F766E", "#2563EB", "#D97706", "#7C3AED"];
+const CARD_ACCENTS = ["#0F766E", "#2563EB", "#0284C7", "#7C3AED"];
 
 function StatCard({ label, value, sub, icon: Icon, accent, href }: {
     label: string; value: string; sub?: string; icon: any; accent: string; href?: string;
@@ -137,7 +137,7 @@ export default function AdminOverviewPage() {
                                             MWK {fmt(p.amount)}
                                         </p>
                                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
-                                            p.status === "success" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+                                            p.status === "success" ? "bg-emerald-50 text-emerald-700" : "bg-sky-50 text-sky-700"
                                         }`}>
                       {p.status}
                     </span>
@@ -188,7 +188,7 @@ export default function AdminOverviewPage() {
                             <td className="px-6 py-3.5 text-sm" style={{ color: "#94A3B8" }}>{fmtDate(u.createdAt)}</td>
                             <td className="px-6 py-3.5">
                   <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
-                      u.isActive ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+                      u.isActive ? "bg-emerald-50 text-emerald-700" : "bg-sky-50 text-sky-700"
                   }`}>
                     {u.isActive ? "Active" : "Pending"}
                   </span>

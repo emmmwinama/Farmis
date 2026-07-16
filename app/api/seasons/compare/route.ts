@@ -12,6 +12,7 @@ function toKg(q: number, unit: string, uw: number | null) {
 export async function GET(req: Request) {
     const { farm } = await getSessionFarm();
     if (!farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const farmId = farm.id;
 
     const { searchParams } = new URL(req.url);
     const seasonA = searchParams.get("a");
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
 
     async function getSeasonData(season: string) {
         const fields = await prisma.field.findMany({
-            where: { farmId: farm.id },
+            where: { farmId },
             include: {
                 cropFields: {
                     where: { season },
@@ -55,9 +56,8 @@ export async function GET(req: Request) {
             totalYieldKg += cf.yields.reduce((s, y) => s + toKg(y.quantity, y.unit, y.unitWeight), 0);
         }
 
-        // @ts-ignore
         const transactions = await prisma.transaction.findMany({
-            where: { farmId: farm.id, season },
+            where: { farmId, season },
         });
         const txIncome = transactions.filter((t) => t.type === "Income").reduce((s, t) => s + t.amount, 0);
         const txExpense = transactions.filter((t) => t.type === "Expense").reduce((s, t) => s + t.amount, 0);

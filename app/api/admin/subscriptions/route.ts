@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/adminAuth";
 import { prisma } from "@/lib/prisma";
+import { getTrialEndDate } from "@/lib/tiers";
 
 export async function GET() {
     try {
@@ -16,6 +17,7 @@ export async function GET() {
                 billingCycle: true,
                 startDate:    true,
                 endDate:      true,
+                trialEndsAt:  true,
                 notes:        true,
                 createdAt:    true,
                 userId:       true,
@@ -54,6 +56,7 @@ export async function GET() {
                 billingCycle: s.billingCycle,
                 startDate:    s.startDate,
                 endDate:      s.endDate,
+                trialEndsAt:  s.trialEndsAt,
                 notes:        s.notes,
                 createdAt:    s.createdAt,
                 userId:       s.userId,
@@ -84,6 +87,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "userId and tierId required" }, { status: 400 });
         }
 
+        const nextStatus = status ?? "active";
+        const trialEndsAt = nextStatus === "trial" ? (endDate ? new Date(endDate) : getTrialEndDate()) : null;
+        const subscriptionEndDate = nextStatus === "trial" ? trialEndsAt : (endDate ? new Date(endDate) : null);
+
         // Upsert — update if exists, create if not
         const existing = await prisma.subscription.findUnique({ where: { userId } });
 
@@ -92,9 +99,10 @@ export async function POST(req: Request) {
                 where: { userId },
                 data: {
                     tierId,
-                    status:       status       ?? "active",
+                    status:       nextStatus,
                     billingCycle: billingCycle ?? "monthly",
-                    endDate:      endDate ? new Date(endDate) : null,
+                    endDate:      subscriptionEndDate,
+                    trialEndsAt,
                     notes:        notes ?? null,
                     startDate:    new Date(),
                 },
@@ -106,9 +114,10 @@ export async function POST(req: Request) {
             data: {
                 userId,
                 tierId,
-                status:       status       ?? "active",
+                status:       nextStatus,
                 billingCycle: billingCycle ?? "monthly",
-                endDate:      endDate ? new Date(endDate) : null,
+                endDate:      subscriptionEndDate,
+                trialEndsAt,
                 notes:        notes ?? null,
                 startDate:    new Date(),
             },

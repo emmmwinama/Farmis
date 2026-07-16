@@ -159,7 +159,7 @@ export default function FieldsPage() {
                 {[
                     { label: "Total fields",  value: String(fields.length),  color: "var(--farm-green)" },
                     { label: "Total area",    value: fmtHa(totalHa),         color: "#2563EB" },
-                    { label: "GPS mapped",    value: `${mappedCount} / ${fields.length}`, color: "#D97706" },
+                    { label: "GPS mapped",    value: `${mappedCount} / ${fields.length}`, color: "#0284C7" },
                 ].map(({ label, value, color }) => (
                     <div key={label} className="rounded-2xl p-5"
                          style={{ background: "var(--bg-card)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(15,23,42,0.06)" }}>
@@ -179,7 +179,7 @@ export default function FieldsPage() {
             ) : fields.length === 0 ? (
                 <div className="rounded-2xl p-16 text-center"
                      style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
-                    <p className="text-5xl mb-4">🌾</p>
+                    <p className="text-5xl mb-4">Harvest</p>
                     <p className="text-base font-bold mb-1" style={{ color: "var(--text-primary)" }}>
                         No fields yet
                     </p>

@@ -9,6 +9,7 @@ import {
     MessageSquare, FileText, BarChart2, ChevronRight as Breadcrumb,
     Sun, Moon,
 } from "lucide-react";
+import AgriVaultLogo from "@/components/AgriVaultLogo";
 
 const NAV_GROUPS = [
     {
@@ -88,24 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {/* Logo */}
                 <div className={`flex items-center h-16 flex-shrink-0 ${collapsed ? "justify-center px-0" : "px-5 gap-3"}`}
                      style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                         style={{ background: "rgba(255,255,255,0.1)" }}>
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                            <polygon points="9,2 16,14 2,14" fill="#475569"/>
-                            <polygon points="9,5 14,14 4,14" fill="#64748B"/>
-                            <polygon points="9,8 12,14 6,14" fill="#94A3B8"/>
-                            <rect x="7.5" y="11" width="3" height="5" rx="1" fill="#334155"/>
-                        </svg>
-                    </div>
-                    {!collapsed && (
-                        <div>
-                            <p className="text-white font-extrabold text-base leading-none tracking-tight">Farmio</p>
-                            <p className="text-[10px] font-bold uppercase tracking-widest mt-0.5"
-                               style={{ color: "rgba(148,163,184,0.7)" }}>
-                                Admin Portal
-                            </p>
-                        </div>
-                    )}
+                    <AgriVaultLogo collapsed={collapsed} />
                 </div>
 
                 {/* Nav */}

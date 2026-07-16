@@ -8,7 +8,7 @@ const ROLE_BADGE: Record<string, { bg: string; color: string }> = {
     owner:      { bg: "#F5F3FF", color: "#3C3489" },
     manager:    { bg: "#EFF6FF", color: "#1E3A8A" },
     agronomist: { bg: "#ECFDF5", color: "#166534" },
-    accountant: { bg: "#FFFBEB", color: "#854F0B" },
+    accountant: { bg: "#F0F9FF", color: "#075985" },
     viewer:     { bg: "#F8FAFC", color: "#475569" },
 };
 
@@ -23,7 +23,7 @@ const AVATAR_COLORS = [
     { bg: "#0F766E", text: "#fff" },
     { bg: "#1E3A8A", text: "#fff" },
     { bg: "#3C3489", text: "#fff" },
-    { bg: "#854F0B", text: "#fff" },
+    { bg: "#075985", text: "#fff" },
 ];
 
 const INP: React.CSSProperties = {
@@ -182,7 +182,7 @@ export default function TeamPage() {
                             {Object.keys(ROLES).map((role) => (
                                 <td key={role} className="py-2 px-2 text-center">
                                     {ROLE_DEFAULTS[role as keyof typeof ROLE_DEFAULTS][key as keyof typeof ROLE_DEFAULTS.owner]
-                                        ? <span className="font-extrabold" style={{ color: "#16A34A" }}>✓</span>
+                                        ? <span className="font-extrabold" style={{ color: "#16A34A" }}>OK</span>
                                         : <span style={{ color: "var(--border)" }}>—</span>}
                                 </td>
                             ))}
@@ -320,7 +320,7 @@ export default function TeamPage() {
                                            onChange={(e) => setInviteEmail(e.target.value)}
                                            placeholder="colleague@farm.com" required style={INP} />
                                     <p className="text-[10px] mt-1.5" style={{ color: "var(--text-muted)" }}>
-                                        The person must already have a Farmio account
+                                        The person must already have a AgriVault account
                                     </p>
                                 </div>
 

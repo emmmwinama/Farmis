@@ -2,6 +2,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
+import { assertStrongSecret, getRequiredEnv } from "@/lib/env";
+
+const NEXTAUTH_SECRET = getRequiredEnv("NEXTAUTH_SECRET");
+assertStrongSecret("NEXTAUTH_SECRET", NEXTAUTH_SECRET);
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -13,10 +17,11 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) return null;
+                const email = credentials.email.trim().toLowerCase();
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email },
+                    where: { email },
                 });
-                if (!user) return null;
+                if (!user || !user.isActive) return null;
                 const passwordMatch = await bcrypt.compare(credentials.password, user.password);
                 if (!passwordMatch) return null;
                 return { id: user.id, email: user.email, name: user.name };
@@ -41,5 +46,5 @@ export const authOptions: NextAuthOptions = {
             return baseUrl + "/dashboard";
         },
     },
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: NEXTAUTH_SECRET,
 };

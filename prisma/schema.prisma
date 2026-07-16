@@ -7,15 +7,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "mysql"
-//   url      = "mysql://root:@localhost:3306/farmio"
-// }
-
 datasource db {
   provider = "mysql"
-  // url      = env("DATABASE_URL")
-  url      = "mysql://root:anUEjPWaxuUGAsppnbGcMwYmcIMCxCdm@mainline.proxy.rlwy.net:56635/railway"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -571,7 +565,7 @@ model LivestockType {
   farmId   String
   name     String
   category String
-  icon     String   @default("🐄")
+  icon     String   @default("Cattle")
   farm     Farm     @relation(fields: [farmId], references: [id])
   animals  Animal[]
 }
@@ -729,23 +723,3 @@ model FarmMarker {
 }
 
 
-model ImpactStat {
-  id        String   @id @default(cuid())
-  icon      String   @default("📊")
-  value     String
-  label     String
-  source    String?
-  color     String?  @default("#1a3d1f")
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-}
-
-model PitchSection {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  title     String
-  content   Json
-  isActive  Boolean  @default(true)
-  updatedAt DateTime @updatedAt
-}

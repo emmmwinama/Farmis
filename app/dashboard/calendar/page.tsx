@@ -6,12 +6,14 @@ import {
     ChevronLeft,
     ChevronRight,
     CalendarRange,
+    Sprout,
+    Wheat,
 } from "lucide-react";
 import Link from "next/link";
 
 const CROP_COLORS = [
     { bg: "#EBF5EC", border: "#86EFAC", text: "#14532D", dot: "#16A34A" },
-    { bg: "#FEF3C7", border: "#FCD34D", text: "#78350F", dot: "#D97706" },
+    { bg: "#E0F2FE", border: "#7DD3FC", text: "#0C4A6E", dot: "#0284C7" },
     { bg: "#EFF6FF", border: "#BFDBFE", text: "#1E3A8A", dot: "#2563EB" },
     { bg: "#FAF5FF", border: "#E9D5FF", text: "#581C87", dot: "#9333EA" },
     { bg: "#FFF1F2", border: "#FECDD3", text: "#9F1239", dot: "#E11D48" },
@@ -42,7 +44,7 @@ export default function CalendarPage() {
     const [viewMode, setViewMode] = useState<"month" | "timeline">("month");
 
     useEffect(() => {
-        fetch("/api/crops")
+        fetch("/api/crops?archived=both")
             .then((r) => r.json())
             .then((d) => {
                 setCrops(d);
@@ -137,7 +139,8 @@ export default function CalendarPage() {
     const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     // Timeline: sort crops by planting date
-    const sortedCrops = [...crops].sort(
+    const timelineCrops = crops.filter((crop) => !crop.isArchived && crop.status !== "Harvested");
+    const sortedCrops = [...timelineCrops].sort(
         (a, b) =>
             new Date(a.plantingDate).getTime() -
             new Date(b.plantingDate).getTime()
@@ -357,18 +360,15 @@ export default function CalendarPage() {
                                                             dayEvents[0].type ===
                                                             "planting"
                                                                 ? "#EBF5EC"
-                                                                : "#FEF3C7",
+                                                                : "#E0F2FE",
                                                         color:
                                                             dayEvents[0].type ===
                                                             "planting"
                                                                 ? "#14532D"
-                                                                : "#78350F",
+                                                                : "#0C4A6E",
                                                     }}
                                                 >
-                          {dayEvents[0].type ===
-                          "planting"
-                              ? "🌱"
-                              : "🌾"}
+                          {dayEvents[0].type === "planting" ? "Plant" : "Harvest"}
                         </span>
                                             )}
                                         </div>
@@ -503,13 +503,13 @@ export default function CalendarPage() {
                                                     background:
                                                         e.type === "planting"
                                                             ? "#EBF5EC"
-                                                            : "#FEF3C7",
+                                                            : "#E0F2FE",
                                                 }}
                                             >
                         <span>
                           {e.type === "planting"
-                              ? "🌱"
-                              : "🌾"}
+                              ? "Plant"
+                              : "Harvest"}
                         </span>
 
                                                 <span
@@ -518,7 +518,7 @@ export default function CalendarPage() {
                                                         color:
                                                             e.type === "planting"
                                                                 ? "#14532D"
-                                                                : "#78350F",
+                                                                : "#0C4A6E",
                                                     }}
                                                 >
                           {e.type === "planting"
@@ -601,7 +601,7 @@ export default function CalendarPage() {
                                                             opacity: 0.7,
                                                         }}
                                                     >
-                                                        {c.variety} · {c.fieldName}
+                                                        {c.variety} - {c.fieldName}
                                                     </p>
 
                                                     <p
@@ -689,11 +689,7 @@ export default function CalendarPage() {
                                                 borderColor: "var(--border)",
                                             }}
                                         >
-                      <span className="text-base">
-                        {event.type === "planting"
-                            ? "🌱"
-                            : "🌾"}
-                      </span>
+                      <span className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "var(--bg-subtle)", color: event.type === "planting" ? "#0D9488" : "#0284C7" }}>{event.type === "planting" ? <Sprout size={15} /> : <Wheat size={15} />}</span>
 
                                             <div className="flex-1 min-w-0">
                                                 <p
@@ -716,7 +712,7 @@ export default function CalendarPage() {
                                                             "var(--text-muted)",
                                                     }}
                                                 >
-                                                    {event.crop.fieldName} ·{" "}
+                                                    {event.crop.fieldName}  - {" "}
                                                     {fmt(
                                                         event.date.toISOString()
                                                     )}
@@ -726,7 +722,7 @@ export default function CalendarPage() {
                                             <span
                                                 className={`badge ${
                                                     daysUntil <= 7
-                                                        ? "badge-amber"
+                                                        ? "badge-sky"
                                                         : "badge-warm"
                                                 }`}
                                             >
@@ -768,7 +764,7 @@ export default function CalendarPage() {
                             className="text-xs"
                             style={{ color: "var(--text-muted)" }}
                         >
-                            All crops sorted by planting date
+                            Active crops sorted by planting date
                         </p>
                     </div>
 
@@ -858,7 +854,7 @@ export default function CalendarPage() {
                                                             "var(--text-muted)",
                                                     }}
                                                 >
-                                                    {crop.fieldName} ·{" "}
+                                                    {crop.fieldName}  - {" "}
                                                     {crop.season}
                                                 </p>
                                             </div>
@@ -897,7 +893,7 @@ export default function CalendarPage() {
                                                 color: "var(--text-muted)",
                                             }}
                                         >
-                                            🌱 {fmt(crop.plantingDate)}
+                                            Plant {fmt(crop.plantingDate)}
                                         </p>
 
                                         <div className="flex-1 relative">
@@ -939,7 +935,7 @@ export default function CalendarPage() {
                                                 color: "var(--text-muted)",
                                             }}
                                         >
-                                            🌾{" "}
+                                            Harvest{" "}
                                             {fmt(
                                                 crop.expectedHarvestDate
                                             )}
@@ -954,3 +950,4 @@ export default function CalendarPage() {
         </div>
     );
 }
+

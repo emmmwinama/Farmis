@@ -1,18 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET ?? "farmio-mobile-secret-key-2024";
-
-function getSession(req: NextRequest) {
-    try {
-        const auth = req.headers.get("Authorization") ?? "";
-        if (!auth.startsWith("Bearer ")) return null;
-        return jwt.verify(auth.slice(7), JWT_SECRET) as {
-            userId: string; farmId: string; email: string; role: string;
-        };
-    } catch { return null; }
-}
+import { getMobileSession } from "@/lib/mobileAuth";
 
 async function verifyCropAccess(cropId: string, farmId: string) {
     return prisma.cropField.findFirst({
@@ -31,7 +19,7 @@ export async function GET(
     req: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    const session = getSession(req);
+    const session = getMobileSession(req);
     if (!session?.farmId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const crop = await verifyCropAccess(params.id, session.farmId);
@@ -100,7 +88,7 @@ export async function PATCH(
     req: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    const session = getSession(req);
+    const session = getMobileSession(req);
     if (!session?.farmId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const crop = await verifyCropAccess(params.id, session.farmId);
@@ -145,7 +133,7 @@ export async function DELETE(
     req: NextRequest,
     { params }: { params: { id: string } }
 ) {
-    const session = getSession(req);
+    const session = getMobileSession(req);
     if (!session?.farmId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const crop = await verifyCropAccess(params.id, session.farmId);

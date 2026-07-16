@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 import { Loader2, Wind, Droplets, Eye, Thermometer, RefreshCw } from "lucide-react";
 
 function getWeatherEmoji(code: number): string {
-    if (code === 0) return "☀️";
-    if (code <= 2) return "⛅";
-    if (code === 3) return "☁️";
-    if (code <= 49) return "🌫️";
-    if (code <= 59) return "🌦️";
-    if (code <= 69) return "🌧️";
-    if (code <= 79) return "❄️";
-    if (code <= 82) return "🌧️";
-    if (code <= 84) return "🌨️";
-    if (code <= 99) return "⛈️";
-    return "🌤️";
+    if (code === 0) return "Sunny";
+    if (code <= 2) return "Partly cloudy";
+    if (code === 3) return "Cloudy";
+    if (code <= 49) return "Mist";
+    if (code <= 59) return "Showers";
+    if (code <= 69) return "Rain";
+    if (code <= 79) return "Cold";
+    if (code <= 82) return "Rain";
+    if (code <= 84) return "Storm";
+    if (code <= 99) return "Thunder";
+    return "Weather";
 }
 
 function getWeatherLabel(code: number): string {
@@ -47,11 +47,11 @@ function getFarmingAdvice(weather: any): { advice: string; color: string; bg: st
     }
 
     if (current.temp > 35) {
-        advices.push({ advice: "High heat alert — water crops and protect young plants", color: "#92400E", bg: "#FFFBEB" });
+        advices.push({ advice: "High heat alert — water crops and protect young plants", color: "#075985", bg: "#F0F9FF" });
     }
 
     if (daily?.slice(0, 3).every((d: any) => d.precipitation < 1)) {
-        advices.push({ advice: "Dry spell ahead — consider irrigation in the next 3 days", color: "#D97706", bg: "#FFFBEB" });
+        advices.push({ advice: "Dry spell ahead — consider irrigation in the next 3 days", color: "#0284C7", bg: "#F0F9FF" });
     }
 
     if (daily?.slice(0, 3).some((d: any) => d.precipitation > 10)) {
@@ -89,7 +89,7 @@ export default function WeatherPage() {
         return (
             <div className="flex items-center justify-center h-[80vh]">
                 <div className="flex flex-col items-center gap-3">
-                    <div className="text-5xl">🌤️</div>
+                    <div className="text-5xl">Weather</div>
                     <Loader2 size={20} className="animate-spin" style={{ color: "var(--farm-green)" }} />
                     <p className="text-sm font-semibold" style={{ color: "var(--text-muted)" }}>
                         Fetching weather for your farm...
@@ -104,7 +104,7 @@ export default function WeatherPage() {
             <div className="p-8 max-w-2xl mx-auto">
                 <div className="rounded-2xl p-10 text-center"
                      style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
-                    <p className="text-4xl mb-4">🌩️</p>
+                    <p className="text-4xl mb-4">Storm</p>
                     <p className="font-bold mb-2" style={{ color: "var(--text-primary)" }}>Weather unavailable</p>
                     <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>
                         {error || "Unable to load weather data."}
@@ -178,7 +178,7 @@ export default function WeatherPage() {
             {advices.length > 0 && (
                 <div className="mb-6">
                     <p className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: "var(--text-muted)" }}>
-                        🌾 Farming advice based on today's forecast
+                        Harvest Farming advice based on today's forecast
                     </p>
                     <div className="flex flex-col gap-2">
                         {advices.map((a, i) => (
@@ -198,7 +198,7 @@ export default function WeatherPage() {
                     <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>7-Day Forecast</p>
                     <p className="text-xs" style={{ color: "var(--text-muted)" }}>Source: Open-Meteo · Updated every 3 hours</p>
                 </div>
-                <div className="divide-y" style={{ divideColor: "var(--border)" }}>
+                <div className="divide-y" style={{ borderColor: "var(--border)" }}>
                     {(weather.daily ?? []).map((day: any, i: number) => {
                         const date = new Date(day.date);
                         const isToday = i === 0;
@@ -257,3 +257,4 @@ export default function WeatherPage() {
         </div>
     );
 }
+

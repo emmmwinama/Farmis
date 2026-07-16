@@ -15,7 +15,7 @@ const CONTACT_STATUS_COLORS: Record<string, string> = {
 };
 
 const BOOKING_STATUS_COLORS: Record<string, string> = {
-    pending:   "bg-amber-900/30 text-amber-400",
+    pending:   "bg-sky-900/30 text-sky-400",
     confirmed: "bg-blue-900/30 text-blue-400",
     completed: "bg-green-900/30 text-green-400",
     cancelled: "bg-red-900/30 text-red-400",
@@ -72,7 +72,7 @@ export default function AdminInquiriesPage() {
                             tab === "bookings" ? "bg-[#1a3d1f] text-white" : "bg-[#1a2d1c] border border-[#2d5c35] text-[#4a7a50] hover:text-white"
                         }`}>
                     <Calendar size={14} /> Demo bookings
-                    {pendingBookings > 0 && <span className="w-5 h-5 bg-amber-500 text-white text-xs rounded-full flex items-center justify-center">{pendingBookings}</span>}
+                    {pendingBookings > 0 && <span className="w-5 h-5 bg-sky-500 text-white text-xs rounded-full flex items-center justify-center">{pendingBookings}</span>}
                 </button>
             </div>
 

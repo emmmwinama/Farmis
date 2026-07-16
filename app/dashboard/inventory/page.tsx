@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
     Plus, Loader2, X, Check, Pencil, Trash2,
-    ShoppingCart,
+    ShoppingCart, Wheat, Sprout, Beaker, FlaskConical, Wrench, Package,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -17,20 +17,20 @@ const CATEGORIES = [
 
 const UNITS = ["kg", "bags", "tonnes", "litres", "units", "crates", "buckets"];
 
-const CAT_ICONS: Record<string, string> = {
-    crop_harvest: "🌾",
-    seed:         "🌱",
-    fertiliser:   "🧪",
-    chemical:     "⚗️",
-    equipment:    "🔧",
-    other:        "📦",
+const CAT_ICONS: Record<string, any> = {
+    crop_harvest: Wheat,
+    seed:         Sprout,
+    fertiliser:   Beaker,
+    chemical:     FlaskConical,
+    equipment:    Wrench,
+    other:        Package,
 };
 
 const CAT_BADGE: Record<string, { bg: string; color: string }> = {
     crop_harvest: { bg: "#ECFDF5", color: "#166534" },
-    seed:         { bg: "#FFFBEB", color: "#854F0B" },
+    seed:         { bg: "#F0F9FF", color: "#075985" },
     fertiliser:   { bg: "#EFF6FF", color: "#1E3A8A" },
-    chemical:     { bg: "#FFF7ED", color: "#9A3412" },
+    chemical:     { bg: "#F0F9FF", color: "#9A3412" },
     equipment:    { bg: "#F8FAFC", color: "#475569" },
     other:        { bg: "#F5F3FF", color: "#3C3489" },
 };
@@ -249,7 +249,7 @@ export default function InventoryPage() {
             ) : items.length === 0 ? (
                 <div className="rounded-2xl p-16 text-center"
                      style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
-                    <p className="text-4xl mb-4">📦</p>
+                    <Package size={34} className="mx-auto mb-4" style={{ color: "var(--text-hint)" }} />
                     <p className="text-base font-black mb-1" style={{ color: "var(--text-primary)" }}>
                         No inventory items yet
                     </p>
@@ -257,7 +257,7 @@ export default function InventoryPage() {
                         Items are added automatically when you record a harvest, or add them manually here.
                     </p>
                     <button onClick={openAdd}
-                            className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-bold text-white"
+                            className="inline-flex items-center gap-2 min-h-11 px-5 rounded-xl text-sm font-bold text-white"
                             style={{ background: "var(--farm-green)" }}>
                         <Plus size={15} /> Add item
                     </button>
@@ -272,12 +272,12 @@ export default function InventoryPage() {
                                  style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
 
                                 {/* Item header */}
-                                <div className="flex items-start justify-between px-5 py-4"
+                                <div className="flex items-start justify-between px-5 py-5 min-h-20"
                                      style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-subtle)" }}>
                                     <div className="flex items-start gap-3">
-                                        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
                                              style={{ background: badge.bg }}>
-                                            {CAT_ICONS[item.category] ?? "📦"}
+                                            {(() => { const Icon = CAT_ICONS[item.category] ?? Package; return <Icon size={18} style={{ color: badge.color }} />; })()}
                                         </div>
                                         <div>
                                             <h3 className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
@@ -290,7 +290,7 @@ export default function InventoryPage() {
                                                 </span>
                                                 {item.season && (
                                                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                                          style={{ background: "#FFFBEB", color: "#854F0B" }}>
+                                                          style={{ background: "#F0F9FF", color: "#075985" }}>
                                                         {item.season}
                                                     </span>
                                                 )}
@@ -331,18 +331,18 @@ export default function InventoryPage() {
                                             {
                                                 label: "Available",
                                                 value: `${item.quantity} ${item.unit}`,
-                                                sub:   item.unitWeight ? `≈ ${fmt(item.quantityKg)} kg` : null,
+                                                sub:   item.unitWeight ? `~ ${fmt(item.quantityKg)} kg` : null,
                                                 color: "var(--text-primary)",
                                             },
                                             {
                                                 label: "Total sold",
-                                                value: item.totalSold > 0 ? `${item.totalSold} ${item.unit}` : "—",
+                                                value: item.totalSold > 0 ? `${item.totalSold} ${item.unit}` : "-",
                                                 sub:   null,
                                                 color: "var(--text-primary)",
                                             },
                                             {
                                                 label: "Revenue",
-                                                value: item.totalRevenue > 0 ? `MWK ${fmt(item.totalRevenue)}` : "—",
+                                                value: item.totalRevenue > 0 ? `MWK ${fmt(item.totalRevenue)}` : "-",
                                                 sub:   null,
                                                 color: item.totalRevenue > 0 ? "#16A34A" : "var(--text-muted)",
                                             },
@@ -388,8 +388,8 @@ export default function InventoryPage() {
                                                                 </p>
                                                                 <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
                                                                     {formatDate(sale.saleDate)}
-                                                                    {sale.buyerName && ` · ${sale.buyerName}`}
-                                                                    {sale.notes && ` · ${sale.notes}`}
+                                                                    {sale.buyerName && `  -  ${sale.buyerName}`}
+                                                                    {sale.notes && `  -  ${sale.notes}`}
                                                                 </p>
                                                             </div>
                                                             <p className="text-sm font-extrabold" style={{ color: "#16A34A" }}>
@@ -408,7 +408,7 @@ export default function InventoryPage() {
                 </div>
             )}
 
-            {/* ── Add/Edit item slide-over ──────────────────────────────────── */}
+            {/* -- Add/Edit item slide-over ------------------------------------ */}
             {showForm && (
                 <div className="fixed inset-0 z-50 flex">
                     <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={() => setShowForm(false)} />
@@ -433,7 +433,7 @@ export default function InventoryPage() {
                                 <div>
                                     <Label>Name *</Label>
                                     <input value={form.name} onChange={(e) => setF("name", e.target.value)}
-                                           placeholder="e.g. Maize — SC403" required style={INP} />
+                                           placeholder="e.g. Maize - SC403" required style={INP} />
                                 </div>
 
                                 <div>
@@ -476,7 +476,7 @@ export default function InventoryPage() {
                                     <div>
                                         <Label>Linked crop record</Label>
                                         <select value={form.cropFieldId} onChange={(e) => setF("cropFieldId", e.target.value)} style={INP}>
-                                            <option value="">None — general harvest</option>
+                                            <option value="">None - general harvest</option>
                                             {cropFields.map((c) => (
                                                 <option key={c.id} value={c.id}>{c.label}</option>
                                             ))}
@@ -524,7 +524,7 @@ export default function InventoryPage() {
                 </div>
             )}
 
-            {/* ── Record sale slide-over ────────────────────────────────────── */}
+            {/* -- Record sale slide-over -------------------------------------- */}
             {showSaleForm && (
                 <div className="fixed inset-0 z-50 flex">
                     <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={() => setShowSaleForm(false)} />
@@ -554,7 +554,7 @@ export default function InventoryPage() {
                                         <option value="">Select item...</option>
                                         {(data?.items ?? []).filter((i: any) => i.quantity > 0).map((i: any) => (
                                             <option key={i.id} value={i.id}>
-                                                {i.name} — {i.quantity} {i.unit} available
+                                                {i.name} - {i.quantity} {i.unit} available
                                             </option>
                                         ))}
                                     </select>
@@ -662,3 +662,4 @@ export default function InventoryPage() {
         </div>
     );
 }
+

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/adminAuth";
 import { prisma } from "@/lib/prisma";
+import { getTrialEndDate } from "@/lib/tiers";
 
 export async function PATCH(
     req: Request,
@@ -21,6 +22,14 @@ export async function PATCH(
         // Handle endDate — null clears it, a date string sets it
         if ("endDate" in body) {
             data.endDate = body.endDate ? new Date(body.endDate) : null;
+        }
+
+        if (body.status === "trial") {
+            const trialEndsAt = data.endDate ?? getTrialEndDate();
+            data.trialEndsAt = trialEndsAt;
+            data.endDate = trialEndsAt;
+        } else if (body.status && body.status !== "trial") {
+            data.trialEndsAt = null;
         }
 
         const sub = await prisma.subscription.update({

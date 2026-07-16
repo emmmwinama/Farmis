@@ -1,51 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-const SECRET = process.env.ADMIN_JWT_SECRET ?? "farmio-admin-secret-2024";
-
-async function isValidToken(token: string): Promise<boolean> {
-    try {
-        const enc = new TextEncoder();
-        const key = await crypto.subtle.importKey(
-            "raw",
-            enc.encode(SECRET),
-            { name: "HMAC", hash: "SHA-256" },
-            false,
-            ["verify"]
-        );
-
-        const decoded = atob(token.replace(/-/g, "+").replace(/_/g, "/"));
-        const lastDot = decoded.lastIndexOf(".");
-        if (lastDot === -1) return false;
-
-        const payload = decoded.slice(0, lastDot);
-        const sigHex  = decoded.slice(lastDot + 1);
-
-        // Convert hex sig back to bytes for verification
-        const sigBytes = new Uint8Array(
-            sigHex.match(/.{2}/g)!.map((b) => parseInt(b, 16))
-        );
-
-        const valid = await crypto.subtle.verify(
-            "HMAC",
-            key,
-            sigBytes,
-            enc.encode(payload)
-        );
-        if (!valid) return false;
-
-        const parts = payload.split(".");
-        const timestamp = parseInt(parts[1]);
-        if (Date.now() - timestamp > 24 * 60 * 60 * 1000) return false;
-
-        return true;
-    } catch {
-        return false;
-    }
-}
+import { verifyAdminToken } from "@/lib/adminToken";
 
 export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
+
+    if (pathname.startsWith("/api/mobile/")) {
+        return mobileCors(req);
+    }
 
     if (
         pathname === "/admin/login"  ||
@@ -56,7 +18,7 @@ export async function middleware(req: NextRequest) {
     }
 
     const token = req.cookies.get("admin_token")?.value;
-    const valid = token ? await isValidToken(token) : false;
+    const valid = token ? await verifyAdminToken(token) : false;
 
     if (!valid) {
         if (pathname.startsWith("/api/")) {
@@ -68,6 +30,29 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
 }
 
+function mobileCors(req: NextRequest) {
+    const origin = req.headers.get("origin") ?? "";
+    const allowedOrigins = new Set([
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
+    ]);
+    const allowOrigin = allowedOrigins.has(origin) ? origin : "";
+
+    const headers = new Headers();
+    if (allowOrigin) headers.set("Access-Control-Allow-Origin", allowOrigin);
+    headers.set("Vary", "Origin");
+    headers.set("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
+    headers.set("Access-Control-Allow-Headers", "Content-Type,Authorization");
+
+    if (req.method === "OPTIONS") {
+        return new NextResponse(null, { status: 204, headers });
+    }
+
+    const response = NextResponse.next();
+    headers.forEach((value, key) => response.headers.set(key, value));
+    return response;
+}
+
 export const config = {
-    matcher: ["/admin/:path*", "/api/admin/:path*"],
+    matcher: ["/admin/:path*", "/api/admin/:path*", "/api/mobile/:path*"],
 };

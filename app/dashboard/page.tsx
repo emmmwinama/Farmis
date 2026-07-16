@@ -6,7 +6,8 @@ import {
     TrendingUp, TrendingDown, Map, Sprout, Wheat,
     Users, Wallet, ArrowRight, Sparkles, AlertTriangle,
     CheckCircle, Info, Lightbulb, Loader2, RefreshCw,
-    Package, Plus, ClipboardList, BarChart2,
+    Package, Plus, ClipboardList, BarChart2, Beaker,
+    Droplets, Leaf, Tractor, Scissors, Search,
 } from "lucide-react";
 
 function fmt(n: number) {
@@ -17,9 +18,17 @@ function formatDate(d: string) {
     return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
-const ACTIVITY_ICONS: Record<string, string> = {
-    Planting: "🌱", Spraying: "🧪", Weeding: "🌿", Irrigation: "💧",
-    Fertilising: "🌾", Harvesting: "🏃", "Land preparation": "🚜", Other: "📋",
+const ACTIVITY_ICONS: Record<string, any> = {
+    Planting: Sprout,
+    Spraying: Beaker,
+    Weeding: Leaf,
+    Irrigation: Droplets,
+    Fertilising: Wheat,
+    Harvesting: Package,
+    "Land preparation": Tractor,
+    Pruning: Scissors,
+    Scouting: Search,
+    Other: ClipboardList,
 };
 
 const INSIGHT_CONFIG: Record<string, {
@@ -27,8 +36,8 @@ const INSIGHT_CONFIG: Record<string, {
     icon: any; iconColor: string; titleColor: string; msgColor: string;
 }> = {
     warning: {
-        bg: "#FFFBEB", border: "#FDE68A",
-        iconBg: "#FEF3C7", icon: AlertTriangle, iconColor: "#D97706", titleColor: "#92400E", msgColor: "#A16207",
+        bg: "#F0F9FF", border: "#BAE6FD",
+        iconBg: "#E0F2FE", icon: AlertTriangle, iconColor: "#0284C7", titleColor: "#075985", msgColor: "#0369A1",
     },
     success: {
         bg: "#F0FDF4", border: "#BBF7D0",
@@ -87,13 +96,13 @@ function StatCard({
 function QuickAction({ href, icon: Icon, label, color }: { href: string; icon: any; label: string; color: string }) {
     return (
         <Link href={href}
-              className="flex flex-col items-center gap-2 p-4 rounded-2xl transition-all hover:-translate-y-0.5 group"
+              className="flex min-h-28 flex-col items-center justify-center gap-3 p-4 rounded-2xl transition-all hover:-translate-y-0.5 group"
               style={{ background: "var(--bg-card)", border: "1.5px solid var(--border)", boxShadow: "0 1px 3px rgba(28,25,23,0.06)" }}>
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-all group-hover:scale-110"
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all group-hover:scale-105"
                  style={{ background: color + "20" }}>
-                <Icon size={20} style={{ color }} />
+                <Icon size={22} style={{ color }} />
             </div>
-            <span className="text-xs font-bold text-center leading-tight" style={{ color: "var(--text-secondary)" }}>
+            <span className="text-sm font-bold text-center leading-tight" style={{ color: "var(--text-secondary)" }}>
         {label}
       </span>
         </Link>
@@ -149,12 +158,12 @@ export default function DashboardPage() {
     return (
         <div className="p-8 max-w-7xl mx-auto animate-fade-in">
 
-            {/* ── Page header ───────────────────────────────────────────────── */}
+            {/* -- Page header ------------------------------------------------- */}
             <div className="page-header flex items-start justify-between">
                 <div>
                     <h1 className="page-title">
                         Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"},
-                        {" "}{stats?.userName?.split(" ")[0]} 👋
+                        {" "}{stats?.userName?.split(" ")[0]}
                     </h1>
                     <p className="page-subtitle">
                         Here&apos;s what&apos;s happening at{" "}
@@ -171,16 +180,16 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* ── Quick actions ─────────────────────────────────────────────── */}
+            {/* -- Quick actions ----------------------------------------------- */}
             <div className="grid grid-cols-5 gap-3 mb-8">
-                <QuickAction href="/dashboard/activities/new" icon={ClipboardList} label="Log activity"    color="#1a3d1f" />
-                <QuickAction href="/dashboard/yields"         icon={Wheat}         label="Record harvest"  color="#D97706" />
+                <QuickAction href="/dashboard/activities/new" icon={ClipboardList} label="Log activity"    color="#0284C7" />
+                <QuickAction href="/dashboard/yields"         icon={Wheat}         label="Record harvest"  color="#0284C7" />
                 <QuickAction href="/dashboard/finance"        icon={Wallet}        label="Add transaction" color="#2563EB" />
                 <QuickAction href="/dashboard/market"         icon={BarChart2}     label="Market prices"   color="#7C3AED" />
                 <QuickAction href="/dashboard/reports"        icon={Sprout}        label="View reports"    color="#059669" />
             </div>
 
-            {/* ── Primary stats ─────────────────────────────────────────────── */}
+            {/* -- Primary stats ----------------------------------------------- */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 <StatCard label="Total fields"   value={String(stats?.totalFields ?? 0)}
                           sub={`${fmt(stats?.totalArea ?? 0)} ha`}
@@ -190,7 +199,7 @@ export default function DashboardPage() {
                           icon={Sprout} iconBg="#EBF5EC" href="/dashboard/crops" />
                 <StatCard label="Total yield"    value={`${fmt(stats?.totalYieldKg ?? 0)} kg`}
                           sub="All harvests"
-                          icon={Wheat} iconBg="#FEF3C7" href="/dashboard/yields" />
+                          icon={Wheat} iconBg="#E0F2FE" href="/dashboard/yields" />
                 <StatCard label="Net income"     value={`MWK ${fmt(Math.abs(stats?.net ?? 0))}`}
                           sub={netPositive ? "Profitable" : "Running at loss"}
                           icon={Wallet} iconBg={netPositive ? "#EBF5EC" : "#FFF1F2"}
@@ -200,12 +209,12 @@ export default function DashboardPage() {
                           href="/dashboard/finance" />
             </div>
 
-            {/* ── Secondary stats ───────────────────────────────────────────── */}
+            {/* -- Secondary stats --------------------------------------------- */}
             <div className="grid grid-cols-4 gap-3 mb-8">
                 {[
                     { label: "Income",         value: `MWK ${fmt(stats?.income ?? 0)}`,            color: "#16A34A" },
                     { label: "Activity costs", value: `MWK ${fmt(stats?.totalActivityCost ?? 0)}`, color: "#DC2626" },
-                    { label: "Overhead",       value: `MWK ${fmt(stats?.totalOverhead ?? 0)}`,     color: "#D97706" },
+                    { label: "Overhead",       value: `MWK ${fmt(stats?.totalOverhead ?? 0)}`,     color: "#0284C7" },
                     { label: "Inventory items",value: String(stats?.totalInventoryItems ?? 0),     color: "#2563EB" },
                 ].map(({ label, value, color }) => (
                     <div key={label} className="rounded-xl px-4 py-3 flex items-center justify-between"
@@ -216,10 +225,71 @@ export default function DashboardPage() {
                 ))}
             </div>
 
-            {/* ── Main grid ─────────────────────────────────────────────────── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+                <div className="rounded-2xl p-5"
+                     style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                    <div className="flex items-center justify-between mb-4">
+                        <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>Season profitability</p>
+                        <BarChart2 size={17} style={{ color: "#0284C7" }} />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                        {(stats?.seasons ?? []).slice(0, 4).map((season: any) => {
+                            const max = Math.max(...(stats?.seasons ?? []).map((item: any) => Math.abs(item.netRevenue ?? 0)), 1);
+                            const width = Math.max(6, Math.round((Math.abs(season.netRevenue ?? 0) / max) * 100));
+                            const positive = (season.netRevenue ?? 0) >= 0;
+                            return (
+                                <div key={season.name}>
+                                    <div className="flex justify-between text-xs font-bold mb-1" style={{ color: "var(--text-secondary)" }}>
+                                        <span>{season.name}</span>
+                                        <span style={{ color: positive ? "#0D9488" : "#DC2626" }}>
+                                            {positive ? "+" : "-"}MWK {fmt(Math.abs(season.netRevenue ?? 0))}
+                                        </span>
+                                    </div>
+                                    <div className="h-3 rounded-full overflow-hidden" style={{ background: "var(--bg-muted)" }}>
+                                        <div className="h-full rounded-full" style={{ width: `${width}%`, background: positive ? "#0D9488" : "#DC2626" }} />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {(stats?.seasons ?? []).length === 0 && (
+                            <p className="text-sm" style={{ color: "var(--text-muted)" }}>Add seasonal crop records to see profit trends.</p>
+                        )}
+                    </div>
+                </div>
+
+                <div className="rounded-2xl p-5"
+                     style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                    <div className="flex items-center justify-between mb-4">
+                        <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>Crop area mix</p>
+                        <Sprout size={17} style={{ color: "#0284C7" }} />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                        {(stats?.cropSummary ?? []).slice(0, 5).map((crop: any) => {
+                            const maxArea = Math.max(...(stats?.cropSummary ?? []).map((item: any) => item.totalArea || 0), 1);
+                            const width = Math.max(6, Math.round((crop.totalArea / maxArea) * 100));
+                            return (
+                                <div key={crop.name}>
+                                    <div className="flex justify-between text-xs font-bold mb-1" style={{ color: "var(--text-secondary)" }}>
+                                        <span>{crop.name}</span>
+                                        <span>{crop.totalArea.toFixed(1)} ha</span>
+                                    </div>
+                                    <div className="h-3 rounded-full overflow-hidden" style={{ background: "var(--bg-muted)" }}>
+                                        <div className="h-full rounded-full" style={{ width: `${width}%`, background: "#0284C7" }} />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {(stats?.cropSummary ?? []).length === 0 && (
+                            <p className="text-sm" style={{ color: "var(--text-muted)" }}>Add crops to see area distribution.</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* -- Main grid --------------------------------------------------- */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {/* AI Insights — takes 2 cols */}
+                {/* AI Insights - takes 2 cols */}
                 <div className="lg:col-span-2 flex flex-col gap-4">
 
                     {/* Insights header */}
@@ -362,7 +432,7 @@ export default function DashboardPage() {
                             <Link href="/dashboard/fields"
                                   className="text-xs font-bold"
                                   style={{ color: "var(--farm-green)" }}>
-                                View →
+                                View
                             </Link>
                         </div>
                         {(stats?.fieldLandUse ?? []).length === 0 ? (
@@ -408,7 +478,7 @@ export default function DashboardPage() {
                          style={{ background: "var(--bg-card)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(28,25,23,0.06)" }}>
                         <div className="flex items-center justify-between mb-4">
                             <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>Crops</p>
-                            <Link href="/dashboard/crops" className="text-xs font-bold" style={{ color: "var(--farm-green)" }}>View →</Link>
+                            <Link href="/dashboard/crops" className="text-xs font-bold" style={{ color: "var(--farm-green)" }}>View</Link>
                         </div>
                         {(stats?.cropSummary ?? []).length === 0 ? (
                             <p className="text-xs" style={{ color: "var(--text-muted)" }}>No crops yet</p>
@@ -418,7 +488,10 @@ export default function DashboardPage() {
                                     <div key={c.name} className="flex items-center justify-between py-2"
                                          style={{ borderBottom: "1px solid var(--border)" }}>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-base">🌱</span>
+                                            <span className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                                                  style={{ background: "var(--bg-subtle)", color: "var(--farm-green)" }}>
+                                                <Sprout size={16} />
+                                            </span>
                                             <div>
                                                 <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>{c.name}</p>
                                                 <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>{c.totalArea.toFixed(1)} ha</p>
@@ -445,23 +518,26 @@ export default function DashboardPage() {
                          style={{ background: "var(--bg-card)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(28,25,23,0.06)" }}>
                         <div className="flex items-center justify-between mb-4">
                             <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>Recent activities</p>
-                            <Link href="/dashboard/activities" className="text-xs font-bold" style={{ color: "var(--farm-green)" }}>View →</Link>
+                            <Link href="/dashboard/activities" className="text-xs font-bold" style={{ color: "var(--farm-green)" }}>View</Link>
                         </div>
                         {(stats?.recentActivities ?? []).length === 0 ? (
                             <p className="text-xs" style={{ color: "var(--text-muted)" }}>No activities logged yet</p>
                         ) : (
                             <div className="flex flex-col gap-2">
                                 {stats.recentActivities.map((a: any) => (
-                                    <div key={a.id} className="flex items-start gap-3 py-2"
+                                    <div key={a.id} className="flex items-start gap-3 py-3"
                                          style={{ borderBottom: "1px solid var(--border)" }}>
-                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-sm"
+                                        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                                              style={{ background: "var(--bg-subtle)" }}>
-                                            {ACTIVITY_ICONS[a.activityType] ?? "📋"}
+                                            {(() => {
+                                                const ActivityIcon = ACTIVITY_ICONS[a.activityType] ?? ClipboardList;
+                                                return <ActivityIcon size={16} style={{ color: "var(--text-secondary)" }} />;
+                                            })()}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>{a.activityType}</p>
                                             <p className="text-[10px] truncate" style={{ color: "var(--text-muted)" }}>
-                                                {a.fieldName}{a.cropName ? ` · ${a.cropName}` : ""}
+                                                {a.fieldName}{a.cropName ? `  -  ${a.cropName}` : ""}
                                             </p>
                                         </div>
                                         <p className="text-[10px] font-semibold flex-shrink-0" style={{ color: "var(--text-hint)" }}>
@@ -478,3 +554,4 @@ export default function DashboardPage() {
         </div>
     );
 }
+

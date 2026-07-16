@@ -262,7 +262,7 @@ export default function CropsPage() {
             ) : filtered.length === 0 ? (
                 <div className="rounded-2xl p-16 text-center"
                      style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
-                    <p className="text-5xl mb-4">🌱</p>
+                    <p className="text-5xl mb-4">Plant</p>
                     <p className="text-base font-bold mb-1" style={{ color: "var(--text-primary)" }}>
                         {showArchived ? "No archived crops" : "No crops yet"}
                     </p>
@@ -365,16 +365,16 @@ export default function CropsPage() {
                                     {daysToHarvest !== null && !crop.isArchived && (
                                         <div className="rounded-xl px-3 py-2 mb-3"
                                              style={{
-                                                 background: daysToHarvest < 0 ? "#FEF2F2" : daysToHarvest < 14 ? "#FFFBEB" : "var(--farm-pale)",
-                                                 border:     `1px solid ${daysToHarvest < 0 ? "#FEE2E2" : daysToHarvest < 14 ? "#FDE68A" : "#86EFAC"}`,
+                                                 background: daysToHarvest < 0 ? "#FEF2F2" : daysToHarvest < 14 ? "#F0F9FF" : "var(--farm-pale)",
+                                                 border:     `1px solid ${daysToHarvest < 0 ? "#FEE2E2" : daysToHarvest < 14 ? "#BAE6FD" : "#86EFAC"}`,
                                              }}>
                                             <p className="text-xs font-bold"
-                                               style={{ color: daysToHarvest < 0 ? "#DC2626" : daysToHarvest < 14 ? "#D97706" : "var(--farm-green)" }}>
+                                               style={{ color: daysToHarvest < 0 ? "#DC2626" : daysToHarvest < 14 ? "#0284C7" : "var(--farm-green)" }}>
                                                 {daysToHarvest < 0
-                                                    ? `⚠️ Harvest overdue by ${Math.abs(daysToHarvest)} days`
+                                                    ? `Warning Harvest overdue by ${Math.abs(daysToHarvest)} days`
                                                     : daysToHarvest === 0
-                                                        ? "🌾 Harvest due today!"
-                                                        : `🌾 Harvest in ${daysToHarvest} days · ${fmtDate(crop.expectedHarvestDate)}`}
+                                                        ? "Harvest Harvest due today!"
+                                                        : `Harvest Harvest in ${daysToHarvest} days · ${fmtDate(crop.expectedHarvestDate)}`}
                                             </p>
                                         </div>
                                     )}

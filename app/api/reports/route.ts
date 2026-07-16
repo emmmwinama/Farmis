@@ -2,336 +2,298 @@ import { NextResponse } from "next/server";
 import { getSessionFarm } from "@/lib/apiHelpers";
 import { prisma } from "@/lib/prisma";
 
+function toKg(quantity: number, unit: string, unitWeight?: number | null) {
+    const u = unit.toLowerCase().trim();
+    if (u === "kg")                 return quantity;
+    if (u === "tonne" || u === "t") return quantity * 1000;
+    if (u.startsWith("bag"))        return quantity * (unitWeight ?? 50);
+    return quantity;
+}
+
 export async function GET(req: Request) {
-    try {
-        const { farm } = await getSessionFarm();
-        if (!farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { farm } = await getSessionFarm();
+    if (!farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        const { searchParams } = new URL(req.url);
-        const season          = searchParams.get("season");
-        const includeArchived = searchParams.get("includeArchived");
+    const { searchParams } = new URL(req.url);
+    const seasonFilter    = searchParams.get("season");
+    const includeArchived = searchParams.get("includeArchived");
+    // includeArchived=false → active only
+    // includeArchived=true  → archived only
+    // not set               → both
 
-        // ── Build filters ──────────────────────────────────────────────────────
-        const cropWhere: any = { field: { farmId: farm.id } };
-        if (season) cropWhere.season = season;
-        if (includeArchived === "true")  cropWhere.isArchived = true;
-        if (includeArchived === "false") cropWhere.isArchived = false;
-
-        // ── Fetch everything ───────────────────────────────────────────────────
-        const [crops, transactions, overheads, yieldsRaw] = await Promise.all([
-            prisma.cropField.findMany({
-                where: cropWhere,
+    // ── Step 1: Fetch ALL crops (no status filter) for overhead distribution
+    //    The overhead pool must never change based on the display filter.
+    const allFields = await prisma.field.findMany({
+        where: { farmId: farm.id },
+        include: {
+            cropFields: {
                 include: {
-                    cropType: true,
-                    field:    true,
-                    yields:   true,
+                    cropType:   true,
                     activities: {
                         include: {
                             inputs:        true,
-                            labourRecords: true,
+                            labourRecords: { include: { employee: true } },
                             otherCosts:    true,
                         },
                     },
+                    yields:       true,
+                    transactions: true,
                 },
-                orderBy: { plantingDate: "desc" },
-            }),
-            prisma.transaction.findMany({
-                where:   { farmId: farm.id, ...(season ? { season } : {}) },
-                orderBy: { date: "desc" },
-            }),
-            // All overheads — we allocate them ourselves
-            prisma.overheadExpense.findMany({
-                where:   { farmId: farm.id },
-                orderBy: { date: "asc" },
-            }),
-            prisma.harvestYield.findMany({
-                where: {
-                    cropField: {
-                        field: { farmId: farm.id },
-                        ...(season ? { season } : {}),
-                        ...(includeArchived === "true"  ? { isArchived: true  } : {}),
-                        ...(includeArchived === "false" ? { isArchived: false } : {}),
-                    },
-                },
-                include: {
-                    cropField: { include: { cropType: true, field: true } },
-                },
-                orderBy: { harvestDate: "desc" },
-            }),
-        ]);
+            },
+        },
+    });
 
-        // ── Overhead allocation ────────────────────────────────────────────────
-        // For each overhead expense, find which crops were "active" on that date
-        // (planted before the expense date AND expected harvest after it).
-        // Allocate the expense proportionally by areaPlanted among active crops.
+    const allCropFields = allFields.flatMap((f) =>
+        f.cropFields.map((c) => ({ ...c, fieldName: f.name }))
+    );
 
-        // Build a map: cropId → allocatedOverhead
-        const overheadAllocation: Record<string, number> = {};
-        let totalUnallocatedOverhead = 0;
+    // ── Step 2: Fetch overhead expenses ─────────────────────────────────────
+    const overheadExpenses = await prisma.overheadExpense.findMany({
+        where:   { farmId: farm.id },
+        orderBy: { date: "asc" },
+    });
 
-        for (const oh of overheads) {
-            const ohDate = new Date(oh.date);
+    // ── Step 3: Distribute overhead using ALL crops (ignore display filter)
+    //    Each crop gets a fixed overhead share that never changes.
+    const overheadAllocation: Record<string, number> = {};
+    let totalAllocated   = 0;
+    let totalUnallocated = 0;
 
-            // Find crops active on this date
-            const activeCrops = crops.filter((c) => {
-                const planted  = c.plantingDate  ? new Date(c.plantingDate)  : null;
-                const harvest  = c.expectedHarvestDate ? new Date(c.expectedHarvestDate) : null;
-                if (!planted) return false;
-                // Planted on or before the overhead date
-                if (planted > ohDate) return false;
-                // Either no expected harvest date, or harvest is after the overhead date
-                if (harvest && harvest < ohDate) return false;
-                return true;
-            });
+    for (const oh of overheadExpenses) {
+        const expDate = new Date(oh.date);
 
-            if (activeCrops.length === 0) {
-                // No crops were active — track as unallocated
-                totalUnallocatedOverhead += oh.amount;
-                continue;
-            }
-
-            const totalArea = activeCrops.reduce((s, c) => s + (c.areaPlanted ?? 0), 0);
-
-            if (totalArea === 0) {
-                // All active crops have 0 area — split equally
-                const share = oh.amount / activeCrops.length;
-                for (const c of activeCrops) {
-                    overheadAllocation[c.id] = (overheadAllocation[c.id] ?? 0) + share;
-                }
-            } else {
-                // Allocate proportionally by area
-                for (const c of activeCrops) {
-                    const share = oh.amount * ((c.areaPlanted ?? 0) / totalArea);
-                    overheadAllocation[c.id] = (overheadAllocation[c.id] ?? 0) + share;
-                }
-            }
-        }
-
-        // Total overhead allocated to selected crops (may be subset if season filtered)
-        const totalAllocatedOverhead = crops.reduce(
-            (s, c) => s + (overheadAllocation[c.id] ?? 0), 0
-        );
-        const totalOverhead = overheads.reduce((s, o) => s + o.amount, 0);
-
-        // ── Activity cost helper ───────────────────────────────────────────────
-        function activityCosts(activities: any[]) {
-            let inputCost = 0, labourCost = 0, otherCost = 0;
-            const byCategory: Record<string, number> = {};
-            for (const act of activities) {
-                for (const inp of act.inputs ?? []) {
-                    inputCost += inp.totalCost ?? 0;
-                    byCategory[inp.category] = (byCategory[inp.category] ?? 0) + (inp.totalCost ?? 0);
-                }
-                for (const lab of act.labourRecords ?? []) {
-                    labourCost += lab.totalCost ?? 0;
-                    byCategory["Labour"] = (byCategory["Labour"] ?? 0) + (lab.totalCost ?? 0);
-                }
-                for (const oth of act.otherCosts ?? []) {
-                    otherCost += oth.amount ?? 0;
-                    byCategory["Other"] = (byCategory["Other"] ?? 0) + (oth.amount ?? 0);
-                }
-            }
-            return { inputCost, labourCost, otherCost, total: inputCost + labourCost + otherCost, byCategory };
-        }
-
-        // ── Yield unit conversion ──────────────────────────────────────────────
-        function toKg(quantity: number, unit: string, unitWeight: number | null): number {
-            const u = (unit ?? "").toLowerCase().trim();
-            if (u === "kg" || u === "kilogram" || u === "kilograms") return quantity;
-            if (u === "tonne" || u === "tonnes" || u === "t") return quantity * 1000;
-            if (u.startsWith("bag")) {
-                if (unitWeight && unitWeight > 0) return quantity * unitWeight;
-                if (u.includes("50"))  return quantity * 50;
-                if (u.includes("25"))  return quantity * 25;
-                if (u.includes("100")) return quantity * 100;
-                return quantity * 50;
-            }
-            if (u === "crate" || u === "crates") return quantity * 20;
-            if (unitWeight && unitWeight > 0) return quantity * unitWeight;
-            return quantity;
-        }
-
-        function formatYield(quantity: number, unit: string, unitWeight: number | null) {
-            const kg = toKg(quantity, unit, unitWeight);
-            const u  = (unit ?? "").toLowerCase().trim();
-            if (u.startsWith("bag")) {
-                const wt = unitWeight ?? (u.includes("50") ? 50 : u.includes("25") ? 25 : 50);
-                return { displayQty: `${quantity} bags`, displayUnit: `${wt} kg/bag`, kg };
-            }
-            if (u === "tonne" || u === "tonnes" || u === "t") {
-                return { displayQty: `${quantity} tonnes`, displayUnit: `(${kg.toLocaleString()} kg)`, kg };
-            }
-            return { displayQty: `${quantity}`, displayUnit: unit, kg };
-        }
-
-        // ── Per-crop summary ───────────────────────────────────────────────────
-        const incomeTransactions  = transactions.filter((t) => t.type === "Income");
-        const expenseTransactions = transactions.filter((t) => t.type === "Expense");
-
-        const perCrop = crops.map((c) => {
-            const costs         = activityCosts(c.activities);
-            const allocatedOH   = overheadAllocation[c.id] ?? 0;
-            const totalCost     = costs.total + allocatedOH;
-
-            const cropRevenue   = incomeTransactions
-                .filter((t) => t.cropFieldId === c.id)
-                .reduce((s, t) => s + t.amount, 0);
-
-            const cropYields    = yieldsRaw.filter((y) => y.cropFieldId === c.id);
-            const totalKg       = cropYields.reduce((s, y) => s + toKg(y.quantity, y.unit, y.unitWeight), 0);
-
-            return {
-                id:              c.id,
-                cropTypeName:    c.cropType.name,
-                fieldName:       c.field.name,
-                variety:         c.variety,
-                season:          c.season,
-                areaPlanted:     c.areaPlanted,
-                plantingDate:    c.plantingDate,
-                expectedHarvestDate: c.expectedHarvestDate,
-                status:          c.status,
-                isArchived:      c.isArchived,
-                archivedAt:      c.archivedAt,
-                archivedReason:  c.archivedReason,
-                yieldCount:      c.yields.length,
-                activityCount:   c.activities.length,
-                // Costs
-                inputCost:       costs.inputCost,
-                labourCost:      costs.labourCost,
-                otherCost:       costs.otherCost,
-                activityCost:    costs.total,
-                allocatedOverhead: allocatedOH,
-                totalCost,
-                // Revenue & profit
-                revenue:         cropRevenue,
-                netProfit:       cropRevenue - totalCost,
-                // Yield
-                totalYieldKg:    totalKg,
-                yieldPerHa:      c.areaPlanted > 0 ? totalKg / c.areaPlanted : 0,
-                costPerKg:       totalKg > 0 ? totalCost / totalKg : 0,
-            };
+        // ALL crops (active + archived) that were growing on this date
+        const growingThen = allCropFields.filter((c) => {
+            const planted   = new Date(c.plantingDate);
+            const harvested = new Date(c.expectedHarvestDate);
+            return planted <= expDate && harvested >= expDate;
         });
 
-        // ── Farm-wide totals ───────────────────────────────────────────────────
-        const totalRevenue  = incomeTransactions.reduce((s, t) => s + t.amount, 0);
-        const totalActCost  = perCrop.reduce((s, c) => s + c.activityCost, 0);
-        const totalExpTx    = expenseTransactions.reduce((s, t) => s + t.amount, 0);
-        const totalExpenses = totalActCost + totalAllocatedOverhead + totalExpTx;
-        const totalArea     = crops.reduce((s, c) => s + (c.areaPlanted ?? 0), 0);
-        const totalKgAll    = perCrop.reduce((s, c) => s + c.totalYieldKg, 0);
+        const totalArea = growingThen.reduce((s, c) => s + c.areaPlanted, 0);
 
-        // ── Expense categories (combined) ──────────────────────────────────────
-        const expCatMap: Record<string, number> = {};
-        for (const c of perCrop) {
-            for (const [cat, amt] of Object.entries(activityCosts(crops.find((x) => x.id === c.id)!.activities).byCategory)) {
-                expCatMap[cat] = (expCatMap[cat] ?? 0) + amt;
-            }
-        }
-        if (totalAllocatedOverhead > 0) expCatMap["Overhead (allocated)"] = totalAllocatedOverhead;
-        for (const t of expenseTransactions) {
-            expCatMap[t.category] = (expCatMap[t.category] ?? 0) + t.amount;
+        if (totalArea === 0) {
+            totalUnallocated += oh.amount;
+            continue;
         }
 
-        const incCatMap: Record<string, number> = {};
-        for (const t of incomeTransactions) {
-            incCatMap[t.category] = (incCatMap[t.category] ?? 0) + t.amount;
+        for (const c of growingThen) {
+            const share = (c.areaPlanted / totalArea) * oh.amount;
+            overheadAllocation[c.id] = (overheadAllocation[c.id] ?? 0) + share;
+            totalAllocated           += share;
         }
+    }
 
-        // ── By-season breakdown ────────────────────────────────────────────────
-        let bySeasonBreakdown: any[] = [];
-        if (!season) {
-            const allCrops = await prisma.cropField.findMany({
-                where:   { field: { farmId: farm.id } },
-                include: {
-                    activities: { include: { inputs: true, labourRecords: true, otherCosts: true } },
-                },
-            });
-            const allTx = await prisma.transaction.findMany({ where: { farmId: farm.id } });
+    const totalOverhead = overheadExpenses.reduce((s, o) => s + o.amount, 0);
 
-            const seasonMap: Record<string, any> = {};
-            for (const c of allCrops) {
-                const s = c.season ?? "Unknown";
-                if (!seasonMap[s]) seasonMap[s] = { season: s, cropCount: 0, area: 0, revenue: 0, expenses: 0, archivedCount: 0 };
-                seasonMap[s].cropCount++;
-                seasonMap[s].area += c.areaPlanted ?? 0;
-                const costs = activityCosts(c.activities);
-                seasonMap[s].expenses += costs.total + (overheadAllocation[c.id] ?? 0);
-                if (c.isArchived) seasonMap[s].archivedCount++;
-            }
-            for (const t of allTx) {
-                const s = t.season ?? "Unknown";
-                if (!seasonMap[s]) seasonMap[s] = { season: s, cropCount: 0, area: 0, revenue: 0, expenses: 0, archivedCount: 0 };
-                if (t.type === "Income")  seasonMap[s].revenue  += t.amount;
-                if (t.type === "Expense") seasonMap[s].expenses += t.amount;
-            }
-            bySeasonBreakdown = Object.values(seasonMap).sort((a, b) => b.season.localeCompare(a.season));
+    // ── Step 4: Now apply the display filter ────────────────────────────────
+    const displayFilter = (c: { status: string }) =>
+        includeArchived === "false" ? c.status !== "Archived" :
+            includeArchived === "true"  ? c.status === "Archived"  :
+                true;
+
+    const displayFields = allFields.map((f) => ({
+        ...f,
+        cropFields: f.cropFields.filter((c) => {
+            if (!displayFilter(c))                         return false;
+            if (seasonFilter && c.season !== seasonFilter) return false;
+            return true;
+        }),
+    }));
+
+    const displayCropFields = displayFields.flatMap((f) =>
+        f.cropFields.map((c) => ({ ...c, fieldName: f.name }))
+    );
+
+    // ── Step 5: Calculate per-crop costs using FIXED overhead allocation ────
+    const cropRows = displayCropFields.map((crop) => {
+        const inputCost  = crop.activities
+            .flatMap((a) => a.inputs)
+            .reduce((s, i) => s + i.totalCost, 0);
+
+        const labourCost = crop.activities
+            .flatMap((a) => a.labourRecords)
+            .reduce((s, l) => s + l.totalCost, 0);
+
+        const otherCost  = crop.activities
+            .flatMap((a) => a.otherCosts)
+            .reduce((s, o) => s + o.amount, 0);
+
+        // Each crop's overhead is FIXED — same whether you filter Active or Both
+        const allocatedOverhead = overheadAllocation[crop.id] ?? 0;
+        const activityCost      = inputCost + labourCost + otherCost;
+        const totalCost         = activityCost + allocatedOverhead;
+
+        const totalYieldKg = crop.yields.reduce(
+            (s, y) => s + toKg(y.quantity, y.unit, y.unitWeight), 0
+        );
+
+        const revenue = crop.transactions
+            .filter((t) => t.type === "Income")
+            .reduce((s, t) => s + t.amount, 0);
+
+        return {
+            id:                  crop.id,
+            isArchived:          crop.status === "Archived",
+            status:              crop.status,
+            cropTypeName:        crop.cropType.name,
+            variety:             crop.variety,
+            fieldName:           crop.fieldName,
+            season:              crop.season,
+            areaPlanted:         crop.areaPlanted,
+            plantingDate:        crop.plantingDate,
+            expectedHarvestDate: crop.expectedHarvestDate,
+            activityCount:       crop.activities.length,
+            inputCost,
+            labourCost,
+            otherCost,
+            activityCost,
+            allocatedOverhead,
+            totalCost,
+            revenue,
+            netProfit:   revenue - totalCost,
+            totalYieldKg,
+            yieldPerHa:  crop.areaPlanted > 0 ? totalYieldKg / crop.areaPlanted : 0,
+            costPerKg:   totalYieldKg > 0      ? totalCost    / totalYieldKg     : 0,
+        };
+    });
+
+    // ── Summary ──────────────────────────────────────────────────────────────
+    const totalRevenue     = cropRows.reduce((s, c) => s + c.revenue,      0);
+    const totalExpenses    = cropRows.reduce((s, c) => s + c.totalCost,    0);
+    const totalKgHarvested = cropRows.reduce((s, c) => s + c.totalYieldKg, 0);
+    const totalArea        = cropRows.reduce((s, c) => s + c.areaPlanted,  0);
+    const avgYieldPerHa    = totalArea > 0 ? totalKgHarvested / totalArea : 0;
+
+    // Overhead shown in summary = only what's allocated to DISPLAYED crops
+    const displayedOverhead = cropRows.reduce(
+        (s, c) => s + c.allocatedOverhead, 0
+    );
+
+    // By-season breakdown
+    const seasonMap: Record<string, {
+        cropCount:     number;
+        archivedCount: number;
+        area:          number;
+        expenses:      number;
+        revenue:       number;
+    }> = {};
+
+    for (const c of cropRows) {
+        if (!seasonMap[c.season]) {
+            seasonMap[c.season] = {
+                cropCount: 0, archivedCount: 0,
+                area: 0, expenses: 0, revenue: 0,
+            };
         }
+        seasonMap[c.season].cropCount  += 1;
+        if (c.isArchived) seasonMap[c.season].archivedCount += 1;
+        seasonMap[c.season].area     += c.areaPlanted;
+        seasonMap[c.season].expenses += c.totalCost;
+        seasonMap[c.season].revenue  += c.revenue;
+    }
 
-        // ── Format yields ──────────────────────────────────────────────────────
-        const formattedYields = yieldsRaw.map((y) => {
-            const d = formatYield(y.quantity, y.unit, y.unitWeight);
+    const bySeasonBreakdown = Object.entries(seasonMap)
+        .map(([season, v]) => ({ season, ...v }))
+        .sort((a, b) => b.season.localeCompare(a.season));
+
+    // ── Transactions ─────────────────────────────────────────────────────────
+    const transactions = await prisma.transaction.findMany({
+        where: {
+            farmId: farm.id,
+            ...(seasonFilter ? { season: seasonFilter } : {}),
+        },
+        orderBy: { date: "desc" },
+    });
+
+    const totalTransactionIncome = transactions
+        .filter((t) => t.type === "Income")
+        .reduce((s, t) => s + t.amount, 0);
+
+    // Income by category
+    const incomeMap: Record<string, number> = {};
+    for (const t of transactions.filter((t) => t.type === "Income")) {
+        incomeMap[t.category] = (incomeMap[t.category] ?? 0) + t.amount;
+    }
+
+    // Expense by category (activity costs + overhead)
+    const expenseMap: Record<string, number> = {
+        "Inputs (seeds, fertiliser, chemicals)": cropRows.reduce((s, c) => s + c.inputCost,  0),
+        "Labour":                                cropRows.reduce((s, c) => s + c.labourCost, 0),
+        "Other activity costs":                  cropRows.reduce((s, c) => s + c.otherCost,  0),
+        "Overhead (allocated)":                  displayedOverhead,
+    };
+
+    const incomeByCategory   = Object.entries(incomeMap)
+        .map(([category, total]) => ({ category, total }))
+        .sort((a, b) => b.total - a.total);
+
+    const expensesByCategory = Object.entries(expenseMap)
+        .filter(([, v]) => v > 0)
+        .map(([category, total]) => ({ category, total }))
+        .sort((a, b) => b.total - a.total);
+
+    // ── Yields ───────────────────────────────────────────────────────────────
+    const yieldRecords = displayCropFields.flatMap((crop) =>
+        crop.yields.map((y) => {
+            const kg = toKg(y.quantity, y.unit, y.unitWeight);
+            const u  = y.unit.toLowerCase();
             return {
                 id:          y.id,
+                cropName:    crop.cropType.name,
+                fieldName:   crop.fieldName,
+                season:      crop.season,
                 harvestDate: y.harvestDate,
-                quantity:    y.quantity,
-                unit:        y.unit,
-                unitWeight:  y.unitWeight,
-                displayQty:  d.displayQty,
-                displayUnit: d.displayUnit,
-                kg:          d.kg,
-                notes:       y.notes,
-                cropName:    y.cropField.cropType.name,
-                fieldName:   y.cropField.field.name,
-                season:      y.cropField.season,
-                isArchived:  y.cropField.isArchived,
+                displayQty:  `${y.quantity} ${y.unit}`,
+                displayUnit: u.startsWith("bag")
+                    ? `${y.unitWeight ?? 50} kg/bag`
+                    : y.unit,
+                kg,
+                notes: y.notes,
             };
-        });
+        })
+    ).sort((a, b) =>
+        new Date(b.harvestDate).getTime() - new Date(a.harvestDate).getTime()
+    );
 
-        return NextResponse.json({
-            summary: {
-                totalCrops:              crops.length,
-                totalArea,
-                totalRevenue,
-                totalExpenses,
-                netProfit:               totalRevenue - totalExpenses,
-                activityCost:            totalActCost,
-                allocatedOverhead:       totalAllocatedOverhead,
-                unallocatedOverhead:     totalUnallocatedOverhead,
-                totalOverhead,
-                totalKgHarvested:        totalKgAll,
-                avgYieldPerHa:           totalArea > 0 ? totalKgAll / totalArea : 0,
-                bySeasonBreakdown,
-            },
-            crops:  perCrop,
-            finance: {
-                totalIncome:         totalRevenue,
-                totalExpenses,
-                netProfit:           totalRevenue - totalExpenses,
-                incomeByCategory:    Object.entries(incCatMap).map(([category, total]) => ({ category, total })).sort((a, b) => b.total - a.total),
-                expensesByCategory:  Object.entries(expCatMap).map(([category, total]) => ({ category, total })).sort((a, b) => b.total - a.total),
-                transactions:        transactions.map((t) => ({
-                    id: t.id, date: t.date, type: t.type,
-                    category: t.category, description: t.description,
-                    amount: t.amount, season: t.season,
-                })),
-            },
-            yields: formattedYields,
-            overheadAllocationSummary: {
-                totalOverhead,
-                totalAllocated:   totalAllocatedOverhead,
-                totalUnallocated: totalUnallocatedOverhead,
-                perCrop: perCrop.map((c) => ({
-                    cropTypeName:     c.cropTypeName,
-                    fieldName:        c.fieldName,
-                    season:           c.season,
-                    areaPlanted:      c.areaPlanted,
-                    allocatedOverhead: c.allocatedOverhead,
-                })).filter((c) => c.allocatedOverhead > 0),
-            },
-        });
+    // ── Overhead allocation per displayed crop ───────────────────────────────
+    const overheadPerCrop = cropRows
+        .filter((c) => c.allocatedOverhead > 0)
+        .map((c) => ({
+            cropTypeName:      c.cropTypeName,
+            fieldName:         c.fieldName,
+            season:            c.season,
+            areaPlanted:       c.areaPlanted,
+            allocatedOverhead: c.allocatedOverhead,
+        }))
+        .sort((a, b) => b.allocatedOverhead - a.allocatedOverhead);
 
-    } catch (err: any) {
-        console.error("Reports error:", err?.message);
-        return NextResponse.json({ error: err?.message ?? "Server error" }, { status: 500 });
-    }
+    return NextResponse.json({
+        summary: {
+            totalCrops:          cropRows.length,
+            totalArea,
+            totalKgHarvested,
+            avgYieldPerHa,
+            totalRevenue,
+            totalExpenses,
+            allocatedOverhead:   displayedOverhead,
+            totalOverhead,
+            unallocatedOverhead: totalUnallocated,
+            bySeasonBreakdown,
+        },
+        crops:   cropRows,
+        finance: {
+            incomeByCategory,
+            expensesByCategory,
+            totalIncome:    totalTransactionIncome,
+            totalExpenses,
+            transactions,
+        },
+        yields: yieldRecords,
+        overheadAllocationSummary: {
+            totalOverhead,
+            totalAllocated,
+            totalUnallocated,
+            perCrop: overheadPerCrop,
+        },
+    });
 }

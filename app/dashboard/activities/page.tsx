@@ -3,14 +3,23 @@
 import { useEffect, useState } from "react";
 import {
     Plus, Loader2, ChevronDown, ChevronUp,
-    ClipboardList, TrendingUp,
+    ClipboardList, TrendingUp, Sprout, Beaker,
+    Droplets, Leaf, Wheat, Package, Tractor, Scissors, Search,
+    Archive, CircleDot, Layers3,
 } from "lucide-react";
 import Link from "next/link";
 
-const ACTIVITY_ICONS: Record<string, string> = {
-    Planting: "🌱", Spraying: "🧪", Weeding: "🌿", Irrigation: "💧",
-    Fertilising: "🌾", Harvesting: "🏃", "Land preparation": "🚜",
-    Pruning: "✂️", Scouting: "🔍", Other: "📋",
+const ACTIVITY_ICONS: Record<string, any> = {
+    Planting: Sprout,
+    Spraying: Beaker,
+    Weeding: Leaf,
+    Irrigation: Droplets,
+    Fertilising: Wheat,
+    Harvesting: Package,
+    "Land preparation": Tractor,
+    Pruning: Scissors,
+    Scouting: Search,
+    Other: ClipboardList,
 };
 
 function fmt(n: number) { return new Intl.NumberFormat("en-MW").format(Math.round(n)); }
@@ -24,6 +33,7 @@ export default function ActivitiesPage() {
     const [typeFilter,    setTypeFilter]    = useState("All");
     const [seasonFilter,  setSeasonFilter]  = useState("All");
     const [fieldFilter,   setFieldFilter]   = useState("All");
+    const [cropState,     setCropState]     = useState<"active" | "archived" | "all">("active");
     const [expandedId,    setExpandedId]    = useState<string | null>(null);
     const [showAnalytics, setShowAnalytics] = useState(true);
 
@@ -33,13 +43,26 @@ export default function ActivitiesPage() {
         if (typeFilter   !== "All") params.set("type",     typeFilter);
         if (seasonFilter !== "All") params.set("season",   seasonFilter);
         if (fieldFilter  !== "All") params.set("fieldId",  fieldFilter);
+        params.set("cropState", cropState);
         fetch(`/api/activities?${params.toString()}`)
             .then((r) => r.json())
             .then((d) => { setData(d); setLoading(false); });
-    }, [typeFilter, seasonFilter, fieldFilter]);
+    }, [typeFilter, seasonFilter, fieldFilter, cropState]);
 
     const activities = data?.activities ?? [];
     const totalCost  = activities.reduce((s: number, a: any) => s + a.totalCost, 0);
+    const activeCount = activities.filter((a: any) => !a.cropArchived && a.cropStatus !== "Harvested").length;
+    const archivedCount = activities.length - activeCount;
+    const avgCost = activities.length ? totalCost / activities.length : 0;
+    const topType = data?.byType?.[0]?.type ?? "No activity";
+    const groupedByCrop = activities.reduce((map: Record<string, any[]>, activity: any) => {
+        const key = activity.cropName
+            ? `${activity.cropName}${activity.cropVariety ? ` - ${activity.cropVariety}` : ""}`
+            : "General field work";
+        if (!map[key]) map[key] = [];
+        map[key].push(activity);
+        return map;
+    }, {});
 
     const SEL: React.CSSProperties = {
         height: "40px", padding: "0 12px",
@@ -54,20 +77,62 @@ export default function ActivitiesPage() {
         <div className="p-8 max-w-6xl mx-auto">
 
             {/* Header */}
-            <div className="flex items-start justify-between mb-8">
+            <div className="flex items-start justify-between mb-6">
                 <div>
                     <h1 className="text-2xl font-black" style={{ color: "var(--text-primary)", letterSpacing: "-0.04em" }}>
                         Activities
                     </h1>
                     <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
-                        {activities.length} activities · MWK {fmt(totalCost)} total cost
+                        {activities.length} activities  -  MWK {fmt(totalCost)} total cost
                     </p>
                 </div>
                 <Link href="/dashboard/activities/new"
-                      className="flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-bold text-white"
-                      style={{ background: "var(--farm-green)", boxShadow: "0 4px 12px rgba(26,61,31,0.25)" }}>
+                      className="flex items-center gap-2 min-h-11 px-5 rounded-xl text-sm font-bold text-white"
+                      style={{ background: "#0284C7", boxShadow: "0 4px 12px rgba(2,132,199,0.25)" }}>
                     <Plus size={15} /> Log activity
                 </Link>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                {[
+                    { label: "Shown records", value: String(activities.length), icon: ClipboardList, color: "#0284C7" },
+                    { label: "Active crop work", value: String(activeCount), icon: CircleDot, color: "#0D9488" },
+                    { label: "Archived history", value: String(archivedCount), icon: Archive, color: "#64748B" },
+                    { label: "Average cost", value: `MWK ${fmt(avgCost)}`, icon: TrendingUp, color: "#2563EB" },
+                ].map(({ label, value, icon: Icon, color }) => (
+                    <div key={label} className="rounded-2xl p-4"
+                         style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>{label}</p>
+                                <p className="text-xl font-black mt-1" style={{ color }}>{value}</p>
+                            </div>
+                            <span className="w-11 h-11 rounded-2xl flex items-center justify-center"
+                                  style={{ background: "var(--bg-subtle)", color }}>
+                                <Icon size={18} />
+                            </span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="flex flex-wrap gap-2 mb-6">
+                {([
+                    { key: "active", label: "Active crops", icon: CircleDot },
+                    { key: "archived", label: "Harvested / archived", icon: Archive },
+                    { key: "all", label: "All activity history", icon: Layers3 },
+                ] as const).map(({ key, label, icon: Icon }) => (
+                    <button key={key} onClick={() => setCropState(key)}
+                            className="min-h-11 px-4 rounded-2xl text-sm font-bold flex items-center gap-2 transition-all"
+                            style={{
+                                background: cropState === key ? "#0F172A" : "var(--bg-card)",
+                                color: cropState === key ? "white" : "var(--text-secondary)",
+                                border: "1px solid var(--border)",
+                            }}>
+                        <Icon size={16} />
+                        {label}
+                    </button>
+                ))}
             </div>
 
             {/* Analytics */}
@@ -83,7 +148,7 @@ export default function ActivitiesPage() {
                     </button>
 
                     {showAnalytics && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             {/* By type */}
                             <div className="rounded-2xl p-5"
                                  style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
@@ -95,7 +160,7 @@ export default function ActivitiesPage() {
                                     {(data?.byType ?? []).slice(0, 5).map((t: any) => (
                                         <div key={t.type} className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-sm">{ACTIVITY_ICONS[t.type] ?? "📋"}</span>
+                                                <span className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "var(--bg-subtle)", color: "var(--text-secondary)" }}>{(() => { const Icon = ACTIVITY_ICONS[t.type] ?? ClipboardList; return <Icon size={15} />; })()}</span>
                                                 <span className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>
                                                     {t.type}
                                                 </span>
@@ -164,6 +229,33 @@ export default function ActivitiesPage() {
                                     ))}
                                 </div>
                             </div>
+
+                            <div className="rounded-2xl p-5"
+                                 style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                                <p className="text-[10px] font-black uppercase tracking-widest mb-3"
+                                   style={{ color: "var(--text-muted)" }}>
+                                    Cost shape
+                                </p>
+                                <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>
+                                    Top work type: <span className="font-black" style={{ color: "var(--text-primary)" }}>{topType}</span>
+                                </p>
+                                <div className="flex flex-col gap-2">
+                                    {(data?.byType ?? []).slice(0, 4).map((t: any) => {
+                                        const pct = totalCost > 0 ? Math.round((t.totalCost / totalCost) * 100) : 0;
+                                        return (
+                                            <div key={t.type}>
+                                                <div className="flex justify-between text-[10px] font-bold mb-1" style={{ color: "var(--text-muted)" }}>
+                                                    <span>{t.type}</span>
+                                                    <span>{pct}%</span>
+                                                </div>
+                                                <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--bg-muted)" }}>
+                                                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: "#0284C7" }} />
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -188,6 +280,15 @@ export default function ActivitiesPage() {
                     ))}
                 </select>
             </div>
+
+            {cropState === "all" && activities.length > 0 && (
+                <div className="rounded-2xl p-4 mb-6"
+                     style={{ background: "#F0F9FF", border: "1px solid #BAE6FD" }}>
+                    <p className="text-sm font-bold" style={{ color: "#075985" }}>
+                        Showing active work and historical records together. Use the crop groups below to separate current work from audit history.
+                    </p>
+                </div>
+            )}
 
             {/* Content */}
             {loading ? (
@@ -214,20 +315,32 @@ export default function ActivitiesPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="flex flex-col gap-3">
-                    {activities.map((activity: any) => (
+                <div className="flex flex-col gap-5">
+                    {Object.entries(groupedByCrop).map(([cropLabel, cropActivities]) => (
+                        <div key={cropLabel} className="rounded-3xl p-3"
+                             style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
+                            <div className="flex items-center justify-between px-2 py-2">
+                                <div>
+                                    <p className="text-sm font-black" style={{ color: "var(--text-primary)" }}>{cropLabel}</p>
+                                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                        {(cropActivities as any[]).length} records - MWK {fmt((cropActivities as any[]).reduce((s, a) => s + a.totalCost, 0))}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                    {(cropActivities as any[]).map((activity: any) => (
                         <div key={activity.id}
                              className="rounded-2xl overflow-hidden transition-all"
                              style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
 
-                            {/* Row header — clickable */}
-                            <div className="flex items-center gap-4 p-4 cursor-pointer"
+                            {/* Row header - clickable */}
+                            <div className="flex items-center gap-4 p-5 cursor-pointer min-h-20"
                                  onClick={() => setExpandedId(expandedId === activity.id ? null : activity.id)}>
 
                                 {/* Icon */}
-                                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                                <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
                                      style={{ background: "var(--bg-subtle)" }}>
-                                    {ACTIVITY_ICONS[activity.activityType] ?? "📋"}
+                                    {(() => { const Icon = ACTIVITY_ICONS[activity.activityType] ?? ClipboardList; return <Icon size={18} style={{ color: "var(--text-secondary)" }} />; })()}
                                 </div>
 
                                 {/* Main info */}
@@ -238,15 +351,21 @@ export default function ActivitiesPage() {
                                         </p>
                                         {activity.season && (
                                             <span className="text-[10px] font-black px-2 py-0.5 rounded-full"
-                                                  style={{ background: "#FFFBEB", color: "#854F0B" }}>
+                                                  style={{ background: "#F0F9FF", color: "#075985" }}>
                                                 {activity.season}
+                                            </span>
+                                        )}
+                                        {(activity.cropArchived || activity.cropStatus === "Harvested") && (
+                                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full"
+                                                  style={{ background: "#E2E8F0", color: "#475569" }}>
+                                                Historical
                                             </span>
                                         )}
                                     </div>
                                     <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                                         {activity.fieldName}
                                         {activity.cropName
-                                            ? ` · ${activity.cropName} (${activity.cropVariety})`
+                                            ? `  -  ${activity.cropName} (${activity.cropVariety})`
                                             : ""}
                                     </p>
                                 </div>
@@ -382,8 +501,12 @@ export default function ActivitiesPage() {
                             )}
                         </div>
                     ))}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
     );
 }
+

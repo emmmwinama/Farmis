@@ -10,12 +10,12 @@ import {
 
 const HEALTH_TYPES = ["Vaccination", "Deworming", "Treatment", "Dipping", "Vet visit", "Dental", "Hoof trimming", "Other"];
 const PRODUCTION_TYPES = [
-    { type: "Milk",  unit: "litres",  icon: "🥛" },
-    { type: "Eggs",  unit: "dozen",   icon: "🥚" },
-    { type: "Wool",  unit: "kg",      icon: "🧶" },
-    { type: "Honey", unit: "kg",      icon: "🍯" },
-    { type: "Meat",  unit: "kg",      icon: "🥩" },
-    { type: "Other", unit: "units",   icon: "📦" },
+    { type: "Milk",  unit: "litres",  icon: "Milk" },
+    { type: "Eggs",  unit: "dozen",   icon: "Eggs" },
+    { type: "Wool",  unit: "kg",      icon: "Wool" },
+    { type: "Honey", unit: "kg",      icon: "Honey" },
+    { type: "Meat",  unit: "kg",      icon: "Meat" },
+    { type: "Other", unit: "units",   icon: "Stock" },
 ];
 const EXPENSE_CATEGORIES = ["Feed", "Medicine", "Equipment", "Labour", "Bedding", "Transport", "Veterinary", "Purchase", "Other"];
 
@@ -148,7 +148,7 @@ export default function AnimalDetailPage() {
                     <ArrowLeft size={16} />
                 </button>
                 <div className="flex items-center gap-3">
-                    <span className="text-3xl">{data.livestockType?.icon ?? "🐄"}</span>
+                    <span className="text-3xl">{data.livestockType?.icon ?? "Cattle"}</span>
                     <div>
                         <h1 className="page-title" style={{ fontSize: "1.5rem" }}>
                             {data.name || data.tag || `${data.livestockType?.name} #${id.slice(-4)}`}
@@ -180,9 +180,9 @@ export default function AnimalDetailPage() {
             {/* Alert */}
             {upcomingHealth.length > 0 && (
                 <div className="rounded-xl p-4 mb-5 flex items-center gap-3"
-                     style={{ background: "#FFFBEB", border: "1.5px solid #FDE68A" }}>
-                    <AlertTriangle size={16} style={{ color: "#D97706" }} />
-                    <p className="text-sm font-semibold" style={{ color: "#92400E" }}>
+                     style={{ background: "#F0F9FF", border: "1.5px solid #BAE6FD" }}>
+                    <AlertTriangle size={16} style={{ color: "#0284C7" }} />
+                    <p className="text-sm font-semibold" style={{ color: "#075985" }}>
                         {upcomingHealth.length} health procedure{upcomingHealth.length !== 1 ? "s" : ""} due soon:{" "}
                         {upcomingHealth.map((h: any) => `${h.type} due ${fmtDate(h.nextDueDate)}`).join(", ")}
                     </p>
@@ -333,7 +333,7 @@ export default function AnimalDetailPage() {
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className="badge badge-green text-xs">{h.type}</span>
                                                     {isDue && h.nextDueDate && (
-                                                        <span className="badge badge-amber text-xs">
+                                                        <span className="badge badge-sky text-xs">
                               Due {fmtDate(h.nextDueDate)}
                             </span>
                                                     )}
@@ -712,9 +712,9 @@ export default function AnimalDetailPage() {
                         else { setShowSaleForm(false); router.push("/dashboard/livestock"); setSaving(false); }
                     }} className="flex flex-col gap-4">
                         <div className="rounded-xl p-4 mb-2"
-                             style={{ background: "#FFFBEB", border: "1.5px solid #FDE68A" }}>
-                            <p className="text-sm font-bold" style={{ color: "#92400E" }}>
-                                ⚠️ Recording a sale will mark this animal as Sold
+                             style={{ background: "#F0F9FF", border: "1.5px solid #BAE6FD" }}>
+                            <p className="text-sm font-bold" style={{ color: "#075985" }}>
+                                Warning Recording a sale will mark this animal as Sold
                             </p>
                         </div>
                         <div className="grid grid-cols-2 gap-3">

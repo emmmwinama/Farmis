@@ -19,6 +19,7 @@ export async function GET() {
                 maxCrops:              true,
                 maxActivities:         true,
                 maxTransactions:       true,
+                maxEmployees:          true,
                 maxTeamMembers:        true,
                 maxFarms:              true,
                 seasonAnalytics:       true,

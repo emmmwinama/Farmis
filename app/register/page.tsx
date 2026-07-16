@@ -47,7 +47,7 @@ export default function RegisterPage() {
         "AI-powered farm insights",
         "Yield & selling price suggestions",
         "Profitability reports by season",
-        "Free forever — no credit card needed",
+        "7-day trial - no credit card needed",
     ];
 
     return (
@@ -63,11 +63,11 @@ export default function RegisterPage() {
                             <rect x="7.5" y="11" width="3" height="5" rx="1" fill="#1a3d1f"/>
                         </svg>
                     </div>
-                    <span className="font-bold text-xl text-white tracking-tight">farmio</span>
+                    <span className="font-bold text-xl text-white tracking-tight">agrivault</span>
                 </div>
 
                 <div className="py-12">
-                    <p className="text-xs font-bold text-[#4a7a50] uppercase tracking-widest mb-3">Free plan includes</p>
+                    <p className="text-xs font-bold text-[#4a7a50] uppercase tracking-widest mb-3">Trial includes</p>
                     <div className="flex flex-col gap-3">
                         {BENEFITS.map((b) => (
                             <div key={b} className="flex items-center gap-3">
@@ -82,7 +82,7 @@ export default function RegisterPage() {
 
                 <div className="mt-auto">
                     <p className="text-xs text-[#4a7a50] leading-relaxed">
-                        Join hundreds of farms across Malawi and southern Africa already using Farmio to make better decisions every season.
+                        Join hundreds of farms across Malawi and southern Africa already using AgriVault to make better decisions every season.
                     </p>
                 </div>
             </div>
@@ -92,7 +92,7 @@ export default function RegisterPage() {
                 <div className="w-full max-w-sm">
                     <div className="mb-8">
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Create your account</h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Start managing your farm in minutes. Free forever.</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Start managing your farm in minutes with a 7-day trial.</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">

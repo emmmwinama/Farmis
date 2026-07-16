@@ -10,8 +10,8 @@ function formatDate(d: string) {
 }
 
 const ACTIVITY_ICONS: Record<string, string> = {
-    Planting: "🌱", Spraying: "🧪", Weeding: "🌿", Irrigation: "💧",
-    Fertilising: "🌾", Harvesting: "🏃", "Land preparation": "🚜", Other: "📋",
+    Planting: "Plant", Spraying: "Spray", Weeding: "Weed", Irrigation: "Water",
+    Fertilising: "Harvest", Harvesting: "Harvest", "Land preparation": "Land prep", Other: "Record",
 };
 
 const STATUS_BADGE: Record<string, { bg: string; color: string }> = {
@@ -131,7 +131,7 @@ export default function SeasonsPage() {
                                         <div key={t.name} className="rounded-xl p-4"
                                              style={{ background: "var(--farm-pale)", border: "1px solid #86efac" }}>
                                             <div className="flex items-center gap-2 mb-3">
-                                                <span className="text-lg">🌱</span>
+                                                <span className="text-lg">Plant</span>
                                                 <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
                                                     {t.name}
                                                 </p>
@@ -197,7 +197,7 @@ export default function SeasonsPage() {
                                              onMouseOver={(e) => (e.currentTarget.style.background = "var(--bg-subtle)")}
                                              onMouseOut={(e)  => (e.currentTarget.style.background = "transparent")}>
                                             <div className="flex items-center gap-3">
-                                                <span className="text-lg">🌱</span>
+                                                <span className="text-lg">Plant</span>
                                                 <div>
                                                     <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
                                                         {cf.cropTypeName}
@@ -246,7 +246,7 @@ export default function SeasonsPage() {
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
                                                  style={{ background: "var(--bg-subtle)" }}>
-                                                {ACTIVITY_ICONS[a.activityType] ?? "📋"}
+                                                {ACTIVITY_ICONS[a.activityType] ?? "Record"}
                                             </div>
                                             <div>
                                                 <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>

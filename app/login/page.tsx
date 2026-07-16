@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff, ShieldCheck } from "lucide-react";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -33,20 +33,12 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex">
-            {/* Left — form */}
+            {/* Left - form */}
             <div className="flex-1 flex items-center justify-center px-8 bg-white dark:bg-slate-950">
                 <div className="w-full max-w-sm">
                     {/* Logo */}
                     <div className="flex items-center gap-2.5 mb-10">
-                        <div className="w-9 h-9 bg-[#1a3d1f] rounded-xl flex items-center justify-center">
-                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                                <polygon points="9,2 16,14 2,14" fill="#2d6a35"/>
-                                <polygon points="9,5 14,14 4,14" fill="#3d8c47"/>
-                                <polygon points="9,8 12,14 6,14" fill="#52b85e"/>
-                                <rect x="7.5" y="11" width="3" height="5" rx="1" fill="#1a3d1f"/>
-                            </svg>
-                        </div>
-                        <span className="font-bold text-xl text-slate-900 dark:text-white tracking-tight">farmio</span>
+                        <div className="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center text-sky-200"><ShieldCheck size={21} /></div><span className="font-bold text-xl text-slate-900 dark:text-white tracking-tight">AgriVault</span>
                     </div>
 
                     <div className="mb-8">
@@ -78,7 +70,7 @@ export default function LoginPage() {
                                     type={showPassword ? "text" : "password"}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="••••••••"
+                                    placeholder="Password"
                                     required
                                     className="w-full h-12 px-4 pr-12 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:border-[#3d8c47] focus:ring-2 focus:ring-[#3d8c47]/10 transition-all text-slate-900 dark:text-white"
                                 />
@@ -116,7 +108,7 @@ export default function LoginPage() {
                 </div>
             </div>
 
-            {/* Right — visual */}
+            {/* Right - visual */}
             <div className="hidden lg:flex flex-1 relative bg-[#1a3d1f] items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 opacity-20">
                     {Array.from({ length: 6 }).map((_, row) =>
@@ -134,12 +126,11 @@ export default function LoginPage() {
                 </div>
 
                 <div className="relative z-10 text-center px-12">
-                    <div className="text-7xl mb-6">🌾</div>
-                    <h2 className="text-3xl font-bold text-white mb-4 leading-tight">
+                    <div className="w-20 h-20 rounded-3xl bg-white/10 text-sky-100 flex items-center justify-center mx-auto mb-6"><ShieldCheck size={38} /></div><h2 className="text-3xl font-bold text-white mb-4 leading-tight">
                         Manage your farm<br />like a business
                     </h2>
                     <p className="text-[#7dd68a] leading-relaxed max-w-sm">
-                        Track fields, crops, activities, yields and finances — all powered by AI insights built for African agriculture.
+                        Track fields, crops, activities, yields and finances - all powered by AI insights built for African agriculture.
                     </p>
 
                     <div className="mt-10 grid grid-cols-3 gap-4">

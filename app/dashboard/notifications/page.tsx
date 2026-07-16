@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const TYPE_CONFIG: Record<string, { icon: any; bg: string; border: string; iconColor: string; dotColor: string }> = {
     harvest_due:   { icon: CheckCircle, bg: "#F0FDF4", border: "#BBF7D0", iconColor: "#16A34A", dotColor: "#22C55E" },
-    no_activity:   { icon: AlertTriangle, bg: "#FFFBEB", border: "#FDE68A", iconColor: "#D97706", dotColor: "#F59E0B" },
+    no_activity:   { icon: AlertTriangle, bg: "#F0F9FF", border: "#BAE6FD", iconColor: "#0284C7", dotColor: "#06B6D4" },
     low_inventory: { icon: Package, bg: "#EFF6FF", border: "#BFDBFE", iconColor: "#2563EB", dotColor: "#3B82F6" },
     price_alert:   { icon: Info, bg: "#FAF5FF", border: "#E9D5FF", iconColor: "#9333EA", dotColor: "#A855F7" },
 };

@@ -8,7 +8,6 @@ export async function GET() {
             features,
             testimonials,
             media,
-            impactStats,
         ] = await Promise.all([
             prisma.siteContent.findMany({
                 orderBy: { key: "asc" },
@@ -28,11 +27,6 @@ export async function GET() {
             }),
 
             prisma.cmsMedia.findMany(),
-
-            prisma.impactStat.findMany({
-                where: { isActive: true },
-                orderBy: { sortOrder: "asc" },
-            }),
         ]);
 
         const content = Object.fromEntries(
@@ -46,7 +40,6 @@ export async function GET() {
             features,
             testimonials,
             media,
-            impactStats,
         });
     } catch (error) {
         console.error("Landing page API error:", error);

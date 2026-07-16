@@ -180,23 +180,23 @@ export default function SeasonComparePage() {
                     <div className="rounded-2xl p-5 mt-5"
                          style={{ background: "var(--farm-pale)", border: "1.5px solid var(--farm-light)20" }}>
                         <p className="text-sm font-extrabold mb-3" style={{ color: "var(--farm-green)" }}>
-                            📊 Key takeaways
+                            Chart Key takeaways
                         </p>
                         <div className="flex flex-col gap-2 text-sm" style={{ color: "var(--farm-green)", opacity: 0.8 }}>
                             {data.comparison.costPerHa.value < 0 && (
-                                <p>✅ Cost per hectare improved by {Math.abs(data.comparison.costPerHa.pct).toFixed(1)}% — good cost management</p>
+                                <p>OK Cost per hectare improved by {Math.abs(data.comparison.costPerHa.pct).toFixed(1)}% — good cost management</p>
                             )}
                             {data.comparison.costPerHa.value > 0 && (
-                                <p>⚠️ Cost per hectare increased by {data.comparison.costPerHa.pct.toFixed(1)}% — review input costs</p>
+                                <p>Warning Cost per hectare increased by {data.comparison.costPerHa.pct.toFixed(1)}% — review input costs</p>
                             )}
                             {data.comparison.yieldPerHa.value > 0 && (
-                                <p>✅ Yield per hectare improved by {data.comparison.yieldPerHa.pct.toFixed(1)}% — great progress</p>
+                                <p>OK Yield per hectare improved by {data.comparison.yieldPerHa.pct.toFixed(1)}% — great progress</p>
                             )}
                             {data.comparison.grossProfit.value > 0 && (
-                                <p>✅ Profitability improved by MWK {fmt(data.comparison.grossProfit.value)}</p>
+                                <p>OK Profitability improved by MWK {fmt(data.comparison.grossProfit.value)}</p>
                             )}
                             {data.comparison.grossProfit.value < 0 && (
-                                <p>⚠️ Profitability declined by MWK {fmt(Math.abs(data.comparison.grossProfit.value))} — analyse cost drivers</p>
+                                <p>Warning Profitability declined by MWK {fmt(Math.abs(data.comparison.grossProfit.value))} — analyse cost drivers</p>
                             )}
                         </div>
                     </div>

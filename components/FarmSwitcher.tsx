@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, ChevronDown, Plus, Loader2 } from "lucide-react";
+import { Check, ChevronDown, Plus, Loader2, Building2 } from "lucide-react";
 
 interface Farm {
     id: string;
@@ -17,11 +17,11 @@ interface Props {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-    owner:      "text-purple-600",
-    manager:    "text-blue-600",
-    agronomist: "text-green-600",
-    accountant: "text-amber-600",
-    viewer:     "text-slate-400",
+    owner:      "text-sky-200",
+    manager:    "text-blue-200",
+    agronomist: "text-cyan-200",
+    accountant: "text-sky-200",
+    viewer:     "text-slate-300",
 };
 
 export default function FarmSwitcher({ collapsed, userId }: Props) {
@@ -84,46 +84,48 @@ export default function FarmSwitcher({ collapsed, userId }: Props) {
         <div className="relative">
             <button
                 onClick={() => setOpen(!open)}
-                className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${collapsed ? "justify-center" : "justify-between"}`}
+                className={`w-full min-h-14 flex items-center gap-3 px-3 rounded-2xl transition-colors ${collapsed ? "justify-center" : "justify-between"}`}
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.10)", color: "white" }}
                 title={collapsed ? activeFarm.name : undefined}
             >
                 <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-6 h-6 rounded-lg bg-[#1a3d1f] flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
-                        {activeFarm.name[0].toUpperCase()}
+                    <div className="w-10 h-10 rounded-2xl bg-sky-500/20 flex items-center justify-center text-sky-100 text-sm font-black flex-shrink-0 ring-1 ring-sky-300/20">
+                        {collapsed ? <Building2 size={17} /> : activeFarm.name[0].toUpperCase()}
                     </div>
                     {!collapsed && (
                         <div className="min-w-0">
-                            <p className="text-xs font-medium text-slate-900 dark:text-white truncate">{activeFarm.name}</p>
+                            <p className="text-sm font-black text-white truncate leading-tight">{activeFarm.name}</p>
                             <p className={`text-xs capitalize ${ROLE_COLORS[activeFarm.role]}`}>{activeFarm.role}</p>
                         </div>
                     )}
                 </div>
-                {!collapsed && <ChevronDown size={12} className="text-slate-400 flex-shrink-0" />}
+                {!collapsed && <ChevronDown size={16} className="text-white/55 flex-shrink-0" />}
             </button>
 
             {open && !collapsed && (
-                <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden">
-                    <div className="p-1">
+                <div className="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl shadow-2xl overflow-hidden"
+                     style={{ background: "#0F172A", border: "1px solid rgba(255,255,255,0.12)" }}>
+                    <div className="p-2">
                         {farms.map((farm) => (
                             <button
                                 key={farm.id}
                                 onClick={() => switchFarm(farm.id)}
-                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left"
+                                className="w-full min-h-12 flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors text-left"
                             >
-                                <div className="w-6 h-6 rounded-lg bg-[#1a3d1f] flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                                <div className="w-9 h-9 rounded-xl bg-sky-500/20 flex items-center justify-center text-sky-100 text-xs font-black flex-shrink-0">
                                     {farm.name[0].toUpperCase()}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-medium text-slate-900 dark:text-white truncate">{farm.name}</p>
+                                    <p className="text-sm font-bold text-white truncate">{farm.name}</p>
                                     <p className={`text-xs capitalize ${ROLE_COLORS[farm.role]}`}>{farm.role}</p>
                                 </div>
-                                {farm.id === activeFarmId && <Check size={12} className="text-green-600 flex-shrink-0" />}
+                                {farm.id === activeFarmId && <Check size={15} className="text-sky-300 flex-shrink-0" />}
                             </button>
                         ))}
                     </div>
 
                     {farms.some((f) => f.isOwned) && (
-                        <div className="border-t border-slate-100 dark:border-slate-800 p-1">
+                        <div className="p-2" style={{ borderTop: "1px solid rgba(255,255,255,0.10)" }}>
                             {showAddFarm ? (
                                 <form onSubmit={createFarm} className="p-2 flex flex-col gap-2">
                                     <input
@@ -142,11 +144,11 @@ export default function FarmSwitcher({ collapsed, userId }: Props) {
                                     {error && <p className="text-xs text-red-500">{error}</p>}
                                     <div className="flex gap-1.5">
                                         <button type="button" onClick={() => setShowAddFarm(false)}
-                                                className="flex-1 h-7 text-xs border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50">
+                                                className="flex-1 min-h-9 text-xs border border-slate-600 rounded-lg text-slate-200 hover:bg-white/10">
                                             Cancel
                                         </button>
                                         <button type="submit" disabled={creating}
-                                                className="flex-1 h-7 text-xs bg-[#1a3d1f] text-white rounded-lg hover:bg-[#2d5c35] disabled:opacity-50 flex items-center justify-center">
+                                                className="flex-1 min-h-9 text-xs bg-sky-600 text-white rounded-lg hover:bg-sky-500 disabled:opacity-50 flex items-center justify-center">
                                             {creating ? <Loader2 size={10} className="animate-spin" /> : "Create"}
                                         </button>
                                     </div>
@@ -154,10 +156,10 @@ export default function FarmSwitcher({ collapsed, userId }: Props) {
                             ) : (
                                 <button
                                     onClick={() => setShowAddFarm(true)}
-                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left"
+                                    className="w-full min-h-11 flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/10 transition-colors text-left"
                                 >
-                                    <Plus size={12} className="text-slate-400" />
-                                    <span className="text-xs text-slate-500">Add farm</span>
+                                    <Plus size={14} className="text-sky-200" />
+                                    <span className="text-xs font-bold text-sky-100">Add farm</span>
                                 </button>
                             )}
                         </div>

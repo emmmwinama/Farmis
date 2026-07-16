@@ -14,7 +14,7 @@ const FieldMapComponent = dynamic(
             <div className="flex-1 flex items-center justify-center"
                  style={{ background: "#f0f4f0" }}>
                 <div className="flex flex-col items-center gap-3">
-                    <div className="text-4xl">🗺️</div>
+                    <div className="text-4xl">Map</div>
                     <Loader2 size={20} className="animate-spin" style={{ color: "#1a3d1f" }} />
                     <p className="text-sm font-semibold" style={{ color: "#666" }}>
                         Loading map...
@@ -123,7 +123,7 @@ export default function FieldMapPage({
                     className="flex-1 flex items-center justify-center"
                     style={{ background: "#f0f4f0" }}>
                     <div className="flex flex-col items-center gap-3">
-                        <div className="text-4xl">🗺️</div>
+                        <div className="text-4xl">Map</div>
                         <Loader2
                             size={20}
                             className="animate-spin"

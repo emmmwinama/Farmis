@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Loader2, Check, X } from "lucide-react";
+import { Loader2, Check, ShieldCheck, X } from "lucide-react";
 
 function ActivateContent() {
     const searchParams = useSearchParams();
@@ -45,15 +45,7 @@ function ActivateContent() {
         <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
             <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-10">
                 <div className="mb-8 text-center">
-                    <div className="w-12 h-12 bg-[#1a3d1f] rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
-                            <polygon points="9,2 16,14 2,14" fill="#2d6a35"/>
-                            <polygon points="9,5 14,14 4,14" fill="#3d8c47"/>
-                            <polygon points="9,8 12,14 6,14" fill="#52b85e"/>
-                            <rect x="7.5" y="11" width="3" height="5" rx="1" fill="#1a3d1f"/>
-                        </svg>
-                    </div>
-                    <h1 className="text-xl font-medium text-slate-900">🌾 Farmio</h1>
+                    <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-4 text-sky-200"><ShieldCheck size={24} /></div><h1 className="text-xl font-medium text-slate-900">AgriVault</h1>
                 </div>
 
                 {status === "loading" && (

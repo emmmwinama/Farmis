@@ -8,12 +8,27 @@ export async function getUserSubscription(userId: string) {
     return sub;
 }
 
+function isUsableSubscription(sub: Awaited<ReturnType<typeof getUserSubscription>>) {
+    if (!sub) return false;
+
+    const now = new Date();
+    if (sub.status === "active") return !sub.endDate || sub.endDate > now;
+    if (sub.status === "trial") {
+        const trialEnd = sub.trialEndsAt ?? sub.endDate;
+        return !!trialEnd && trialEnd > now;
+    }
+
+    return false;
+}
+
 export async function checkLimit(
     userId: string,
     resource: "Fields" | "Crops" | "Activities" | "Transactions" | "Employees" | "Farms"
 ) {
     const sub = await getUserSubscription(userId);
-    if (!sub) return; // no subscription = free tier defaults apply
+    if (!sub || !isUsableSubscription(sub)) {
+        throw new Error("No active subscription found. Please start a trial or upgrade your plan.");
+    }
 
     const limitKey = `max${resource}` as keyof typeof sub.tier;
     const limit = sub.tier[limitKey] as number;
@@ -71,7 +86,7 @@ export async function checkFeature(
         | "apiAccess"
 ) {
     const sub = await getUserSubscription(userId);
-    if (!sub) {
+    if (!sub || !isUsableSubscription(sub)) {
         throw new Error("No active subscription found.");
     }
 
@@ -88,12 +103,11 @@ export async function getSubscriptionStatus(userId: string) {
     if (!sub) return { active: false, tier: null, daysRemaining: null };
 
     const now = new Date();
-    const active =
-        sub.status === "active" &&
-        (!sub.endDate || sub.endDate > now);
+    const active = isUsableSubscription(sub);
 
-    const daysRemaining = sub.endDate
-        ? Math.max(0, Math.ceil((sub.endDate.getTime() - now.getTime()) / 86400000))
+    const endDate = sub.status === "trial" ? sub.trialEndsAt ?? sub.endDate : sub.endDate;
+    const daysRemaining = endDate
+        ? Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / 86400000))
         : null;
 
     return { active, tier: sub.tier, daysRemaining, status: sub.status };

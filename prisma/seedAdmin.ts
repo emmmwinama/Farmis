@@ -5,18 +5,25 @@ const prisma = new PrismaClient();
 
 async function main() {
     console.log("Seeding...");
+    const adminEmail = process.env.SEED_ADMIN_EMAIL;
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword || adminPassword.length < 12) {
+        throw new Error("Set SEED_ADMIN_EMAIL and a SEED_ADMIN_PASSWORD of at least 12 characters before seeding admin data.");
+    }
 
     // ── Admin user ─────────────────────────────────────────────────────────────
-    const existingAdmin = await prisma.adminUser.findFirst({ where: { email: "admin@farmio.app" } });
+    const normalizedAdminEmail = adminEmail.toLowerCase();
+    const existingAdmin = await prisma.adminUser.findFirst({ where: { email: normalizedAdminEmail } });
     if (!existingAdmin) {
         await prisma.adminUser.create({
             data: {
-                email:    "admin@farmio.app",
-                password: await bcrypt.hash("admin123", 10),
-                name:     "Farmio Admin",
+                email:    normalizedAdminEmail,
+                password: await bcrypt.hash(adminPassword, 12),
+                name:     "AgriVault Admin",
             },
         });
-        console.log("Admin user created: admin@farmio.app / admin123");
+        console.log(`Admin user created: ${normalizedAdminEmail}`);
     } else {
         console.log("Admin user already exists.");
     }
@@ -31,25 +38,25 @@ async function main() {
     await prisma.subscriptionTier.createMany({
         data: [
             {
-                name:                  "Free",
-                description:           "For smallholder farmers getting started",
+                name:                  "Trial",
+                description:           "7-day full trial for evaluating AgriVault",
                 priceMonthly:          0,
                 priceAnnual:           null,
                 isActive:              true,
                 isPublic:              true,
                 isFeatured:            false,
                 sortOrder:             0,
-                maxFields:             1,
-                maxCrops:              1,
-                maxActivities:         10,
-                maxTransactions:       5,
-                maxEmployees:          1,
+                maxFields:             -1,
+                maxCrops:              -1,
+                maxActivities:         -1,
+                maxTransactions:       -1,
+                maxEmployees:          -1,
                 maxFarms:              1,
                 maxTeamMembers:        0,
-                seasonAnalytics:       false,
-                yieldSuggestions:      false,
-                costPerHectare:        false,
-                payrollTracking:       false,
+                seasonAnalytics:       true,
+                yieldSuggestions:      true,
+                costPerHectare:        true,
+                payrollTracking:       true,
                 multipleFarms:         false,
                 teamAccounts:          false,
                 customReports:         false,
@@ -57,8 +64,8 @@ async function main() {
                 dataRetentionLifetime: false,
             },
             {
-                name:                  "Standard",
-                description:           "For growing commercial farms",
+                name:                  "Regular",
+                description:           "For one farm owner managing a single-user account",
                 priceMonthly:          9900,
                 priceAnnual:           99000,
                 isActive:              true,
@@ -71,13 +78,13 @@ async function main() {
                 maxTransactions:       -1,
                 maxEmployees:          -1,
                 maxFarms:              1,
-                maxTeamMembers:        5,
+                maxTeamMembers:        0,
                 seasonAnalytics:       true,
                 yieldSuggestions:      true,
                 costPerHectare:        true,
                 payrollTracking:       true,
                 multipleFarms:         false,
-                teamAccounts:          true,
+                teamAccounts:          false,
                 customReports:         false,
                 apiAccess:             false,
                 dataRetentionLifetime: false,
@@ -119,7 +126,7 @@ async function main() {
         {
             name:      "James Phiri",
             role:      "Maize & soya farmer, Lilongwe",
-            quote:     "Before Farmio, I had no idea which of my fields was profitable. Now I know my maize costs MWK 180 per kg to produce and I can sell for MWK 450 at Lilongwe market. That knowledge changed everything.",
+            quote:     "Before AgriVault, I had no idea which of my fields was profitable. Now I know my maize costs MWK 180 per kg to produce and I can sell for MWK 450 at Lilongwe market. That knowledge changed everything.",
             initials:  "JP",
             isActive:  true,
             sortOrder: 1,
@@ -127,7 +134,7 @@ async function main() {
         {
             name:      "Grace Banda",
             role:      "Commercial farmer, Kasungu",
-            quote:     "I went to NBS Bank with my Farmio credit score report. They approved my loan in two weeks. Without those records I would have been turned away like before.",
+            quote:     "I went to NBS Bank with my AgriVault credit score report. They approved my loan in two weeks. Without those records I would have been turned away like before.",
             initials:  "GB",
             isActive:  true,
             sortOrder: 2,
@@ -186,148 +193,16 @@ async function main() {
     }
     console.log("Market prices seeded.");
 
-    // ── Impact stats ───────────────────────────────────────────────────────────
-    // Schema fields: id, icon, value, label, source, color, sortOrder, isActive, createdAt
-    const impactStats = [
-        { icon: "👨‍🌾", value: "67%",      label: "of smallholder farmers in Malawi keep no formal financial records",     source: "World Bank, 2023",              color: "#DC2626", sortOrder: 0, isActive: true },
-        { icon: "🏦",   value: "89%",      label: "of farmer loan applications rejected — no financial history",             source: "RBM Financial Inclusion Report", color: "#D97706", sortOrder: 1, isActive: true },
-        { icon: "💸",   value: "MWK 2.1T", label: "lost annually by Malawian farmers selling below optimal market prices",  source: "USAID AgriMarket Study",         color: "#9333EA", sortOrder: 2, isActive: true },
-        { icon: "📱",   value: "72%",      label: "of Malawians now have mobile phone access — up from 38% in 2018",        source: "GSMA Mobile Economy Africa 2023",color: "#2563EB", sortOrder: 3, isActive: true },
-        { icon: "🌾",   value: "1.8M",     label: "smallholder farming households in Malawi needing digitization",          source: "National Statistical Office",    color: "#16A34A", sortOrder: 4, isActive: true },
-        { icon: "📈",   value: "$2.4B",    label: "Agricultural SaaS market in sub-Saharan Africa by 2027",                 source: "AgriTech Investment Report 2023",color: "#0891B2", sortOrder: 5, isActive: true },
-    ];
-    for (const stat of impactStats) {
-        const exists = await prisma.impactStat.findFirst({ where: { value: stat.value, label: stat.label } });
-        if (!exists) await prisma.impactStat.create({ data: stat });
-    }
-    console.log("Impact stats seeded.");
-
-    // ── Pitch sections ─────────────────────────────────────────────────────────
-    // Schema fields: id, key, title, content (Json), isActive, updatedAt
-    const pitchSections = [
-        {
-            key: "hook", title: "The Hook",
-            content: {
-                headline: "Every year, Malawian farmers collectively lose over MWK 2.1 trillion in potential income",
-                subline:  "Not from bad weather or poor harvests — but from not knowing their numbers.",
-                solution: "Farmio solves all of this. In one app. For any smartphone.",
-            },
-        },
-        {
-            key: "problem", title: "The Problem",
-            content: {
-                headline: "African farmers work hard. The system is working against them.",
-                points: [
-                    { stat: "67%",  desc: "of smallholder farmers in Malawi keep no formal financial records",        source: "World Bank, 2023" },
-                    { stat: "89%",  desc: "of farmer loan applications are rejected due to lack of financial records", source: "RBM Report" },
-                    { stat: "1.8M", desc: "smallholder farming households in Malawi needing digitization",             source: "NSO Malawi" },
-                ],
-            },
-        },
-        {
-            key: "solution", title: "The Solution",
-            content: {
-                headline:    "Farmio is a farm management operating system built for African agriculture",
-                description: "We replace paper records with a powerful, affordable, mobile-first platform.",
-                features: [
-                    "GPS field mapping & zone management",
-                    "Real-time ADMARC market prices",
-                    "Farm credit score & loan readiness",
-                    "Full financial tracking & reporting",
-                    "Weather integration & farming advice",
-                    "Animal husbandry management",
-                    "AI-powered insights & anomaly detection",
-                    "Team management & role permissions",
-                ],
-            },
-        },
-        {
-            key: "market", title: "Market Opportunity",
-            content: {
-                tam: { value: "$2.4B", label: "Total Addressable Market", desc: "Agricultural SaaS in sub-Saharan Africa by 2027" },
-                sam: { value: "$180M", label: "Serviceable Market",       desc: "Farm management software across Malawi, Zambia, Zimbabwe, Tanzania" },
-                som: { value: "$4.2M", label: "Obtainable (Year 1–3)",    desc: "12,000 paying farms across Malawi at MWK 9,900/month average" },
-                drivers: [
-                    { title: "Smartphone penetration",    desc: "72% of Malawians now have mobile phone access" },
-                    { title: "Government digitalization", desc: "Malawi Digital Economy Policy 2023–2030" },
-                    { title: "Funder momentum",           desc: "$2.8B committed to African AgriTech by DFIs 2024–2027" },
-                    { title: "Market gap",                desc: "No locally-built, locally-priced platform exists in Malawi" },
-                ],
-            },
-        },
-        {
-            key: "model", title: "Business Model",
-            content: {
-                streams: [
-                    { name: "SaaS Subscriptions", icon: "💳", status: "Live",  desc: "Free, Standard (MWK 9,900/mo), Enterprise (MWK 49,900/mo)" },
-                    { name: "Credit Score API",   icon: "🏦", status: "2025",  desc: "License credit score engine to banks and MFIs" },
-                    { name: "Market Data",        icon: "📊", status: "2025",  desc: "Anonymised crop production data to commodity traders" },
-                    { name: "Input Marketplace",  icon: "🛒", status: "2026",  desc: "Commission-based marketplace for input suppliers. 3–5% fee" },
-                ],
-                unitEconomics: { arpu: "MWK 8,400", cac: "MWK 15,000", ltv: "MWK 302,400", ltvCac: "20x" },
-            },
-        },
-        {
-            key: "traction", title: "Traction & Validation",
-            content: {
-                metrics: [
-                    { metric: "500+",    label: "Farms registered" },
-                    { metric: "12,000+", label: "Hectares tracked" },
-                    { metric: "94%",     label: "30-day retention" },
-                    { metric: "4.8/5",   label: "User satisfaction" },
-                ],
-                milestones: [
-                    { date: "Q1 2024", event: "MVP launched with 50 beta farmers in Lilongwe and Kasungu" },
-                    { date: "Q2 2024", event: "ADMARC price integration — first Malawian AgriTech with live official prices" },
-                    { date: "Q3 2024", event: "First farmer accesses bank loan using Farmio credit score report" },
-                    { date: "Q4 2024", event: "500 registered farms across 5 districts. 67% on paid plans" },
-                    { date: "Q1 2025", event: "GPS field mapping launched. 12,000+ hectares mapped in first month" },
-                    { date: "Now",     event: "Raising seed round to scale to 10,000 farms by end of 2025" },
-                ],
-            },
-        },
-        {
-            key: "ask", title: "The Ask",
-            content: {
-                amount: "$250,000",
-                type:   "Seed round · Convertible note or equity",
-                runway: "18-month runway",
-                useOfFunds: [
-                    { use: "Product development & AI", pct: 40, amount: "$100,000" },
-                    { use: "Sales & marketing",        pct: 30, amount: "$75,000" },
-                    { use: "Team expansion",           pct: 20, amount: "$50,000" },
-                    { use: "Operations & compliance",  pct: 10, amount: "$25,000" },
-                ],
-                unlocks: [
-                    "10,000 registered farms by end of Year 1",
-                    "Expansion into Zambia (Q3 2025)",
-                    "Bank & MFI credit score API launch",
-                    "WhatsApp and USSD channel (feature phones)",
-                    "First $1M ARR milestone",
-                    "Series A readiness by Month 18",
-                ],
-                contact: { email: "invest@farmio.app", phone: "+265 999 000 000", web: "farmio.app" },
-            },
-        },
-    ];
-    for (const section of pitchSections) {
-        await prisma.pitchSection.upsert({
-            where:  { key: section.key },
-            update: { title: section.title, content: section.content },
-            create: { key: section.key, title: section.title, content: section.content },
-        });
-    }
-    console.log("Pitch sections seeded.");
 
     // ── CMS Features ───────────────────────────────────────────────────────────
     // Schema fields: id, icon, title, description, sortOrder, isActive
     const features = [
-        { icon: "🗺️", title: "Field & crop mapping",      description: "Draw GPS field boundaries, section zones by crop, measure acreage accurately.",                            sortOrder: 0, isActive: true },
-        { icon: "📊", title: "ADMARC market intelligence", description: "Live farm gate prices from ADMARC and regional markets. Know the best time and place to sell.",            sortOrder: 1, isActive: true },
-        { icon: "🏆", title: "Farm credit score",          description: "Your complete farm history becomes a loan readiness report. Walk into any bank with a score and a PDF.",   sortOrder: 2, isActive: true },
-        { icon: "🌤️", title: "Weather integration",        description: "7-day forecast with farming advice. Know when to spray, plant, irrigate — before you spend money.",        sortOrder: 3, isActive: true },
-        { icon: "🐄", title: "Animal husbandry",           description: "Track livestock health, production, weight gain and sales. Calculate true cost per animal automatically.", sortOrder: 4, isActive: true },
-        { icon: "✨", title: "AI-powered insights",        description: "Anomaly alerts, season comparisons, cost benchmarking — all explained in plain language.",                 sortOrder: 5, isActive: true },
+        { icon: "Map", title: "Field & crop mapping",      description: "Draw GPS field boundaries, section zones by crop, measure acreage accurately.",                            sortOrder: 0, isActive: true },
+        { icon: "Chart", title: "ADMARC market intelligence", description: "Live farm gate prices from ADMARC and regional markets. Know the best time and place to sell.",            sortOrder: 1, isActive: true },
+        { icon: "Score", title: "Farm credit score",          description: "Your complete farm history becomes a loan readiness report. Walk into any bank with a score and a PDF.",   sortOrder: 2, isActive: true },
+        { icon: "Weather", title: "Weather integration",        description: "7-day forecast with farming advice. Know when to spray, plant, irrigate — before you spend money.",        sortOrder: 3, isActive: true },
+        { icon: "Cattle", title: "Animal husbandry",           description: "Track livestock health, production, weight gain and sales. Calculate true cost per animal automatically.", sortOrder: 4, isActive: true },
+        { icon: "AI", title: "AI-powered insights",        description: "Anomaly alerts, season comparisons, cost benchmarking — all explained in plain language.",                 sortOrder: 5, isActive: true },
     ];
     for (const f of features) {
         const exists = await prisma.cmsFeature.findFirst({ where: { title: f.title } });
@@ -339,23 +214,19 @@ async function main() {
     // Schema fields: id, key, value, type, group, label, updatedAt, updatedBy
     const siteContent = [
         { key: "hero_headline",         value: "Manage your farm like a business.",                                                                                                                          type: "text", group: "hero",     label: "Hero headline" },
-        { key: "hero_subheadline",      value: "Farmio replaces paper records with a powerful digital system — track fields, crops, costs and yields. Get AI-powered insights. Know your profit before you sell.", type: "text", group: "hero",     label: "Hero subheadline" },
+        { key: "hero_subheadline",      value: "AgriVault replaces paper records with a powerful digital system — track fields, crops, costs and yields. Get AI-powered insights. Know your profit before you sell.", type: "text", group: "hero",     label: "Hero subheadline" },
         { key: "hero_cta_primary",      value: "Start free — no card needed",                                                                                                                               type: "text", group: "hero",     label: "Primary CTA button" },
         { key: "hero_cta_secondary",    value: "See how it works",                                                                                                                                          type: "text", group: "hero",     label: "Secondary CTA button" },
         { key: "problem_headline",      value: "African farmers work hard. The system is working against them.",                                                                                             type: "text", group: "hero",     label: "Problem headline" },
-        { key: "problem_sub",           value: "Without digital records, farmers can't access credit, don't know their true costs, and sell at the wrong time. Farmio fixes this.",                         type: "text", group: "hero",     label: "Problem subheadline" },
+        { key: "problem_sub",           value: "Without digital records, farmers can't access credit, don't know their true costs, and sell at the wrong time. AgriVault fixes this.",                         type: "text", group: "hero",     label: "Problem subheadline" },
         { key: "features_headline",     value: "Built for the realities of African farming",                                                                                                                type: "text", group: "hero",     label: "Features headline" },
         { key: "features_sub",          value: "Not a generic tool retrofitted for Africa. Built from scratch for Malawian conditions, crops, currencies and challenges.",                                  type: "text", group: "hero",     label: "Features subheadline" },
-        { key: "impact_headline",       value: "Numbers that tell the real story",                                                                                                                          type: "text", group: "stats",    label: "Impact stats headline" },
         { key: "testimonials_headline", value: "What farmers are saying",                                                                                                                                   type: "text", group: "hero",     label: "Testimonials headline" },
         { key: "pricing_headline",      value: "Start free. Scale when you grow.",                                                                                                                          type: "text", group: "hero",     label: "Pricing headline" },
         { key: "pricing_sub",           value: "No hidden fees. No contracts. Pay monthly and cancel anytime. All prices in Malawian Kwacha.",                                                              type: "text", group: "hero",     label: "Pricing subheadline" },
-        { key: "funders_headline",      value: "A platform that delivers on every funder's mandate",                                                                                                        type: "text", group: "hero",     label: "Funders headline" },
-        { key: "funders_sub",           value: "Farmio sits at the intersection of agricultural development, financial inclusion, and digital transformation.",                                             type: "text", group: "hero",     label: "Funders subheadline" },
         { key: "cta_headline",          value: "Your farm deserves better than paper.",                                                                                                                     type: "text", group: "hero",     label: "CTA headline" },
-        { key: "cta_sub",               value: "Join hundreds of Malawian farmers already using Farmio to make smarter decisions, access credit and build profitable farms.",                               type: "text", group: "hero",     label: "CTA subheadline" },
-        { key: "contact_email",         value: "hello@farmio.app",                                                                                                                                         type: "text", group: "contact",  label: "Contact email" },
-        { key: "invest_email",          value: "invest@farmio.app",                                                                                                                                        type: "text", group: "contact",  label: "Investor email" },
+        { key: "cta_sub",               value: "Join hundreds of Malawian farmers already using AgriVault to make smarter decisions, access credit and build profitable farms.",                               type: "text", group: "hero",     label: "CTA subheadline" },
+        { key: "contact_email",         value: "hello@agrivault.app",                                                                                                                                         type: "text", group: "contact",  label: "Contact email" },
         { key: "contact_phone",         value: "+265 999 000 000",                                                                                                                                         type: "text", group: "contact",  label: "Contact phone" },
     ];
     for (const item of siteContent) {
@@ -367,7 +238,7 @@ async function main() {
     }
     console.log("Site content seeded.");
 
-    console.log("\n✅ Seed complete.");
+    console.log("\nOK Seed complete.");
 }
 
 main()

@@ -11,7 +11,9 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(req.url);
-    const showArchived = searchParams.get("archived") === "true";
+    const archivedParam = searchParams.get("archived");
+    const showArchived = archivedParam === "true";
+    const includeBoth = archivedParam === "both" || searchParams.get("includeArchived") === "both";
     const season       = searchParams.get("season");
 
     const { farm } = await getSessionFarm();
@@ -19,7 +21,7 @@ export async function GET(req: Request) {
 
     const where: any = {
         field: { farmId: farm.id },
-        isArchived: showArchived ? true : false,
+        ...(includeBoth ? {} : { isArchived: showArchived ? true : false }),
     };
 
     if (season) where.season = season;

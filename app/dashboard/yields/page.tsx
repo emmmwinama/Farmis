@@ -267,9 +267,9 @@ function YieldsContent() {
                                         }}
                                         className="flex items-center gap-2 h-9 px-4 rounded-xl text-xs font-bold transition-all flex-shrink-0"
                                         style={{
-                                            background: isPanelOpen ? "#FFFBEB" : "var(--bg-card)",
-                                            color:      "#854F0B",
-                                            border:     "1.5px solid #FDE68A",
+                                            background: isPanelOpen ? "#F0F9FF" : "var(--bg-card)",
+                                            color:      "#075985",
+                                            border:     "1.5px solid #BAE6FD",
                                         }}>
                                         <TrendingUp size={13} /> Price suggestion
                                     </button>
@@ -298,13 +298,13 @@ function YieldsContent() {
                                     {/* Price suggestion panel */}
                                     {isPanelOpen && (
                                         <div className="rounded-xl p-4"
-                                             style={{ background: "#FFFBEB", border: "1.5px solid #FDE68A" }}>
+                                             style={{ background: "#F0F9FF", border: "1.5px solid #BAE6FD" }}>
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-sm font-extrabold" style={{ color: "#854F0B" }}>
+                                                <p className="text-sm font-extrabold" style={{ color: "#075985" }}>
                                                     Selling price suggestion
                                                 </p>
                                                 <div className="flex items-center gap-2">
-                                                    <label className="text-xs font-bold" style={{ color: "#854F0B" }}>
+                                                    <label className="text-xs font-bold" style={{ color: "#075985" }}>
                                                         Target margin:
                                                     </label>
                                                     <input type="number" min="0" max="200" value={margin}
@@ -317,17 +317,17 @@ function YieldsContent() {
                                                                padding: "0 8px", fontSize: "12px",
                                                                borderRadius: "8px", outline: "none",
                                                                textAlign: "center", fontWeight: 700,
-                                                               border: "1px solid #FDE68A",
+                                                               border: "1px solid #BAE6FD",
                                                                background: "var(--bg-card)",
-                                                               color: "#854F0B",
+                                                               color: "#075985",
                                                            }} />
-                                                    <span className="text-xs font-bold" style={{ color: "#854F0B" }}>%</span>
+                                                    <span className="text-xs font-bold" style={{ color: "#075985" }}>%</span>
                                                 </div>
                                             </div>
 
                                             {loadingSuggestion ? (
                                                 <div className="flex justify-center py-4">
-                                                    <Loader2 size={16} className="animate-spin" style={{ color: "#D97706" }} />
+                                                    <Loader2 size={16} className="animate-spin" style={{ color: "#0284C7" }} />
                                                 </div>
                                             ) : suggestion && (
                                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -340,12 +340,12 @@ function YieldsContent() {
                                                         { label: "Projected profit",          value: suggestion.projectedProfit      ? `MWK ${fmt(suggestion.projectedProfit)}`      : "—" },
                                                     ].map(({ label, value }) => (
                                                         <div key={label} className="rounded-xl p-3"
-                                                             style={{ background: "var(--bg-card)", border: "1px solid #FDE68A" }}>
+                                                             style={{ background: "var(--bg-card)", border: "1px solid #BAE6FD" }}>
                                                             <p className="text-[10px] font-black uppercase tracking-wide mb-1"
-                                                               style={{ color: "#D97706" }}>
+                                                               style={{ color: "#0284C7" }}>
                                                                 {label}
                                                             </p>
-                                                            <p className="text-sm font-extrabold" style={{ color: "#92400E" }}>
+                                                            <p className="text-sm font-extrabold" style={{ color: "#075985" }}>
                                                                 {value}
                                                             </p>
                                                         </div>

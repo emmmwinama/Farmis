@@ -1,12 +1,16 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+    throw new Error("DATABASE_URL is required for Prisma.");
+}
+
 export default defineConfig({
     schema: "prisma/schema.prisma",
 
     datasource: {
-        // url: "mysql://root:anUEjPWaxuUGAsppnbGcMwYmcIMCxCdm@mainline.proxy.rlwy.net:56635/railway",
-        url: "mysql://root:@localhost:3306/farmio"
+        url: databaseUrl
     },
 
 });

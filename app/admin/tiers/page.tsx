@@ -10,15 +10,15 @@ function fmt(n: number) {
 }
 
 const FEATURES = [
-    { key: "seasonAnalytics"       as const, label: "Season analytics",       icon: "📈" },
-    { key: "yieldSuggestions"      as const, label: "Yield suggestions",       icon: "🌾" },
-    { key: "costPerHectare"        as const, label: "Cost per hectare",        icon: "💰" },
-    { key: "payrollTracking"       as const, label: "Payroll tracking",        icon: "👷" },
-    { key: "multipleFarms"         as const, label: "Multiple farms",          icon: "🏡" },
-    { key: "teamAccounts"          as const, label: "Team accounts",           icon: "👥" },
-    { key: "customReports"         as const, label: "Custom reports",          icon: "📋" },
-    { key: "apiAccess"             as const, label: "API access",              icon: "🔌" },
-    { key: "dataRetentionLifetime" as const, label: "Lifetime data retention", icon: "♾️" },
+    { key: "seasonAnalytics"       as const, label: "Season analytics",       icon: "Trend" },
+    { key: "yieldSuggestions"      as const, label: "Yield suggestions",       icon: "Harvest" },
+    { key: "costPerHectare"        as const, label: "Cost per hectare",        icon: "Cost" },
+    { key: "payrollTracking"       as const, label: "Payroll tracking",        icon: "Payroll" },
+    { key: "multipleFarms"         as const, label: "Multiple farms",          icon: "Farms" },
+    { key: "teamAccounts"          as const, label: "Team accounts",           icon: "Team" },
+    { key: "customReports"         as const, label: "Custom reports",          icon: "Record" },
+    { key: "apiAccess"             as const, label: "API access",              icon: "API" },
+    { key: "dataRetentionLifetime" as const, label: "Lifetime data retention", icon: "Life" },
 ];
 
 const LIMITS = [
@@ -248,7 +248,7 @@ export default function AdminTiersPage() {
             ) : tiers.length === 0 ? (
                 <div className="rounded-2xl p-16 text-center"
                      style={{ background: "white", border: "1.5px dashed #E2E8F0" }}>
-                    <p className="text-5xl mb-4">📦</p>
+                    <p className="text-5xl mb-4">Stock</p>
                     <p className="font-bold mb-1" style={{ color: "#0F172A" }}>No tiers yet</p>
                     <p className="text-sm mb-6" style={{ color: "#94A3B8" }}>Create your first subscription tier</p>
                     <button onClick={openAdd}

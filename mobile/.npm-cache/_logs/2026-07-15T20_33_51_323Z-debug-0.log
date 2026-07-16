@@ -1,0 +1,289 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.13.0
+2 info using node@v26.1.0
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\Users\emmanuel.mwinama\Code\Farmis\mobile\.npmrc
+5 silly config load:file:C:\Users\emmanuel.mwinama\.npmrc
+6 silly config load:file:C:\Users\emmanuel.mwinama\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install react-native-web@~0.21.0 react-dom@19.2.3 @expo/metro-runtime@~57.0.5
+8 verbose argv "install" "react-native-web@~0.21.0" "react-dom@19.2.3" "@expo/metro-runtime@~57.0.5" "--cache" ".\\.npm-cache" "--fetch-retries" "5" "--fetch-retry-mintimeout" "20000" "--fetch-retry-maxtimeout" "120000" "--no-audit" "--no-fund"
+9 verbose logfile logs-max:10 dir:C:\Users\emmanuel.mwinama\Code\Farmis\mobile\.npm-cache\_logs\2026-07-15T20_33_51_323Z-
+10 verbose logfile C:\Users\emmanuel.mwinama\Code\Farmis\mobile\.npm-cache\_logs\2026-07-15T20_33_51_323Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4395630592 maxSize:1098907648 maxEntrySize:549453824
+13 silly idealTree buildDeps
+14 silly fetch manifest react-native-web@~0.21.0
+15 silly packumentCache full:https://registry.npmjs.org/react-native-web cache-miss
+16 http fetch GET 200 https://registry.npmjs.org/react-native-web 1131ms (cache revalidated)
+17 silly packumentCache full:https://registry.npmjs.org/react-native-web set size:1090416 disposed:false
+18 silly fetch manifest react@19.2.3
+19 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+20 http fetch GET 200 https://registry.npmjs.org/react 491ms (cache revalidated)
+21 silly packumentCache full:https://registry.npmjs.org/react set size:6796788 disposed:false
+22 silly fetch manifest react-dom@19.2.3
+23 silly packumentCache full:https://registry.npmjs.org/react-dom cache-miss
+24 http fetch GET 200 https://registry.npmjs.org/react-dom 499ms (cache revalidated)
+25 silly packumentCache full:https://registry.npmjs.org/react-dom set size:9106365 disposed:false
+26 silly fetch manifest @expo/metro-runtime@~57.0.5
+27 silly packumentCache full:https://registry.npmjs.org/@expo%2fmetro-runtime cache-miss
+28 http fetch GET 200 https://registry.npmjs.org/@expo%2fmetro-runtime 1072ms (cache revalidated)
+29 silly packumentCache full:https://registry.npmjs.org/@expo%2fmetro-runtime set size:756211 disposed:false
+30 silly fetch manifest expo@~57.0.6
+31 silly packumentCache full:https://registry.npmjs.org/expo cache-miss
+32 http fetch GET 200 https://registry.npmjs.org/expo 472ms (cache revalidated)
+33 silly packumentCache full:https://registry.npmjs.org/expo set size:3927571 disposed:false
+34 silly fetch manifest react-native@0.86.0
+35 silly packumentCache full:https://registry.npmjs.org/react-native cache-miss
+36 http fetch GET 200 https://registry.npmjs.org/react-native 537ms (cache revalidated)
+37 silly packumentCache full:https://registry.npmjs.org/react-native set size:15499313 disposed:false
+38 silly fetch manifest @react-native/jest-preset@0.86.0
+39 silly packumentCache full:https://registry.npmjs.org/@react-native%2fjest-preset cache-miss
+40 http fetch GET 200 https://registry.npmjs.org/@react-native%2fjest-preset 993ms (cache revalidated)
+41 silly packumentCache full:https://registry.npmjs.org/@react-native%2fjest-preset set size:268799 disposed:false
+42 silly fetch manifest @types/react@~19.2.2
+43 silly packumentCache full:https://registry.npmjs.org/@types%2freact cache-miss
+44 http fetch GET 200 https://registry.npmjs.org/@types%2freact 823ms (cache revalidated)
+45 silly packumentCache full:https://registry.npmjs.org/@types%2freact set size:2632776 disposed:false
+46 silly fetch manifest react-native-webview@*
+47 silly packumentCache full:https://registry.npmjs.org/react-native-webview cache-miss
+48 http fetch GET 200 https://registry.npmjs.org/react-native-webview 465ms (cache revalidated)
+49 silly packumentCache full:https://registry.npmjs.org/react-native-webview set size:1379763 disposed:false
+50 silly placeDep ROOT @expo/metro-runtime@57.0.5 OK for: farmio-mobile@1.0.0 want: ~57.0.5
+51 silly placeDep ROOT react-dom@19.2.3 OK for: farmio-mobile@1.0.0 want: 19.2.3
+52 silly placeDep ROOT react-native-web@0.21.2 OK for: farmio-mobile@1.0.0 want: ~0.21.0
+53 silly fetch manifest @expo/log-box@^57.0.1
+54 silly packumentCache full:https://registry.npmjs.org/@expo%2flog-box cache-miss
+55 silly fetch manifest fbjs@^3.0.4
+56 silly packumentCache full:https://registry.npmjs.org/fbjs cache-miss
+57 silly fetch manifest styleq@^0.1.3
+58 silly packumentCache full:https://registry.npmjs.org/styleq cache-miss
+59 silly fetch manifest memoize-one@^6.0.0
+60 silly packumentCache full:https://registry.npmjs.org/memoize-one cache-miss
+61 silly fetch manifest postcss-value-parser@^4.2.0
+62 silly packumentCache full:https://registry.npmjs.org/postcss-value-parser cache-miss
+63 silly fetch manifest inline-style-prefixer@^7.0.1
+64 silly packumentCache full:https://registry.npmjs.org/inline-style-prefixer cache-miss
+65 silly fetch manifest @react-native/normalize-colors@^0.74.1
+66 silly packumentCache full:https://registry.npmjs.org/@react-native%2fnormalize-colors cache-miss
+67 http fetch GET 200 https://registry.npmjs.org/fbjs 480ms (cache miss)
+68 silly packumentCache full:https://registry.npmjs.org/fbjs set size:undefined disposed:false
+69 http fetch GET 200 https://registry.npmjs.org/memoize-one 818ms (cache revalidated)
+70 silly packumentCache full:https://registry.npmjs.org/memoize-one set size:217155 disposed:false
+71 http fetch GET 200 https://registry.npmjs.org/inline-style-prefixer 876ms (cache miss)
+72 silly packumentCache full:https://registry.npmjs.org/inline-style-prefixer set size:undefined disposed:false
+73 http fetch GET 200 https://registry.npmjs.org/styleq 885ms (cache miss)
+74 silly packumentCache full:https://registry.npmjs.org/styleq set size:undefined disposed:false
+75 http fetch GET 200 https://registry.npmjs.org/postcss-value-parser 888ms (cache miss)
+76 silly packumentCache full:https://registry.npmjs.org/postcss-value-parser set size:undefined disposed:false
+77 http fetch GET 200 https://registry.npmjs.org/@expo%2flog-box 1325ms (cache revalidated)
+78 silly packumentCache full:https://registry.npmjs.org/@expo%2flog-box set size:265400 disposed:false
+79 http fetch GET 200 https://registry.npmjs.org/@react-native%2fnormalize-colors 1361ms (cache revalidated)
+80 silly packumentCache full:https://registry.npmjs.org/@react-native%2fnormalize-colors set size:1962031 disposed:false
+81 silly fetch manifest expo@*
+82 silly packumentCache full:https://registry.npmjs.org/expo cache-miss
+83 http cache https://registry.npmjs.org/expo 47ms (cache hit)
+84 silly packumentCache full:https://registry.npmjs.org/expo set size:3927571 disposed:false
+85 silly fetch manifest @expo/metro-runtime@*
+86 silly packumentCache full:https://registry.npmjs.org/@expo%2fmetro-runtime cache-hit
+87 silly fetch manifest react@*
+88 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+89 http cache https://registry.npmjs.org/react 49ms (cache hit)
+90 silly packumentCache full:https://registry.npmjs.org/react set size:6796788 disposed:false
+91 silly fetch manifest react-dom@*
+92 silly packumentCache full:https://registry.npmjs.org/react-dom cache-miss
+93 http cache https://registry.npmjs.org/react-dom 86ms (cache hit)
+94 silly packumentCache full:https://registry.npmjs.org/react-dom set size:9106365 disposed:false
+95 silly fetch manifest react-native@*
+96 silly packumentCache full:https://registry.npmjs.org/react-native cache-miss
+97 http cache https://registry.npmjs.org/react-native 135ms (cache hit)
+98 silly packumentCache full:https://registry.npmjs.org/react-native set size:15499313 disposed:false
+99 silly fetch manifest @types/react@^19.1.1
+100 silly packumentCache full:https://registry.npmjs.org/@types%2freact cache-miss
+101 http cache https://registry.npmjs.org/@types%2freact 30ms (cache hit)
+102 silly packumentCache full:https://registry.npmjs.org/@types%2freact set size:2632776 disposed:false
+103 silly fetch manifest react-native-web@*
+104 silly packumentCache full:https://registry.npmjs.org/react-native-web cache-miss
+105 http cache https://registry.npmjs.org/react-native-web 44ms (cache hit)
+106 silly packumentCache full:https://registry.npmjs.org/react-native-web set size:1090416 disposed:false
+107 silly placeDep ROOT @expo/log-box@57.0.1 OK for: @expo/metro-runtime@57.0.5 want: ^57.0.1
+108 silly fetch manifest @expo/dom-webview@^57.0.1
+109 silly packumentCache full:https://registry.npmjs.org/@expo%2fdom-webview cache-miss
+110 http fetch GET 200 https://registry.npmjs.org/@expo%2fdom-webview 1008ms (cache revalidated)
+111 silly packumentCache full:https://registry.npmjs.org/@expo%2fdom-webview set size:431596 disposed:false
+112 silly placeDep ROOT @expo/dom-webview@57.0.1 OK for: @expo/log-box@57.0.1 want: ^57.0.1
+113 silly placeDep node_modules/react-native-web @react-native/normalize-colors@0.74.89 OK for: react-native-web@0.21.2 want: ^0.74.1
+114 silly placeDep ROOT fbjs@3.0.5 OK for: react-native-web@0.21.2 want: ^3.0.4
+115 silly placeDep ROOT inline-style-prefixer@7.0.1 OK for: react-native-web@0.21.2 want: ^7.0.1
+116 silly placeDep node_modules/react-native-web memoize-one@6.0.0 OK for: react-native-web@0.21.2 want: ^6.0.0
+117 silly placeDep ROOT postcss-value-parser@4.2.0 OK for: react-native-web@0.21.2 want: ^4.2.0
+118 silly placeDep ROOT styleq@0.1.3 OK for: react-native-web@0.21.2 want: ^0.1.3
+119 silly fetch manifest promise@^7.1.1
+120 silly packumentCache full:https://registry.npmjs.org/promise cache-miss
+121 silly fetch manifest cross-fetch@^3.1.5
+122 silly packumentCache full:https://registry.npmjs.org/cross-fetch cache-miss
+123 silly fetch manifest setimmediate@^1.0.5
+124 silly packumentCache full:https://registry.npmjs.org/setimmediate cache-miss
+125 silly fetch manifest ua-parser-js@^1.0.35
+126 silly packumentCache full:https://registry.npmjs.org/ua-parser-js cache-miss
+127 silly fetch manifest fbjs-css-vars@^1.0.0
+128 silly packumentCache full:https://registry.npmjs.org/fbjs-css-vars cache-miss
+129 silly fetch manifest object-assign@^4.1.0
+130 silly packumentCache full:https://registry.npmjs.org/object-assign cache-miss
+131 silly fetch manifest css-in-js-utils@^3.1.0
+132 silly packumentCache full:https://registry.npmjs.org/css-in-js-utils cache-miss
+133 http fetch GET 200 https://registry.npmjs.org/object-assign 139ms (cache miss)
+134 silly packumentCache full:https://registry.npmjs.org/object-assign set size:undefined disposed:false
+135 http fetch GET 200 https://registry.npmjs.org/setimmediate 141ms (cache miss)
+136 silly packumentCache full:https://registry.npmjs.org/setimmediate set size:undefined disposed:false
+137 http fetch GET 200 https://registry.npmjs.org/promise 448ms (cache revalidated)
+138 silly packumentCache full:https://registry.npmjs.org/promise set size:112704 disposed:false
+139 http fetch GET 200 https://registry.npmjs.org/css-in-js-utils 490ms (cache miss)
+140 silly packumentCache full:https://registry.npmjs.org/css-in-js-utils set size:undefined disposed:false
+141 http fetch GET 200 https://registry.npmjs.org/fbjs-css-vars 491ms (cache miss)
+142 silly packumentCache full:https://registry.npmjs.org/fbjs-css-vars set size:undefined disposed:false
+143 http fetch GET 200 https://registry.npmjs.org/cross-fetch 493ms (cache miss)
+144 silly packumentCache full:https://registry.npmjs.org/cross-fetch set size:undefined disposed:false
+145 http fetch GET 200 https://registry.npmjs.org/ua-parser-js 671ms (cache miss)
+146 silly packumentCache full:https://registry.npmjs.org/ua-parser-js set size:undefined disposed:false
+147 silly placeDep ROOT cross-fetch@3.2.0 OK for: fbjs@3.0.5 want: ^3.1.5
+148 silly placeDep ROOT fbjs-css-vars@1.0.2 OK for: fbjs@3.0.5 want: ^1.0.0
+149 silly placeDep ROOT object-assign@4.1.1 OK for: fbjs@3.0.5 want: ^4.1.0
+150 silly placeDep node_modules/fbjs promise@7.3.1 OK for: fbjs@3.0.5 want: ^7.1.1
+151 silly placeDep ROOT setimmediate@1.0.5 OK for: fbjs@3.0.5 want: ^1.0.5
+152 silly placeDep ROOT ua-parser-js@1.0.41 OK for: fbjs@3.0.5 want: ^1.0.35
+153 silly fetch manifest node-fetch@^2.7.0
+154 silly packumentCache full:https://registry.npmjs.org/node-fetch cache-miss
+155 http fetch GET 200 https://registry.npmjs.org/node-fetch 649ms (cache miss)
+156 silly packumentCache full:https://registry.npmjs.org/node-fetch set size:undefined disposed:false
+157 silly fetch manifest encoding@^0.1.0
+158 silly packumentCache full:https://registry.npmjs.org/encoding cache-miss
+159 http fetch GET 200 https://registry.npmjs.org/encoding 427ms (cache miss)
+160 silly packumentCache full:https://registry.npmjs.org/encoding set size:undefined disposed:false
+161 silly placeDep ROOT node-fetch@2.7.0 OK for: cross-fetch@3.2.0 want: ^2.7.0
+162 silly fetch manifest whatwg-url@^5.0.0
+163 silly packumentCache full:https://registry.npmjs.org/whatwg-url cache-miss
+164 http fetch GET 200 https://registry.npmjs.org/whatwg-url 455ms (cache miss)
+165 silly packumentCache full:https://registry.npmjs.org/whatwg-url set size:undefined disposed:false
+166 silly placeDep ROOT css-in-js-utils@3.1.0 OK for: inline-style-prefixer@7.0.1 want: ^3.1.0
+167 silly fetch manifest hyphenate-style-name@^1.0.3
+168 silly packumentCache full:https://registry.npmjs.org/hyphenate-style-name cache-miss
+169 http fetch GET 200 https://registry.npmjs.org/hyphenate-style-name 443ms (cache miss)
+170 silly packumentCache full:https://registry.npmjs.org/hyphenate-style-name set size:undefined disposed:false
+171 silly placeDep ROOT hyphenate-style-name@1.1.0 OK for: css-in-js-utils@3.1.0 want: ^1.0.3
+172 silly placeDep ROOT whatwg-url@5.0.0 OK for: node-fetch@2.7.0 want: ^5.0.0
+173 silly fetch manifest tr46@~0.0.3
+174 silly packumentCache full:https://registry.npmjs.org/tr46 cache-miss
+175 silly fetch manifest webidl-conversions@^3.0.0
+176 silly packumentCache full:https://registry.npmjs.org/webidl-conversions cache-miss
+177 http fetch GET 200 https://registry.npmjs.org/tr46 455ms (cache miss)
+178 silly packumentCache full:https://registry.npmjs.org/tr46 set size:undefined disposed:false
+179 http fetch GET 200 https://registry.npmjs.org/webidl-conversions 566ms (cache miss)
+180 silly packumentCache full:https://registry.npmjs.org/webidl-conversions set size:undefined disposed:false
+181 silly placeDep ROOT tr46@0.0.3 OK for: whatwg-url@5.0.0 want: ~0.0.3
+182 silly placeDep ROOT webidl-conversions@3.0.1 OK for: whatwg-url@5.0.0 want: ^3.0.0
+183 silly reify mark retired [
+183 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo\\node_modules\\@expo\\dom-webview'
+183 silly reify ]
+184 silly reify mark retired [
+184 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo\\node_modules\\@expo\\log-box'
+184 silly reify ]
+185 silly reify moves {
+185 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo\\node_modules\\@expo\\dom-webview': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo\\node_modules\\@expo\\.dom-webview-Y8eJyzeP',
+185 silly reify   'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo\\node_modules\\@expo\\log-box': 'C:\\Users\\emmanuel.mwinama\\Code\\Farmis\\mobile\\node_modules\\expo\\node_modules\\@expo\\.log-box-GIeqnPJ7'
+185 silly reify }
+186 http cache webidl-conversions@https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz 0ms (cache hit)
+187 http cache tr46@https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz 0ms (cache hit)
+188 http cache css-in-js-utils@https://registry.npmjs.org/css-in-js-utils/-/css-in-js-utils-3.1.0.tgz 4ms (cache hit)
+189 http cache hyphenate-style-name@https://registry.npmjs.org/hyphenate-style-name/-/hyphenate-style-name-1.1.0.tgz 0ms (cache hit)
+190 http cache node-fetch@https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz 0ms (cache hit)
+191 http cache whatwg-url@https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz 0ms (cache hit)
+192 http cache setimmediate@https://registry.npmjs.org/setimmediate/-/setimmediate-1.0.5.tgz 0ms (cache hit)
+193 http cache ua-parser-js@https://registry.npmjs.org/ua-parser-js/-/ua-parser-js-1.0.41.tgz 0ms (cache hit)
+194 http cache object-assign@https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz 0ms (cache hit)
+195 http cache fbjs-css-vars@https://registry.npmjs.org/fbjs-css-vars/-/fbjs-css-vars-1.0.2.tgz 0ms (cache hit)
+196 http cache cross-fetch@https://registry.npmjs.org/cross-fetch/-/cross-fetch-3.2.0.tgz 0ms (cache hit)
+197 http cache styleq@https://registry.npmjs.org/styleq/-/styleq-0.1.3.tgz 0ms (cache hit)
+198 http cache postcss-value-parser@https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz 0ms (cache hit)
+199 http cache inline-style-prefixer@https://registry.npmjs.org/inline-style-prefixer/-/inline-style-prefixer-7.0.1.tgz 0ms (cache hit)
+200 http cache fbjs@https://registry.npmjs.org/fbjs/-/fbjs-3.0.5.tgz 0ms (cache hit)
+201 http cache @expo/dom-webview@https://registry.npmjs.org/@expo/dom-webview/-/dom-webview-57.0.1.tgz 0ms (cache hit)
+202 http cache @expo/log-box@https://registry.npmjs.org/@expo/log-box/-/log-box-57.0.1.tgz 0ms (cache hit)
+203 http cache react-native-web@https://registry.npmjs.org/react-native-web/-/react-native-web-0.21.2.tgz 0ms (cache hit)
+204 http cache react-dom@https://registry.npmjs.org/react-dom/-/react-dom-19.2.3.tgz 0ms (cache hit)
+205 http cache @expo/metro-runtime@https://registry.npmjs.org/@expo/metro-runtime/-/metro-runtime-57.0.5.tgz 0ms (cache hit)
+206 http cache promise@https://registry.npmjs.org/promise/-/promise-7.3.1.tgz 0ms (cache hit)
+207 http cache memoize-one@https://registry.npmjs.org/memoize-one/-/memoize-one-6.0.0.tgz 0ms (cache hit)
+208 silly tarball no local data for webidl-conversions@https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz. Extracting by manifest.
+209 http cache @react-native/normalize-colors@https://registry.npmjs.org/@react-native/normalize-colors/-/normalize-colors-0.74.89.tgz 0ms (cache hit)
+210 silly tarball no local data for tr46@https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz. Extracting by manifest.
+211 silly tarball no local data for css-in-js-utils@https://registry.npmjs.org/css-in-js-utils/-/css-in-js-utils-3.1.0.tgz. Extracting by manifest.
+212 silly tarball no local data for hyphenate-style-name@https://registry.npmjs.org/hyphenate-style-name/-/hyphenate-style-name-1.1.0.tgz. Extracting by manifest.
+213 silly tarball no local data for node-fetch@https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz. Extracting by manifest.
+214 silly tarball no local data for whatwg-url@https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz. Extracting by manifest.
+215 silly tarball no local data for setimmediate@https://registry.npmjs.org/setimmediate/-/setimmediate-1.0.5.tgz. Extracting by manifest.
+216 silly tarball no local data for ua-parser-js@https://registry.npmjs.org/ua-parser-js/-/ua-parser-js-1.0.41.tgz. Extracting by manifest.
+217 silly tarball no local data for object-assign@https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz. Extracting by manifest.
+218 silly tarball no local data for fbjs-css-vars@https://registry.npmjs.org/fbjs-css-vars/-/fbjs-css-vars-1.0.2.tgz. Extracting by manifest.
+219 silly tarball no local data for cross-fetch@https://registry.npmjs.org/cross-fetch/-/cross-fetch-3.2.0.tgz. Extracting by manifest.
+220 silly tarball no local data for styleq@https://registry.npmjs.org/styleq/-/styleq-0.1.3.tgz. Extracting by manifest.
+221 silly tarball no local data for postcss-value-parser@https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz. Extracting by manifest.
+222 silly tarball no local data for inline-style-prefixer@https://registry.npmjs.org/inline-style-prefixer/-/inline-style-prefixer-7.0.1.tgz. Extracting by manifest.
+223 silly tarball no local data for fbjs@https://registry.npmjs.org/fbjs/-/fbjs-3.0.5.tgz. Extracting by manifest.
+224 silly tarball no local data for react-native-web@https://registry.npmjs.org/react-native-web/-/react-native-web-0.21.2.tgz. Extracting by manifest.
+225 silly tarball no local data for react-dom@https://registry.npmjs.org/react-dom/-/react-dom-19.2.3.tgz. Extracting by manifest.
+226 silly tarball no local data for @expo/metro-runtime@https://registry.npmjs.org/@expo/metro-runtime/-/metro-runtime-57.0.5.tgz. Extracting by manifest.
+227 silly tarball no local data for promise@https://registry.npmjs.org/promise/-/promise-7.3.1.tgz. Extracting by manifest.
+228 silly tarball no local data for memoize-one@https://registry.npmjs.org/memoize-one/-/memoize-one-6.0.0.tgz. Extracting by manifest.
+229 silly tarball no local data for @react-native/normalize-colors@https://registry.npmjs.org/@react-native/normalize-colors/-/normalize-colors-0.74.89.tgz. Extracting by manifest.
+230 http fetch GET 200 https://registry.npmjs.org/setimmediate/-/setimmediate-1.0.5.tgz 239ms (cache miss)
+231 http fetch GET 200 https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz 250ms (cache miss)
+232 http fetch GET 200 https://registry.npmjs.org/hyphenate-style-name/-/hyphenate-style-name-1.1.0.tgz 283ms (cache miss)
+233 http fetch GET 200 https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz 1578ms (cache miss)
+234 http fetch GET 200 https://registry.npmjs.org/css-in-js-utils/-/css-in-js-utils-3.1.0.tgz 2602ms (cache miss)
+235 http fetch GET 200 https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz 3248ms (cache miss)
+236 http fetch GET 200 https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz 3823ms (cache miss)
+237 http fetch GET 200 https://registry.npmjs.org/@expo/metro-runtime/-/metro-runtime-57.0.5.tgz 8126ms (cache miss)
+238 http fetch GET 200 https://registry.npmjs.org/promise/-/promise-7.3.1.tgz 8796ms (cache miss)
+239 http fetch GET 200 https://registry.npmjs.org/memoize-one/-/memoize-one-6.0.0.tgz 9363ms (cache miss)
+240 http fetch GET 200 https://registry.npmjs.org/@react-native/normalize-colors/-/normalize-colors-0.74.89.tgz 9703ms (cache miss)
+241 http fetch GET 200 https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz 12767ms (cache miss)
+242 http fetch GET 200 https://registry.npmjs.org/fbjs-css-vars/-/fbjs-css-vars-1.0.2.tgz 12811ms (cache miss)
+243 http fetch GET 200 https://registry.npmjs.org/object-assign/-/object-assign-4.1.1.tgz 13159ms (cache miss)
+244 http fetch GET 200 https://registry.npmjs.org/styleq/-/styleq-0.1.3.tgz 13322ms (cache miss)
+245 http fetch GET 200 https://registry.npmjs.org/cross-fetch/-/cross-fetch-3.2.0.tgz 13818ms (cache miss)
+246 http fetch GET 200 https://registry.npmjs.org/ua-parser-js/-/ua-parser-js-1.0.41.tgz 13924ms (cache miss)
+247 http fetch GET 200 https://registry.npmjs.org/fbjs/-/fbjs-3.0.5.tgz 15965ms (cache miss)
+248 http fetch GET 200 https://registry.npmjs.org/react-native-web/-/react-native-web-0.21.2.tgz 20831ms (cache miss)
+249 http fetch GET 200 https://registry.npmjs.org/inline-style-prefixer/-/inline-style-prefixer-7.0.1.tgz 20998ms (cache miss)
+250 http fetch GET 200 https://registry.npmjs.org/react-dom/-/react-dom-19.2.3.tgz 24620ms (cache miss)
+251 silly ADD node_modules/webidl-conversions
+252 silly ADD node_modules/tr46
+253 silly ADD node_modules/whatwg-url
+254 silly ADD node_modules/hyphenate-style-name
+255 silly ADD node_modules/css-in-js-utils
+256 silly ADD node_modules/node-fetch
+257 silly ADD node_modules/ua-parser-js
+258 silly ADD node_modules/setimmediate
+259 silly ADD node_modules/object-assign
+260 silly ADD node_modules/fbjs-css-vars
+261 silly ADD node_modules/cross-fetch
+262 silly ADD node_modules/styleq
+263 silly ADD node_modules/postcss-value-parser
+264 silly ADD node_modules/inline-style-prefixer
+265 silly ADD node_modules/fbjs
+266 silly ADD node_modules/fbjs/node_modules/promise
+267 silly ADD node_modules/@expo/dom-webview
+268 silly ADD node_modules/@expo/log-box
+269 silly ADD node_modules/react-native-web
+270 silly ADD node_modules/react-native-web/node_modules/memoize-one
+271 silly ADD node_modules/react-native-web/node_modules/@react-native/normalize-colors
+272 silly ADD node_modules/react-dom
+273 silly ADD node_modules/@expo/metro-runtime
+274 silly REMOVE node_modules/expo/node_modules/@expo/log-box
+275 silly REMOVE node_modules/expo/node_modules/@expo/dom-webview
+276 verbose cwd C:\Users\emmanuel.mwinama\Code\Farmis\mobile
+277 verbose os Windows_NT 10.0.26200
+278 verbose node v26.1.0
+279 verbose npm  v11.13.0
+280 verbose exit 0
+281 info ok

@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     }
 
     const type = await prisma.livestockType.create({
-        data: { farmId: farm.id, name, category, icon: icon ?? "🐄" },
+        data: { farmId: farm.id, name, category, icon: icon ?? "Cattle" },
     });
 
     return NextResponse.json(type, { status: 201 });
