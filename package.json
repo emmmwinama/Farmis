@@ -11,7 +11,8 @@
     "mobile:ios": "npm --prefix mobile run ios",
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
-    "seed:admin": "tsx prisma/seedAdmin.ts"
+    "seed:admin": "tsx prisma/seedAdmin.ts",
+    "seed:production": "tsx prisma/seedProduction.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

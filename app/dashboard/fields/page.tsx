@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Loader2, Map, Pencil, Trash2, X, Check, Leaf } from "lucide-react";
 import Link from "next/link";
+import { submitWithOfflineQueue } from "@/lib/offlineQueue";
 
 function fmtHa(n: number) {
     return `${n.toFixed(2)} ha`;
@@ -94,14 +95,18 @@ export default function FieldsPage() {
         };
 
         try {
-            const res  = await fetch(url, {
+            const result = await submitWithOfflineQueue(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
                 body:    JSON.stringify(payload),
-            });
-            const text = await res.text();
-            const d    = text ? JSON.parse(text) : {};
-            if (!res.ok) { setError(d.error ?? `Failed (${res.status})`); setSaving(false); return; }
+            }, `${editingField ? "Field update" : "New field"}: ${form.name}`);
+            if (result.queued) {
+                setShowForm(false);
+                setError("");
+                alert("Saved offline. AgriVault will sync this field record when the connection returns.");
+                return;
+            }
+            if (!result.response?.ok) { setError(result.data?.error ?? `Failed (${result.response?.status})`); setSaving(false); return; }
             setShowForm(false);
             load();
         } catch (err: any) {
@@ -179,7 +184,10 @@ export default function FieldsPage() {
             ) : fields.length === 0 ? (
                 <div className="rounded-2xl p-16 text-center"
                      style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
-                    <p className="text-5xl mb-4">Harvest</p>
+                    <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+                         style={{ background: "var(--bg-subtle)", color: "var(--farm-green)" }}>
+                        <Map size={28} />
+                    </div>
                     <p className="text-base font-bold mb-1" style={{ color: "var(--text-primary)" }}>
                         No fields yet
                     </p>

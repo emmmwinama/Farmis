@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, TrendingUp, TrendingDown, Minus, ArrowLeftRight } from "lucide-react";
+import { CheckCircle2, Download, Loader2, TrendingUp, TrendingDown, Minus, ArrowLeftRight, AlertTriangle } from "lucide-react";
 
 function fmt(n: number) { return new Intl.NumberFormat("en-MW").format(Math.round(n)); }
 
@@ -61,9 +61,15 @@ export default function SeasonComparePage() {
     return (
         <div className="p-8 max-w-5xl mx-auto animate-fade-in">
 
-            <div className="page-header">
-                <h1 className="page-title">Season Comparison</h1>
-                <p className="page-subtitle">Compare performance across two growing seasons</p>
+            <div className="page-header flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="page-title">Season Comparison</h1>
+                    <p className="page-subtitle">Compare performance across two growing seasons</p>
+                </div>
+                <a href={`/api/export/records?type=season-comparison&format=pdf&section=fields&section=activities&section=finance${seasonA ? `&season=${encodeURIComponent(seasonA)}` : ""}`}
+                   className="btn-secondary min-h-11">
+                    <Download size={16} /> Export PDF
+                </a>
             </div>
 
             {/* Season selectors */}
@@ -184,19 +190,19 @@ export default function SeasonComparePage() {
                         </p>
                         <div className="flex flex-col gap-2 text-sm" style={{ color: "var(--farm-green)", opacity: 0.8 }}>
                             {data.comparison.costPerHa.value < 0 && (
-                                <p>OK Cost per hectare improved by {Math.abs(data.comparison.costPerHa.pct).toFixed(1)}% — good cost management</p>
+                                <p className="flex items-center gap-2"><CheckCircle2 size={14} /> Cost per hectare improved by {Math.abs(data.comparison.costPerHa.pct).toFixed(1)}% - good cost management</p>
                             )}
                             {data.comparison.costPerHa.value > 0 && (
-                                <p>Warning Cost per hectare increased by {data.comparison.costPerHa.pct.toFixed(1)}% — review input costs</p>
+                                <p className="flex items-center gap-2"><AlertTriangle size={14} /> Cost per hectare increased by {data.comparison.costPerHa.pct.toFixed(1)}% - review input costs</p>
                             )}
                             {data.comparison.yieldPerHa.value > 0 && (
-                                <p>OK Yield per hectare improved by {data.comparison.yieldPerHa.pct.toFixed(1)}% — great progress</p>
+                                <p className="flex items-center gap-2"><CheckCircle2 size={14} /> Yield per hectare improved by {data.comparison.yieldPerHa.pct.toFixed(1)}% - strong progress</p>
                             )}
                             {data.comparison.grossProfit.value > 0 && (
-                                <p>OK Profitability improved by MWK {fmt(data.comparison.grossProfit.value)}</p>
+                                <p className="flex items-center gap-2"><CheckCircle2 size={14} /> Profitability improved by MWK {fmt(data.comparison.grossProfit.value)}</p>
                             )}
                             {data.comparison.grossProfit.value < 0 && (
-                                <p>Warning Profitability declined by MWK {fmt(Math.abs(data.comparison.grossProfit.value))} — analyse cost drivers</p>
+                                <p className="flex items-center gap-2"><AlertTriangle size={14} /> Profitability declined by MWK {fmt(Math.abs(data.comparison.grossProfit.value))} - analyse cost drivers</p>
                             )}
                         </div>
                     </div>
@@ -205,3 +211,4 @@ export default function SeasonComparePage() {
         </div>
     );
 }
+

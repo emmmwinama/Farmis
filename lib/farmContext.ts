@@ -44,20 +44,35 @@ export async function getActiveFarm(userId: string) {
 
 export async function getAllAccessibleFarms(userId: string) {
     const [ownFarms, memberships] = await Promise.all([
-        prisma.farm.findMany({ where: { userId }, orderBy: { createdAt: "asc" } }),
+        prisma.farm.findMany({
+            where: { userId },
+            orderBy: { createdAt: "asc" },
+            include: {
+                _count: { select: { fields: true, employees: true, transactions: true, inventory: true, animals: true } },
+                fields: { select: { _count: { select: { cropFields: true, activities: true } } } },
+            },
+        }),
         prisma.teamMember.findMany({
             where: { userId, status: "active" },
-            include: { farm: { include: { user: { select: { name: true } } } } },
+            include: {
+                farm: {
+                    include: {
+                        user: { select: { name: true } },
+                        _count: { select: { fields: true, employees: true, transactions: true, inventory: true, animals: true } },
+                        fields: { select: { _count: { select: { cropFields: true, activities: true } } } },
+                    },
+                },
+            },
         }),
     ]);
 
     const memberFarms = memberships.map((m) => ({
-        ...m.farm,
+        ...withFarmCounts(m.farm),
         role: m.role,
         isOwned: false,
     }));
 
-    const owned = ownFarms.map((f) => ({ ...f, role: "owner", isOwned: true }));
+    const owned = ownFarms.map((f) => ({ ...withFarmCounts(f), role: "owner", isOwned: true }));
 
     // Deduplicate
     const seen = new Set(owned.map((f) => f.id));
@@ -67,4 +82,31 @@ export async function getAllAccessibleFarms(userId: string) {
     }
 
     return combined;
+}
+
+function withFarmCounts(farm: any) {
+    const cropCount = farm.fields.reduce((sum: number, field: any) => sum + field._count.cropFields, 0);
+    const activityCount = farm.fields.reduce((sum: number, field: any) => sum + field._count.activities, 0);
+    const recordCount =
+        farm._count.fields +
+        cropCount +
+        activityCount +
+        farm._count.employees +
+        farm._count.transactions +
+        farm._count.inventory +
+        farm._count.animals;
+    const { fields, _count, ...rest } = farm;
+    return {
+        ...rest,
+        counts: {
+            fields: _count.fields,
+            crops: cropCount,
+            activities: activityCount,
+            employees: _count.employees,
+            transactions: _count.transactions,
+            inventory: _count.inventory,
+            animals: _count.animals,
+            records: recordCount,
+        },
+    };
 }

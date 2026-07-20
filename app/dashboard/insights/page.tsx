@@ -38,7 +38,7 @@ const INSIGHT_TOOLS: Array<{
   },
   {
     title: "Record packs",
-    description: "Export farm evidence for loans, buyers, audits, insurance, and partner reporting.",
+    description: "Export farm evidence for records, audits, insurance, commercial reviews, and partner reporting.",
     href: "/dashboard/records",
     icon: FileArchive,
     meta: "Evidence exports",

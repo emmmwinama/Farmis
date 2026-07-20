@@ -5,6 +5,7 @@ import {
     Plus, Loader2, X, Check, Pencil, Trash2,
     Archive, RotateCcw, Leaf, Calendar, MapPin,
 } from "lucide-react";
+import { submitWithOfflineQueue } from "@/lib/offlineQueue";
 
 function fmtDate(d: string) {
     return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
@@ -47,6 +48,7 @@ export default function CropsPage() {
     const [crops,        setCrops]        = useState<any[]>([]);
     const [fields,       setFields]       = useState<any[]>([]);
     const [cropTypes,    setCropTypes]    = useState<any[]>([]);
+    const [seasons,      setSeasons]      = useState<string[]>([]);
     const [loading,      setLoading]      = useState(true);
     const [showArchived, setShowArchived] = useState(false);
     const [search,       setSearch]       = useState("");
@@ -69,11 +71,12 @@ export default function CropsPage() {
     // New crop type
     const [newTypeName,   setNewTypeName]   = useState("");
     const [addingType,    setAddingType]    = useState(false);
+    const [seasonMode,    setSeasonMode]     = useState<"existing" | "manual">("existing");
 
     const load = async () => {
         setLoading(true);
         try {
-            const [cropsRes, fieldsRes, typesRes] = await Promise.all([
+            const [cropsRes, fieldsRes, typesRes, seasonsRes] = await Promise.all([
                 fetch(`/api/crops?archived=${showArchived}`).then(async (r) => {
                     const t = await r.text(); return t ? JSON.parse(t) : [];
                 }),
@@ -83,10 +86,14 @@ export default function CropsPage() {
                 fetch("/api/crop-types").then(async (r) => {
                     const t = await r.text(); return t ? JSON.parse(t) : [];
                 }),
+                fetch("/api/seasons").then(async (r) => {
+                    const t = await r.text(); return t ? JSON.parse(t) : { allSeasons: [] };
+                }).catch(() => ({ allSeasons: [] })),
             ]);
             setCrops(Array.isArray(cropsRes) ? cropsRes : []);
             setFields(Array.isArray(fieldsRes) ? fieldsRes : []);
             setCropTypes(Array.isArray(typesRes) ? typesRes : []);
+            setSeasons(Array.isArray(seasonsRes?.allSeasons) ? seasonsRes.allSeasons : []);
         } finally {
             setLoading(false);
         }
@@ -100,6 +107,7 @@ export default function CropsPage() {
     const openAdd = () => {
         setEditingCrop(null);
         setForm({ ...EMPTY_FORM });
+        setSeasonMode(seasons.length > 0 ? "existing" : "manual");
         setFormError("");
         setShowForm(true);
     };
@@ -116,6 +124,7 @@ export default function CropsPage() {
             expectedHarvestDate: crop.expectedHarvestDate ? new Date(crop.expectedHarvestDate).toISOString().split("T")[0] : "",
             status:              crop.status              ?? "Active",
         });
+        setSeasonMode("manual");
         setFormError("");
         setShowForm(true);
     };
@@ -127,17 +136,21 @@ export default function CropsPage() {
         const url    = editingCrop ? `/api/crops/${editingCrop.id}` : "/api/crops";
         const method = editingCrop ? "PATCH" : "POST";
         try {
-            const res  = await fetch(url, {
+            const result = await submitWithOfflineQueue(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
                 body:    JSON.stringify({
                     ...form,
                     areaPlanted: parseFloat(form.areaPlanted) || 0,
                 }),
-            });
-            const text = await res.text();
-            const d    = text ? JSON.parse(text) : {};
-            if (!res.ok) { setFormError(d.error ?? "Failed"); setSaving(false); return; }
+            }, `${editingCrop ? "Crop update" : "New crop"}: ${form.season || "season"}`);
+            if (result.queued) {
+                setShowForm(false);
+                setFormError("");
+                alert("Saved offline. AgriVault will sync this crop record when the connection returns.");
+                return;
+            }
+            if (!result.response?.ok) { setFormError(result.data?.error ?? "Failed"); setSaving(false); return; }
             setShowForm(false);
             load();
         } catch (err: any) {
@@ -198,6 +211,10 @@ export default function CropsPage() {
             c.fieldName?.toLowerCase().includes(q) ||
             c.season?.toLowerCase().includes(q);
     });
+    const selectedField = fields.find((f) => f.id === form.fieldId);
+    const selectedFieldRemaining = selectedField
+        ? Math.max(0, Number(selectedField.cultivatableArea ?? selectedField.totalArea ?? 0) - Number(selectedField.allocatedArea ?? 0) + (editingCrop?.fieldId === selectedField.id ? Number(editingCrop.areaPlanted ?? 0) : 0))
+        : null;
 
     const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
         Active:   { bg: "#ECFDF5", color: "#059669" },
@@ -262,7 +279,10 @@ export default function CropsPage() {
             ) : filtered.length === 0 ? (
                 <div className="rounded-2xl p-16 text-center"
                      style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
-                    <p className="text-5xl mb-4">Plant</p>
+                    <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+                         style={{ background: "var(--bg-subtle)", color: "var(--farm-green)" }}>
+                        <Leaf size={28} />
+                    </div>
                     <p className="text-base font-bold mb-1" style={{ color: "var(--text-primary)" }}>
                         {showArchived ? "No archived crops" : "No crops yet"}
                     </p>
@@ -371,10 +391,10 @@ export default function CropsPage() {
                                             <p className="text-xs font-bold"
                                                style={{ color: daysToHarvest < 0 ? "#DC2626" : daysToHarvest < 14 ? "#0284C7" : "var(--farm-green)" }}>
                                                 {daysToHarvest < 0
-                                                    ? `Warning Harvest overdue by ${Math.abs(daysToHarvest)} days`
+                                                    ? `Harvest overdue by ${Math.abs(daysToHarvest)} days`
                                                     : daysToHarvest === 0
-                                                        ? "Harvest Harvest due today!"
-                                                        : `Harvest Harvest in ${daysToHarvest} days · ${fmtDate(crop.expectedHarvestDate)}`}
+                                                        ? "Harvest due today"
+                                                        : `Harvest in ${daysToHarvest} days - ${fmtDate(crop.expectedHarvestDate)}`}
                                             </p>
                                         </div>
                                     )}
@@ -504,10 +524,20 @@ export default function CropsPage() {
                                             className="w-full h-11 px-3 rounded-xl text-sm outline-none"
                                             style={{ border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--text-primary)" }}>
                                         <option value="">Select field...</option>
-                                        {fields.map((f) => (
-                                            <option key={f.id} value={f.id}>{f.name} ({f.totalArea} ha)</option>
-                                        ))}
+                                        {fields.map((f) => {
+                                            const remaining = Math.max(0, Number(f.cultivatableArea ?? f.totalArea ?? 0) - Number(f.allocatedArea ?? 0) + (editingCrop?.fieldId === f.id ? Number(editingCrop.areaPlanted ?? 0) : 0));
+                                            return (
+                                                <option key={f.id} value={f.id}>
+                                                    {f.name} - {remaining.toFixed(2)} ha remaining
+                                                </option>
+                                            );
+                                        })}
                                     </select>
+                                    {selectedFieldRemaining !== null && (
+                                        <p className="text-[11px] mt-1.5 font-bold" style={{ color: "var(--text-muted)" }}>
+                                            Available for this crop: {selectedFieldRemaining.toFixed(2)} ha of {selectedField?.cultivatableArea ?? selectedField?.totalArea} ha cultivatable
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Variety & area */}
@@ -538,26 +568,45 @@ export default function CropsPage() {
                                 <div>
                                     <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
                                            style={{ color: "var(--text-muted)" }}>Season *</label>
-                                    <input value={form.season}
-                                           onChange={(e) => setF("season", e.target.value)}
-                                           placeholder="e.g. 2024/25, Wet season 2025"
-                                           required
-                                           className="w-full h-11 px-3 rounded-xl text-sm outline-none"
-                                           style={{ border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--text-primary)" }} />
-                                </div>
-
-                                {/* Dates */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
-                                               style={{ color: "var(--text-muted)" }}>Planting date *</label>
-                                        <input type="date"
-                                               value={form.plantingDate}
-                                               onChange={(e) => setF("plantingDate", e.target.value)}
+                                    {seasons.length > 0 && (
+                                        <div className="grid grid-cols-2 gap-2 mb-2">
+                                            {[
+                                                { key: "existing", label: "Select existing" },
+                                                { key: "manual", label: "Manual entry" },
+                                            ].map((option) => (
+                                                <button key={option.key} type="button"
+                                                        onClick={() => { setSeasonMode(option.key as any); if (option.key === "existing") setF("season", seasons[0] ?? ""); }}
+                                                        className="h-9 rounded-xl text-xs font-bold"
+                                                        style={{
+                                                            background: seasonMode === option.key ? "var(--farm-pale)" : "var(--bg-subtle)",
+                                                            color: seasonMode === option.key ? "var(--farm-green)" : "var(--text-muted)",
+                                                            border: `1.5px solid ${seasonMode === option.key ? "var(--farm-green)" : "var(--border)"}`,
+                                                        }}>
+                                                    {option.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                    {seasonMode === "existing" && seasons.length > 0 ? (
+                                        <select value={form.season}
+                                                onChange={(e) => setF("season", e.target.value)}
+                                                required
+                                                className="w-full h-11 px-3 rounded-xl text-sm outline-none"
+                                                style={{ border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--text-primary)" }}>
+                                            <option value="">Select season...</option>
+                                            {seasons.map((season) => <option key={season} value={season}>{season}</option>)}
+                                        </select>
+                                    ) : (
+                                        <input value={form.season}
+                                               onChange={(e) => setF("season", e.target.value)}
+                                               placeholder="e.g. 2026 dry season"
                                                required
                                                className="w-full h-11 px-3 rounded-xl text-sm outline-none"
                                                style={{ border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--text-primary)" }} />
-                                    </div>
+                                    )}
+                                </div>
+
+                                {editingCrop && (
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
                                                style={{ color: "var(--text-muted)" }}>Expected harvest</label>
@@ -567,7 +616,7 @@ export default function CropsPage() {
                                                className="w-full h-11 px-3 rounded-xl text-sm outline-none"
                                                style={{ border: "1px solid var(--border)", background: "var(--bg-subtle)", color: "var(--text-primary)" }} />
                                     </div>
-                                </div>
+                                )}
 
                                 {/* Status */}
                                 <div>

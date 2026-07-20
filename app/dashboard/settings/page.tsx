@@ -238,7 +238,7 @@ export default function SettingsPage() {
                         <div>
                             <Label>Location</Label>
                             <input value={farmLocation} onChange={(e) => setFarmLocation(e.target.value)}
-                                   placeholder="e.g. Lilongwe, Malawi" style={INP} />
+                                   placeholder="e.g. District, region, or nearest town" style={INP} />
                         </div>
                         <SaveButton savingKey="profile" saving={saving} success={success}
                                     label="Save farm details" onClick={handleProfileSave} />

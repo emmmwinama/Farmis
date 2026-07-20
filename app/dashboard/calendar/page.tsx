@@ -8,8 +8,12 @@ import {
     CalendarRange,
     Sprout,
     Wheat,
+    AlertTriangle,
+    CheckCircle2,
+    Clock3,
 } from "lucide-react";
 import Link from "next/link";
+import { buildCropTimelineStatus } from "@/lib/cropTimelines";
 
 const CROP_COLORS = [
     { bg: "#EBF5EC", border: "#86EFAC", text: "#14532D", dot: "#16A34A" },
@@ -20,11 +24,15 @@ const CROP_COLORS = [
     { bg: "#F0FDFA", border: "#99F6E4", text: "#134E4A", dot: "#0D9488" },
 ];
 
-function fmt(d: string) {
+function fmt(d: string | Date) {
     return new Date(d).toLocaleDateString("en-GB", {
         day: "numeric",
         month: "short",
     });
+}
+
+function dayKey(d: string | Date) {
+    return new Date(d).toISOString().slice(0, 10);
 }
 
 function daysIn(year: number, month: number) {
@@ -42,6 +50,7 @@ export default function CalendarPage() {
     const [month, setMonth] = useState(new Date().getMonth());
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
     const [viewMode, setViewMode] = useState<"month" | "timeline">("month");
+    const [selectedGuidanceKey, setSelectedGuidanceKey] = useState<string | null>(null);
 
     useEffect(() => {
         fetch("/api/crops?archived=both")
@@ -105,19 +114,29 @@ export default function CalendarPage() {
         )}-${String(day).padStart(2, "0")}`;
 
         return crops
-            .filter((c) => {
-                const plantStr = c.plantingDate.split("T")[0];
-                const harvestStr = c.expectedHarvestDate.split("T")[0];
-
-                return plantStr === dateStr || harvestStr === dateStr;
-            })
-            .map((c) => ({
+            .flatMap((c) => {
+                const plantStr = dayKey(c.plantingDate);
+                const harvestStr = dayKey(c.expectedHarvestDate);
+                const events: any[] = [];
+                if (plantStr === dateStr || harvestStr === dateStr) {
+                    events.push({
                 crop: c,
                 type:
-                    c.plantingDate.split("T")[0] === dateStr
+                    plantStr === dateStr
                         ? "planting"
                         : "harvest",
-            }));
+                    });
+                }
+
+                if (!c.isArchived && c.status !== "Harvested") {
+                    const guidance = buildCropTimelineStatus(c);
+                    guidance.steps
+                        .filter((step) => dayKey(step.dueStart) === dateStr)
+                        .forEach((step) => events.push({ crop: c, type: "activity_due", step }));
+                }
+
+                return events;
+            });
     };
 
     const days = daysIn(year, month);
@@ -144,6 +163,10 @@ export default function CalendarPage() {
         (a, b) =>
             new Date(a.plantingDate).getTime() -
             new Date(b.plantingDate).getTime()
+    );
+    const guidanceSummaries = sortedCrops.map((crop) => ({ crop, guidance: buildCropTimelineStatus(crop) }));
+    const dueGuidance = guidanceSummaries.flatMap(({ crop, guidance }) =>
+        guidance.dueSteps.map((step) => ({ crop, step })),
     );
 
     return (
@@ -357,18 +380,20 @@ export default function CalendarPage() {
                                                     className="text-[9px] font-black px-1.5 py-0.5 rounded-full"
                                                     style={{
                                                         background:
-                                                            dayEvents[0].type ===
-                                                            "planting"
+                                                            dayEvents[0].type === "planting"
                                                                 ? "#EBF5EC"
-                                                                : "#E0F2FE",
+                                                                : dayEvents[0].type === "activity_due"
+                                                                    ? "#EFF6FF"
+                                                                    : "#E0F2FE",
                                                         color:
-                                                            dayEvents[0].type ===
-                                                            "planting"
+                                                            dayEvents[0].type === "planting"
                                                                 ? "#14532D"
-                                                                : "#0C4A6E",
+                                                                : dayEvents[0].type === "activity_due"
+                                                                    ? "#1E3A8A"
+                                                                    : "#0C4A6E",
                                                     }}
                                                 >
-                          {dayEvents[0].type === "planting" ? "Plant" : "Harvest"}
+                          {dayEvents[0].type === "planting" ? "Plant" : dayEvents[0].type === "activity_due" ? "Due" : "Harvest"}
                         </span>
                                             )}
                                         </div>
@@ -734,6 +759,69 @@ export default function CalendarPage() {
                                     );
                                 })}
                         </div>
+
+                        <div
+                            className="rounded-2xl p-5"
+                            style={{
+                                background: "var(--bg-card)",
+                                border: "1px solid var(--border)",
+                            }}
+                        >
+                            <p
+                                className="text-xs font-extrabold uppercase tracking-widest mb-3"
+                                style={{ color: "var(--text-muted)" }}
+                            >
+                                Due crop work
+                            </p>
+
+                            {dueGuidance.length > 0 ? (
+                                <div className="flex flex-col gap-2">
+                                    {dueGuidance.slice(0, 6).map(({ crop, step }) => {
+                                        const guidanceKey = `${crop.id}-${step.id}`;
+                                        const selected = selectedGuidanceKey === guidanceKey;
+                                        return (
+                                            <div key={guidanceKey}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setSelectedGuidanceKey(selected ? null : guidanceKey)}
+                                                    className="w-full rounded-xl p-3 flex items-start gap-3 text-left"
+                                                    style={{ background: step.state === "overdue" ? "#FEF2F2" : "#EFF6FF", border: `1px solid ${step.state === "overdue" ? "#FECACA" : "#BFDBFE"}` }}
+                                                >
+                                                    <AlertTriangle size={16} style={{ color: step.state === "overdue" ? "#DC2626" : "#2563EB", marginTop: 2 }} />
+                                                    <div className="min-w-0">
+                                                        <p className="text-xs font-extrabold" style={{ color: "var(--text-primary)" }}>{step.title}</p>
+                                                        <p className="text-[10px] mt-0.5" style={{ color: "var(--text-muted)" }}>{crop.cropTypeName} - {crop.fieldName}</p>
+                                                    </div>
+                                                </button>
+                                                {selected && (
+                                                    <div className="mt-2 rounded-xl p-3" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                                                        <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>
+                                                            Recommended activity details
+                                                        </p>
+                                                        <p className="text-xs mt-1 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                                                            {step.recommendation}
+                                                        </p>
+                                                        <p className="text-[10px] mt-2" style={{ color: "var(--text-muted)" }}>
+                                                            Generally due {fmt(step.dueStart)} to {fmt(step.dueEnd)}. Status: {step.state}.
+                                                        </p>
+                                                        <Link
+                                                            href={`/dashboard/activities/new?cropFieldId=${crop.id}&activityType=${encodeURIComponent(step.title)}`}
+                                                            className="btn-secondary min-h-10 mt-3 text-xs"
+                                                        >
+                                                            Record activity
+                                                        </Link>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                    No guided activities are due today.
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             ) : (
@@ -808,6 +896,8 @@ export default function CalendarPage() {
                                     100
                                 )
                             );
+                            const guidance = buildCropTimelineStatus(crop);
+                            const nextStep = guidance.nextStep;
 
                             return (
                                 <div
@@ -940,6 +1030,98 @@ export default function CalendarPage() {
                                                 crop.expectedHarvestDate
                                             )}
                                         </p>
+                                    </div>
+
+                                    <div
+                                        className="mt-4 rounded-2xl p-4"
+                                        style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)" }}
+                                    >
+                                        <div className="flex items-start justify-between gap-4 mb-3">
+                                            <div>
+                                                <p className="text-xs font-extrabold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                                                    Guided activity timeline
+                                                </p>
+                                                <p className="text-sm font-bold mt-1" style={{ color: "var(--text-primary)" }}>
+                                                    {nextStep ? `${nextStep.title}: ${nextStep.recommendation}` : "All guided steps are complete for the expected timeline."}
+                                                </p>
+                                            </div>
+                                            <span className="badge badge-sky flex-shrink-0">
+                                                {guidance.completedCount}/{guidance.steps.length} done
+                                            </span>
+                                        </div>
+
+                                        {guidance.steps.length === 0 ? (
+                                            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                                No built-in calendar is available for this crop type yet.
+                                            </p>
+                                        ) : (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                                                {guidance.steps.map((step) => {
+                                                    const isProblem = step.state === "overdue";
+                                                    const isDue = step.state === "due";
+                                                    const isDone = step.state === "done";
+                                                    const Icon = isDone ? CheckCircle2 : isProblem ? AlertTriangle : Clock3;
+                                                    const guidanceKey = `${crop.id}-${step.id}`;
+                                                    const selected = selectedGuidanceKey === guidanceKey;
+                                                    return (
+                                                        <div
+                                                            key={step.id}
+                                                        >
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setSelectedGuidanceKey(selected ? null : guidanceKey)}
+                                                                className="w-full min-h-24 rounded-xl p-3 border transition-all hover:shadow-sm text-left"
+                                                                style={{
+                                                                    background: isDone ? "#F0FDF4" : isProblem ? "#FEF2F2" : isDue ? "#EFF6FF" : "var(--bg-card)",
+                                                                    borderColor: isDone ? "#BBF7D0" : isProblem ? "#FECACA" : isDue ? "#BFDBFE" : "var(--border)",
+                                                                }}
+                                                            >
+                                                                <div className="flex items-start justify-between gap-2">
+                                                                    <Icon size={15} style={{ color: isDone ? "#16A34A" : isProblem ? "#DC2626" : isDue ? "#2563EB" : "var(--text-muted)" }} />
+                                                                    <span className="text-[10px] font-bold" style={{ color: "var(--text-muted)" }}>
+                                                                        {fmt(step.dueStart)}-{fmt(step.dueEnd)}
+                                                                    </span>
+                                                                </div>
+                                                                <p className="text-xs font-extrabold mt-2" style={{ color: "var(--text-primary)" }}>{step.title}</p>
+                                                                <p className="text-[10px] mt-1 capitalize" style={{ color: isProblem ? "#991B1B" : isDue ? "#1E3A8A" : "var(--text-muted)" }}>
+                                                                    {step.state === "done" ? "Recorded" : step.state}
+                                                                </p>
+                                                            </button>
+                                                            {selected && (
+                                                                <div className="mt-2 rounded-xl p-3" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                                                                    <p className="text-xs font-extrabold" style={{ color: "var(--text-primary)" }}>
+                                                                        {step.title}
+                                                                    </p>
+                                                                    <p className="text-xs mt-1 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                                                                        {step.recommendation}
+                                                                    </p>
+                                                                    <div className="grid grid-cols-2 gap-2 mt-3">
+                                                                        <div className="rounded-lg p-2" style={{ background: "var(--bg-subtle)" }}>
+                                                                            <p className="text-[10px] font-black uppercase" style={{ color: "var(--text-muted)" }}>Window</p>
+                                                                            <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>{fmt(step.dueStart)}-{fmt(step.dueEnd)}</p>
+                                                                        </div>
+                                                                        <div className="rounded-lg p-2" style={{ background: "var(--bg-subtle)" }}>
+                                                                            <p className="text-[10px] font-black uppercase" style={{ color: "var(--text-muted)" }}>Evidence</p>
+                                                                            <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>
+                                                                                {step.matchingActivities.length > 0 ? `${step.matchingActivities.length} record${step.matchingActivities.length === 1 ? "" : "s"}` : "No record yet"}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                    {!isDone && (
+                                                                        <Link
+                                                                            href={`/dashboard/activities/new?cropFieldId=${crop.id}&activityType=${encodeURIComponent(step.title)}`}
+                                                                            className="btn-secondary min-h-10 mt-3 text-xs"
+                                                                        >
+                                                                            Record activity
+                                                                        </Link>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             );

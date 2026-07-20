@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --font-nunito: 'Nunito', sans-serif;
+    --font-app: "Nunito", "Segoe UI", Arial, sans-serif;
 
     /* Light theme neutral product palette */
     --bg-page:       #F8FAFC;
@@ -83,12 +83,14 @@
   }
 
   html {
-    font-family: var(--font-nunito), system-ui, sans-serif;
+    font-family: var(--font-nunito), "Nunito", "Segoe UI", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
+    --font-app: var(--font-nunito), "Nunito", "Segoe UI", Arial, sans-serif;
+    font-family: var(--font-app);
     background-color: var(--bg-page);
     color: var(--text-primary);
   }
@@ -99,7 +101,7 @@
   }
 
   * {
-    font-family: var(--font-nunito), system-ui, sans-serif;
+    font-family: inherit;
     border-color: var(--border);
   }
 
@@ -379,7 +381,8 @@
 }
 
 @layer utilities {
-  .font-nunito { font-family: var(--font-nunito), system-ui, sans-serif; }
+  .font-nunito { font-family: var(--font-app); }
+  .font-app { font-family: var(--font-app); }
 
   .text-primary   { color: var(--text-primary); }
   .text-secondary { color: var(--text-secondary); }

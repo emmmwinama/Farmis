@@ -21,8 +21,10 @@ export async function GET() {
 
   return NextResponse.json({
     active: status.active,
+    canView: status.canView ?? status.active,
     status: status.status ?? null,
     daysRemaining: status.daysRemaining,
+    viewDaysRemaining: status.viewDaysRemaining,
     tier: tier
       ? {
           name: tier.name,

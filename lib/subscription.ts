@@ -8,7 +8,13 @@ export async function getUserSubscription(userId: string) {
     return sub;
 }
 
-function isUsableSubscription(sub: Awaited<ReturnType<typeof getUserSubscription>>) {
+const TRIAL_READ_GRACE_DAYS = 14;
+
+function addDays(date: Date, days: number) {
+    return new Date(date.getTime() + days * 86400000);
+}
+
+function isWritableSubscription(sub: Awaited<ReturnType<typeof getUserSubscription>>) {
     if (!sub) return false;
 
     const now = new Date();
@@ -21,14 +27,40 @@ function isUsableSubscription(sub: Awaited<ReturnType<typeof getUserSubscription
     return false;
 }
 
+function isReadableSubscription(sub: Awaited<ReturnType<typeof getUserSubscription>>) {
+    if (!sub) return false;
+
+    const now = new Date();
+    if (sub.status === "active") return !sub.endDate || sub.endDate > now;
+    if (sub.status === "trial") {
+        const trialEnd = sub.trialEndsAt ?? sub.endDate;
+        return !!trialEnd && addDays(trialEnd, TRIAL_READ_GRACE_DAYS) > now;
+    }
+
+    return false;
+}
+
+export async function assertSubscriptionCanWrite(userId: string) {
+    const sub = await getUserSubscription(userId);
+    if (!sub || !isWritableSubscription(sub)) {
+        throw new Error("Your trial or subscription no longer allows new records. Please upgrade to continue adding data.");
+    }
+    return sub;
+}
+
+export async function assertSubscriptionCanRead(userId: string) {
+    const sub = await getUserSubscription(userId);
+    if (!sub || !isReadableSubscription(sub)) {
+        throw new Error("Your trial record-viewing period has ended. Please upgrade to access your records.");
+    }
+    return sub;
+}
+
 export async function checkLimit(
     userId: string,
     resource: "Fields" | "Crops" | "Activities" | "Transactions" | "Employees" | "Farms"
 ) {
-    const sub = await getUserSubscription(userId);
-    if (!sub || !isUsableSubscription(sub)) {
-        throw new Error("No active subscription found. Please start a trial or upgrade your plan.");
-    }
+    const sub = await assertSubscriptionCanWrite(userId);
 
     const limitKey = `max${resource}` as keyof typeof sub.tier;
     const limit = sub.tier[limitKey] as number;
@@ -86,7 +118,7 @@ export async function checkFeature(
         | "apiAccess"
 ) {
     const sub = await getUserSubscription(userId);
-    if (!sub || !isUsableSubscription(sub)) {
+    if (!sub || !isWritableSubscription(sub)) {
         throw new Error("No active subscription found.");
     }
 
@@ -103,12 +135,17 @@ export async function getSubscriptionStatus(userId: string) {
     if (!sub) return { active: false, tier: null, daysRemaining: null };
 
     const now = new Date();
-    const active = isUsableSubscription(sub);
+    const active = isWritableSubscription(sub);
+    const canView = isReadableSubscription(sub);
 
     const endDate = sub.status === "trial" ? sub.trialEndsAt ?? sub.endDate : sub.endDate;
     const daysRemaining = endDate
         ? Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / 86400000))
         : null;
+    const viewEndsAt = sub.status === "trial" && endDate ? addDays(endDate, TRIAL_READ_GRACE_DAYS) : endDate;
+    const viewDaysRemaining = viewEndsAt
+        ? Math.max(0, Math.ceil((viewEndsAt.getTime() - now.getTime()) / 86400000))
+        : null;
 
-    return { active, tier: sub.tier, daysRemaining, status: sub.status };
+    return { active, canView, tier: sub.tier, daysRemaining, viewDaysRemaining, status: sub.status };
 }

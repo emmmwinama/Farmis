@@ -7,15 +7,16 @@ import { signOut, useSession } from "next-auth/react";
 import {
     LayoutDashboard, Map, ClipboardCheck, BriefcaseBusiness,
     Settings, LogOut, ChevronLeft, ChevronRight,
-    FileBarChart, Users2, Bell, CloudSun, Beef,
+    FileBarChart, Users2, Bell, CloudSun, FileText, Tractor,
 } from "lucide-react";
 import FarmSwitcher from "@/components/FarmSwitcher";
 import DarkModeToggle from "@/components/DarkModeToggle";
-import AIAssistant from "@/components/AIAssistant";
 import AgriVaultLogo from "@/components/AgriVaultLogo";
+import OfflineSyncStatus from "@/components/OfflineSyncStatus";
 
 type SubscriptionAccess = {
     active: boolean;
+    canView?: boolean;
     tier: {
         name: string;
         limits: Record<string, number>;
@@ -38,6 +39,7 @@ const limitAllows = (limits: Record<string, number> | undefined, key: string) =>
 };
 
 const hasFeature = (features: Record<string, boolean> | undefined, key: string) => Boolean(features?.[key]);
+const canUseDashboard = (access: SubscriptionAccess | null) => !access || Boolean(access.active || access.canView);
 
 const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
     {
@@ -45,17 +47,11 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
         items: [
             { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, exact: true },
             {
-                label: "Capture",
-                href: "/dashboard/field-capture",
-                icon: ClipboardCheck,
-                access: (access) => !access || (access.active && limitAllows(access.tier?.limits, "maxActivities")),
-            },
-            {
                 label: "Farm",
                 href: "/dashboard/farm",
                 icon: Map,
-                matches: ["/dashboard/fields", "/dashboard/crops", "/dashboard/activities", "/dashboard/calendar", "/dashboard/yields", "/dashboard/map"],
-                access: (access) => !access || (access.active && (
+                matches: ["/dashboard/fields", "/dashboard/crops", "/dashboard/activities", "/dashboard/calendar", "/dashboard/yields", "/dashboard/map", "/dashboard/livestock"],
+                access: (access) => !access || (canUseDashboard(access) && (
                     limitAllows(access.tier?.limits, "maxFields") ||
                     limitAllows(access.tier?.limits, "maxCrops") ||
                     limitAllows(access.tier?.limits, "maxActivities")
@@ -65,20 +61,20 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
                 label: "Business",
                 href: "/dashboard/business",
                 icon: BriefcaseBusiness,
-                matches: ["/dashboard/finance", "/dashboard/inventory", "/dashboard/employees", "/dashboard/seasons", "/dashboard/market"],
-                access: (access) => !access || (access.active && (
+                matches: ["/dashboard/finance", "/dashboard/inventory", "/dashboard/employees", "/dashboard/seasons"],
+                access: (access) => !access || (canUseDashboard(access) && (
                     limitAllows(access.tier?.limits, "maxTransactions") ||
                     limitAllows(access.tier?.limits, "maxEmployees") ||
                     hasFeature(access.tier?.features, "payrollTracking")
                 )),
             },
-            { label: "Livestock", href: "/dashboard/livestock", icon: Beef, access: (access) => !access || access.active },
+            { label: "Equipment", href: "/dashboard/equipment", icon: Tractor, access: (access) => !access || Boolean(access.active || access.canView) },
             {
                 label: "Insights",
                 href: "/dashboard/insights",
                 icon: FileBarChart,
                 matches: ["/dashboard/reports", "/dashboard/weather", "/dashboard/records", "/dashboard/credit-score"],
-                access: (access) => !access || (access.active && (
+                access: (access) => !access || (canUseDashboard(access) && (
                     hasFeature(access.tier?.features, "seasonAnalytics") ||
                     hasFeature(access.tier?.features, "yieldSuggestions") ||
                     hasFeature(access.tier?.features, "costPerHectare") ||
@@ -94,11 +90,14 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
                 label: "Team",
                 href: "/dashboard/team",
                 icon: Users2,
-                access: (access) => !access || (access.active && (
+                access: (access) => !access || (canUseDashboard(access) && (
                     hasFeature(access.tier?.features, "teamAccounts") ||
                     limitAllows(access.tier?.limits, "maxTeamMembers")
                 )),
             },
+            { label: "Documents", href: "/dashboard/documents", icon: FileText, access: (access) => !access || Boolean(access.active || access.canView) },
+            { label: "Compliance", href: "/dashboard/compliance", icon: ClipboardCheck, access: (access) => !access || Boolean(access.active || access.canView) },
+            { label: "Report Builder", href: "/dashboard/report-builder", icon: FileBarChart, access: (access) => !access || Boolean(access.active || access.canView) },
             { label: "Settings",      href: "/dashboard/settings",     icon: Settings },
         ],
     },
@@ -293,7 +292,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
             </main>
 
-            <AIAssistant />
+            <OfflineSyncStatus />
         </div>
     );
 }

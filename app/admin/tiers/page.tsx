@@ -41,6 +41,10 @@ type TierForm = {
     description:           string;
     priceMonthly:          string;
     priceAnnual:           string;
+    audience:              string;
+    ctaLabel:              string;
+    ctaHref:               string;
+    offerItems:            string;
     maxFields:             string;
     maxCrops:              string;
     maxActivities:         string;
@@ -66,6 +70,7 @@ type TierForm = {
 const EMPTY: TierForm = {
     name: "", description: "",
     priceMonthly: "0", priceAnnual: "",
+    audience: "", ctaLabel: "", ctaHref: "", offerItems: "",
     maxFields: "-1", maxCrops: "-1", maxActivities: "-1",
     maxTransactions: "-1", maxEmployees: "-1", maxFarms: "1", maxTeamMembers: "0",
     seasonAnalytics: false, yieldSuggestions: false, costPerHectare: false,
@@ -118,9 +123,15 @@ export default function AdminTiersPage() {
     const setF = <K extends keyof TierForm>(k: K, v: TierForm[K]) =>
         setForm((p) => ({ ...p, [k]: v }));
 
+    const closeForm = () => {
+        setShowForm(false);
+        setSaving(false);
+    };
+
     const openAdd = () => {
         setEditingTier(null);
         setForm({ ...EMPTY, sortOrder: String(tiers.length) });
+        setSaving(false);
         setError("");
         setShowForm(true);
     };
@@ -132,6 +143,10 @@ export default function AdminTiersPage() {
             description:           t.description         ?? "",
             priceMonthly:          String(t.priceMonthly  ?? 0),
             priceAnnual:           t.priceAnnual != null  ? String(t.priceAnnual) : "",
+            audience:              t.audience            ?? "",
+            ctaLabel:              t.ctaLabel            ?? "",
+            ctaHref:               t.ctaHref             ?? "",
+            offerItems:            Array.isArray(t.offerItems) ? t.offerItems.join("\n") : "",
             maxFields:             String(t.maxFields      ?? -1),
             maxCrops:              String(t.maxCrops       ?? -1),
             maxActivities:         String(t.maxActivities  ?? -1),
@@ -153,6 +168,7 @@ export default function AdminTiersPage() {
             isFeatured:            t.isFeatured ?? false,
             sortOrder:             String(t.sortOrder ?? 0),
         });
+        setSaving(false);
         setError("");
         setShowForm(true);
     };
@@ -170,6 +186,10 @@ export default function AdminTiersPage() {
             description:           form.description || null,
             priceMonthly:          parseFloat(form.priceMonthly)  || 0,
             priceAnnual:           form.priceAnnual !== "" ? parseFloat(form.priceAnnual) : null,
+            audience:              form.audience || null,
+            ctaLabel:              form.ctaLabel || null,
+            ctaHref:               form.ctaHref || null,
+            offerItems:            form.offerItems,
             maxFields:             parseInt(form.maxFields),
             maxCrops:              parseInt(form.maxCrops),
             maxActivities:         parseInt(form.maxActivities),
@@ -203,9 +223,10 @@ export default function AdminTiersPage() {
             if (text.trim()) { try { d = JSON.parse(text); } catch {} }
             if (!res.ok) { setError(d.error ?? `Failed (${res.status})`); setSaving(false); return; }
             setShowForm(false);
-            load();
+            await load();
         } catch (err: any) {
             setError(err.message ?? "Unexpected error");
+        } finally {
             setSaving(false);
         }
     };
@@ -263,6 +284,7 @@ export default function AdminTiersPage() {
                         const price  = tier.priceMonthly ?? 0;
                         const subs   = tier._count?.subscriptions ?? 0;
                         const active = FEATURES.filter((f) => tier[f.key]);
+                        const offerItems = Array.isArray(tier.offerItems) ? tier.offerItems : [];
 
                         return (
                             <div key={tier.id}
@@ -296,6 +318,11 @@ export default function AdminTiersPage() {
                                             {tier.description && (
                                                 <p className="text-xs mt-0.5 leading-snug" style={{ color: "#94A3B8" }}>
                                                     {tier.description}
+                                                </p>
+                                            )}
+                                            {tier.audience && (
+                                                <p className="text-[11px] mt-2 font-bold" style={{ color: "#0284C7" }}>
+                                                    {tier.audience}
                                                 </p>
                                             )}
                                         </div>
@@ -372,6 +399,22 @@ export default function AdminTiersPage() {
                                             : <span style={{ fontSize: "10px", color: "#CBD5E1" }}>No premium features</span>}
                                     </div>
 
+                                    {offerItems.length > 0 && (
+                                        <div className="rounded-xl p-3" style={{ background: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+                                            <p className="text-[10px] font-black uppercase tracking-wide mb-2" style={{ color: "#64748B" }}>
+                                                Offer package
+                                            </p>
+                                            <ul className="space-y-1.5">
+                                                {offerItems.slice(0, 4).map((item: string) => (
+                                                    <li key={item} className="text-xs flex gap-2" style={{ color: "#475569" }}>
+                                                        <Check size={12} className="mt-0.5 flex-shrink-0" style={{ color: "#0284C7" }} />
+                                                        <span>{item}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
                                     {/* Footer */}
                                     <div className="flex items-center justify-between pt-3"
                                          style={{ borderTop: "1px solid #F1F5F9" }}>
@@ -408,7 +451,7 @@ export default function AdminTiersPage() {
             {showForm && (
                 <div className="fixed inset-0 z-50 flex">
                     {/* Backdrop */}
-                    <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={() => setShowForm(false)} />
+                    <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={closeForm} />
 
                     {/* Panel — full height, scrollable body */}
                     <div className="w-full max-w-lg flex flex-col shadow-2xl"
@@ -422,10 +465,10 @@ export default function AdminTiersPage() {
                                     {editingTier ? `Edit — ${editingTier.name}` : "New subscription tier"}
                                 </h2>
                                 <p className="text-xs mt-0.5" style={{ color: "#94A3B8" }}>
-                                    Changes sync live to the landing page
+                                    Manage the package shown to customers
                                 </p>
                             </div>
-                            <button onClick={() => setShowForm(false)}
+                            <button onClick={closeForm}
                                     className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
                                     style={{ background: "#F1F5F9", color: "#64748B" }}>
                                 <X size={15} />
@@ -455,7 +498,7 @@ export default function AdminTiersPage() {
                                 </Section>
 
                                 {/* ── Pricing ── */}
-                                <Section title="Pricing (whole MWK — not cents)">
+                                <Section title="Pricing">
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <Label>Monthly (MWK)</Label>
@@ -485,6 +528,46 @@ export default function AdminTiersPage() {
                                 </Section>
 
                                 {/* ── Limits ── */}
+                                <Section title="Offer package">
+                                    <div>
+                                        <Label>Audience</Label>
+                                        <input value={form.audience}
+                                               onChange={(e) => setF("audience", e.target.value)}
+                                               placeholder="e.g. Single farm owners, estates, cooperatives"
+                                               style={INP} />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <Label>CTA label</Label>
+                                            <input value={form.ctaLabel}
+                                                   onChange={(e) => setF("ctaLabel", e.target.value)}
+                                                   placeholder="Start trial"
+                                                   style={INP} />
+                                        </div>
+                                        <div>
+                                            <Label>CTA destination</Label>
+                                            <input value={form.ctaHref}
+                                                   onChange={(e) => setF("ctaHref", e.target.value)}
+                                                   placeholder="/register"
+                                                   style={INP} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <Label>Included package items</Label>
+                                        <textarea value={form.offerItems}
+                                                  onChange={(e) => setF("offerItems", e.target.value)}
+                                                  placeholder={"One item per line\nOffline field capture\nProfessional PDF reports\nTeam roles and approvals"}
+                                                  rows={6}
+                                                  style={{
+                                                      ...INP,
+                                                      height: "auto",
+                                                      minHeight: "120px",
+                                                      padding: "10px 12px",
+                                                      resize: "vertical",
+                                                  }} />
+                                    </div>
+                                </Section>
+
                                 <Section title="Usage limits (-1 = unlimited, 0 = disabled)">
                                     <div className="grid grid-cols-3 gap-2">
                                         {[
@@ -590,7 +673,7 @@ export default function AdminTiersPage() {
                             {/* Sticky footer */}
                             <div className="flex gap-3 px-6 py-5 flex-shrink-0"
                                  style={{ borderTop: "1px solid #F1F5F9", background: "white" }}>
-                                <button type="button" onClick={() => setShowForm(false)}
+                                <button type="button" onClick={closeForm}
                                         className="flex-1 h-11 rounded-xl font-bold text-sm"
                                         style={{ border: "1.5px solid #E2E8F0", color: "#64748B" }}>
                                     Cancel

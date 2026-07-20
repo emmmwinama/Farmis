@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BarChart2,
   CalendarDays,
   Package,
   Users,
@@ -44,13 +43,6 @@ const BUSINESS_TOOLS: Array<{
     icon: CalendarDays,
     meta: "Season control",
   },
-  {
-    title: "Market prices",
-    description: "Compare market signals and selling decisions before produce leaves the farm.",
-    href: "/dashboard/market",
-    icon: BarChart2,
-    meta: "Price intelligence",
-  },
 ];
 
 export default function BusinessCommandPage() {
@@ -62,7 +54,7 @@ export default function BusinessCommandPage() {
         </p>
         <h1 className="page-title">Business</h1>
         <p className="page-subtitle">
-          Finance, inventory, payroll, seasons, and market decisions for running the farm like a business.
+          Finance, inventory, payroll, and seasons for running the farm like a business.
         </p>
       </div>
 

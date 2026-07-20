@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFarm } from "@/lib/apiHelpers";
+import { requireFarmPermission } from "@/lib/roleAccess";
 
 function toKg(quantity: number, unit: string, unitWeight: number | null): number {
     if (unit === "kg") return quantity;
@@ -117,8 +118,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { farm } = await getSessionFarm();
-    if (!farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const access = await requireFarmPermission("yields", "write");
+    if (access.error) return access.error;
+    const { farm } = access;
 
     const body = await req.json();
     const { cropFieldId, harvestDate, quantity, unit, unitWeight, notes } = body;

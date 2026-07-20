@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSessionFarm } from "@/lib/apiHelpers";
+import { requireFarmPermission } from "@/lib/roleAccess";
 
 export async function GET(req: Request) {
-    const { farm } = await getSessionFarm();
-    if (!farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const access = await requireFarmPermission("finance");
+    if (access.error) return access.error;
 
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");
@@ -12,7 +12,7 @@ export async function GET(req: Request) {
 
     const items = await prisma.inventoryItem.findMany({
         where: {
-            farmId: farm.id,
+            farmId: access.farm.id,
             ...(category ? { category } : {}),
             ...(season ? { season } : {}),
         },
@@ -38,6 +38,8 @@ export async function GET(req: Request) {
             category: item.category,
             unit: item.unit,
             quantity: remainingQty,
+            acquisitionUnitCost: item.acquisitionUnitCost,
+            acquiredAt: item.acquiredAt,
             unitWeight: item.unitWeight,
             season: item.season,
             notes: item.notes,
@@ -58,6 +60,7 @@ export async function GET(req: Request) {
                     : item.unitWeight
                         ? remainingQty * item.unitWeight
                         : remainingQty,
+            lowStock: remainingQty <= 5,
             sales: item.sales.map((s) => ({
                 id: s.id,
                 quantitySold: s.quantitySold,
@@ -91,7 +94,7 @@ export async function GET(req: Request) {
     }
 
     const allSeasons = await prisma.cropField.findMany({
-        where: { field: { farmId: farm.id } },
+        where: { field: { farmId: access.farm.id } },
         select: { season: true },
         distinct: ["season"],
         orderBy: { season: "desc" },
@@ -110,23 +113,50 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { farm } = await getSessionFarm();
-    if (!farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const access = await requireFarmPermission("finance", "write");
+    if (access.error) return access.error;
 
     const body = await req.json();
-    const { name, category, unit, quantity, unitWeight, season, cropFieldId, notes } = body;
+    const { name, category, unit, quantity, unitWeight, acquisitionUnitCost, acquiredAt, season, cropFieldId, notes } = body;
 
     if (!name || !category || !unit || quantity === undefined) {
         return NextResponse.json({ error: "Name, category, unit and quantity are required" }, { status: 400 });
     }
 
+    const existing = await prisma.inventoryItem.findFirst({
+        where: {
+            farmId: access.farm.id,
+            name: String(name).trim(),
+            category,
+            unit,
+            season: season || null,
+            cropFieldId: cropFieldId || null,
+        },
+    });
+
+    if (existing) {
+        const item = await prisma.inventoryItem.update({
+            where: { id: existing.id },
+            data: {
+                quantity: existing.quantity + parseFloat(quantity),
+                acquisitionUnitCost: acquisitionUnitCost ? parseFloat(acquisitionUnitCost) : existing.acquisitionUnitCost,
+                acquiredAt: acquiredAt ? new Date(acquiredAt) : existing.acquiredAt,
+                unitWeight: unitWeight ? parseFloat(unitWeight) : existing.unitWeight,
+                notes: notes ? `${existing.notes ?? ""}\nPurchase/addition: ${notes}`.trim() : existing.notes,
+            },
+        });
+        return NextResponse.json(item);
+    }
+
     const item = await prisma.inventoryItem.create({
         data: {
-            farmId: farm.id,
-            name,
+            farmId: access.farm.id,
+            name: String(name).trim(),
             category,
             unit,
             quantity: parseFloat(quantity),
+            acquisitionUnitCost: acquisitionUnitCost ? parseFloat(acquisitionUnitCost) : null,
+            acquiredAt: acquiredAt ? new Date(acquiredAt) : null,
             unitWeight: unitWeight ? parseFloat(unitWeight) : null,
             season: season || null,
             cropFieldId: cropFieldId || null,

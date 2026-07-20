@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFarm } from "@/lib/apiHelpers";
 import { checkLimit } from "@/lib/subscription";
+import { requireFarmPermission } from "@/lib/roleAccess";
 
 function aggregateByType(activities: any[]) {
     const map: Record<string, { count: number; totalCost: number }> = {};
@@ -37,6 +38,27 @@ function aggregateBySeason(activities: any[]) {
     return Object.entries(map)
         .map(([season, data]) => ({ season, ...data }))
         .sort((a, b) => b.season.localeCompare(a.season));
+}
+
+function unpackNotes(notes: string | null | undefined) {
+    const text = notes ?? "";
+    const match = text.match(/^\[Responsible:\s*(.*?)\]\n?/i);
+    return {
+        responsiblePersonName: match?.[1]?.trim() || null,
+        notes: match ? text.slice(match[0].length).trim() : text,
+    };
+}
+
+const DEFAULT_ANNUAL_CARRYING_RATE = 0.12;
+
+function costAtUse(unitCost: number, acquiredAt: Date | null, usedAt: Date) {
+    if (!acquiredAt) return { unitCostAtUse: unitCost, timeValuePerUnit: 0 };
+    const daysHeld = Math.max(0, Math.ceil((usedAt.getTime() - acquiredAt.getTime()) / 86_400_000));
+    const timeValuePerUnit = unitCost * DEFAULT_ANNUAL_CARRYING_RATE * (daysHeld / 365);
+    return {
+        unitCostAtUse: unitCost + timeValuePerUnit,
+        timeValuePerUnit,
+    };
 }
 
 export async function GET(req: Request) {
@@ -78,11 +100,14 @@ export async function GET(req: Request) {
         orderBy: { date: "desc" },
     });
 
-    const result = activities.map((a) => ({
+    const result = activities.map((a) => {
+        const noteData = unpackNotes(a.notes);
+        return ({
         id: a.id,
         activityType: a.activityType,
         date: a.date,
-        notes: a.notes,
+        notes: noteData.notes,
+        responsiblePersonName: a.responsiblePersonName ?? noteData.responsiblePersonName,
         fieldId: a.fieldId,
         fieldName: a.field.name,
         cropFieldId: a.cropFieldId,
@@ -109,6 +134,9 @@ export async function GET(req: Request) {
             unit: i.unit,
             unitCost: i.unitCost,
             totalCost: i.totalCost,
+            acquisitionUnitCost: i.acquisitionUnitCost,
+            timeValueCost: i.timeValueCost,
+            inventoryItemId: i.inventoryItemId,
         })),
         otherCosts: a.otherCosts.map((o) => ({
             id: o.id,
@@ -122,7 +150,8 @@ export async function GET(req: Request) {
             a.labourRecords.reduce((s, l) => s + l.totalCost, 0) +
             a.inputs.reduce((s, i) => s + i.totalCost, 0) +
             a.otherCosts.reduce((s, o) => s + o.amount, 0),
-    }));
+    });
+    });
 
     const allSeasons = await prisma.cropField.findMany({
         where: { field: { farmId: farm.id } },
@@ -146,8 +175,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { user, farm } = await getSessionFarm();
-    if (!farm || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const access = await requireFarmPermission("activities", "write");
+    if (access.error) return access.error;
+    const { user, farm } = access;
 
     try {
         await checkLimit(user.id, "Activities");
@@ -158,11 +188,104 @@ export async function POST(req: Request) {
     const body = await req.json();
     const {
         fieldId, cropFieldId, activityType, date,
-        notes, responsibleEmployeeId, labourRecords, inputs, otherCosts,
+        notes, responsibleEmployeeId, responsiblePersonName, labourRecords, inputs, otherCosts,
     } = body;
 
     if (!fieldId || !activityType || !date) {
         return NextResponse.json({ error: "Field, activity type and date are required" }, { status: 400 });
+    }
+
+    const activityDate = new Date(date);
+    if (Number.isNaN(activityDate.getTime())) {
+        return NextResponse.json({ error: "Activity date must be a valid date" }, { status: 400 });
+    }
+
+    const field = await prisma.field.findFirst({ where: { id: fieldId, farmId: farm.id } });
+    if (!field) return NextResponse.json({ error: "Field not found" }, { status: 404 });
+
+    let cropField = null;
+    if (cropFieldId) {
+        cropField = await prisma.cropField.findFirst({
+            where: { id: cropFieldId, field: { farmId: farm.id } },
+        });
+        if (!cropField) return NextResponse.json({ error: "Crop record not found" }, { status: 404 });
+        if (activityDate < cropField.plantingDate || activityDate > cropField.expectedHarvestDate) {
+            return NextResponse.json(
+                { error: "Activity date must fall within the crop planting and expected harvest window" },
+                { status: 400 }
+            );
+        }
+    }
+
+    const duplicate = await prisma.farmActivity.findFirst({
+        where: {
+            fieldId,
+            cropFieldId: cropFieldId || null,
+            activityType,
+            date: activityDate,
+            createdById: user.id,
+        },
+    });
+    if (duplicate) {
+        return NextResponse.json({ error: "A matching activity record already exists" }, { status: 409 });
+    }
+
+    const normalisedInputs = [];
+    const inventoryDeductions: Array<{ id: string; quantity: number; unit: string; name: string; notes: string | null }> = [];
+
+    for (const rawInput of inputs ?? []) {
+        const quantity = parseFloat(rawInput.quantity) || 0;
+        if ((!rawInput.inputName && !rawInput.inventoryItemId) || quantity <= 0) continue;
+
+        if (rawInput.inventoryItemId) {
+            const inventory = await prisma.inventoryItem.findFirst({
+                where: { id: rawInput.inventoryItemId, farmId: farm.id },
+            });
+            if (!inventory) {
+                return NextResponse.json({ error: "Selected inventory item was not found" }, { status: 404 });
+            }
+            if (inventory.unit !== rawInput.unit) {
+                return NextResponse.json(
+                    { error: `${inventory.name} is tracked in ${inventory.unit}. Use the same unit when consuming stock.` },
+                    { status: 400 },
+                );
+            }
+            if (quantity > inventory.quantity) {
+                return NextResponse.json(
+                    { error: `Only ${inventory.quantity} ${inventory.unit} available for ${inventory.name}` },
+                    { status: 400 },
+                );
+            }
+
+            const acquisitionUnitCost = inventory.acquisitionUnitCost ?? (parseFloat(rawInput.unitCost) || 0);
+            const cost = costAtUse(acquisitionUnitCost, inventory.acquiredAt, activityDate);
+            normalisedInputs.push({
+                inputName: inventory.name,
+                category: rawInput.category || inventory.category,
+                quantity,
+                unit: inventory.unit,
+                unitCost: cost.unitCostAtUse,
+                totalCost: quantity * cost.unitCostAtUse,
+                acquisitionUnitCost,
+                timeValueCost: quantity * cost.timeValuePerUnit,
+                inventoryItemId: inventory.id,
+            });
+            inventoryDeductions.push({ id: inventory.id, quantity, unit: inventory.unit, name: inventory.name, notes: inventory.notes });
+            continue;
+        }
+
+        const unitCost = parseFloat(rawInput.unitCost) || 0;
+        normalisedInputs.push({
+            inputName: rawInput.inputName,
+            category: rawInput.category,
+            quantity,
+            unit: rawInput.unit,
+            unitCost,
+            totalCost: quantity * unitCost,
+            acquisitionUnitCost: null,
+            timeValueCost: null,
+            inventoryItemId: null,
+        });
     }
 
     const activity = await prisma.farmActivity.create({
@@ -170,9 +293,10 @@ export async function POST(req: Request) {
             fieldId,
             cropFieldId: cropFieldId || null,
             activityType,
-            date: new Date(date),
+            date: activityDate,
             notes: notes || "",
             responsibleEmployeeId: responsibleEmployeeId || null,
+            responsiblePersonName: responsibleEmployeeId ? null : String(responsiblePersonName ?? "").trim() || null,
             createdById: user.id,
             labourRecords: {
                 create: (labourRecords ?? []).map((l: any) => ({
@@ -183,14 +307,7 @@ export async function POST(req: Request) {
                 })),
             },
             inputs: {
-                create: (inputs ?? []).map((i: any) => ({
-                    inputName: i.inputName,
-                    category: i.category,
-                    quantity: parseFloat(i.quantity) || 0,
-                    unit: i.unit,
-                    unitCost: parseFloat(i.unitCost) || 0,
-                    totalCost: (parseFloat(i.quantity) || 0) * (parseFloat(i.unitCost) || 0),
-                })),
+                create: normalisedInputs,
             },
             otherCosts: {
                 create: (otherCosts ?? []).map((o: any) => ({
@@ -200,6 +317,42 @@ export async function POST(req: Request) {
             },
         },
     });
+
+    for (const input of inventoryDeductions) {
+        await prisma.inventoryItem.update({
+            where: { id: input.id },
+            data: {
+                quantity: { decrement: input.quantity },
+                notes: `${input.notes ?? ""}\nConsumed ${input.quantity} ${input.unit} by ${activityType} on ${new Date(date).toISOString().slice(0, 10)}.`.trim(),
+            },
+        });
+    }
+
+    for (const input of (inputs ?? []).filter((item: any) => !item.inventoryItemId)) {
+        const quantity = parseFloat(input.quantity) || 0;
+        if (!input.inputName || quantity <= 0) continue;
+
+        const inventory = await prisma.inventoryItem.findFirst({
+            where: {
+                farmId: farm.id,
+                name: { equals: String(input.inputName).trim() },
+                unit: input.unit,
+                quantity: { gt: 0 },
+                category: { in: [input.category, String(input.category).toLowerCase(), "seed", "fertiliser", "fertilizer", "chemical"] },
+            },
+            orderBy: { createdAt: "asc" },
+        });
+
+        if (!inventory) continue;
+
+        await prisma.inventoryItem.update({
+            where: { id: inventory.id },
+            data: {
+                quantity: Math.max(0, inventory.quantity - quantity),
+                notes: `${inventory.notes ?? ""}\nConsumed ${quantity} ${input.unit} by ${activityType} on ${new Date(date).toISOString().slice(0, 10)}.`.trim(),
+            },
+        });
+    }
 
     return NextResponse.json(activity, { status: 201 });
 }

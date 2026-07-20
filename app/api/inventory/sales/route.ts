@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFarm } from "@/lib/apiHelpers";
+import { assertSubscriptionCanWrite } from "@/lib/subscription";
 
 export async function GET(req: Request) {
     const { farm } = await getSessionFarm();
@@ -25,8 +26,16 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { farm } = await getSessionFarm();
-    if (!farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { user, farm } = await getSessionFarm();
+    if (!user || !farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    try {
+        await assertSubscriptionCanWrite(user.id);
+    } catch (err) {
+        return NextResponse.json(
+            { error: err instanceof Error ? err.message : "Subscription upgrade required" },
+            { status: 403 },
+        );
+    }
 
     const body = await req.json();
     const {
@@ -39,8 +48,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Item, quantity, price and date are required" }, { status: 400 });
     }
 
-    const item = await prisma.inventoryItem.findUnique({
-        where: { id: inventoryItemId },
+    const item = await prisma.inventoryItem.findFirst({
+        where: { id: inventoryItemId, farmId: farm.id },
         include: { cropField: { include: { cropType: true } } },
     });
 

@@ -13,6 +13,7 @@ export async function GET() {
     const { user, farm } = await getSessionFarm();
     if (!farm || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    try {
     const [fields, employees, transactions, overhead, inventory] = await Promise.all([
         prisma.field.findMany({
             where: { farmId: farm.id },
@@ -39,6 +40,12 @@ export async function GET() {
             include: { sales: true },
         }),
     ]);
+    const membership = farm.userId === user.id
+        ? { role: "owner" }
+        : await prisma.teamMember.findFirst({
+            where: { farmId: farm.id, userId: user.id, status: "active" },
+            select: { role: true },
+        });
 
     const allCropFields = fields.flatMap((f) => f.cropFields);
 
@@ -168,7 +175,10 @@ export async function GET() {
 
     return NextResponse.json({
         farmName: farm.name,
+        farmId: farm.id,
         userName: user.name,
+        userEmail: user.email,
+        farmRole: membership?.role ?? "viewer",
         totalFields: fields.length,
         totalArea: fields.reduce((s, f) => s + f.totalArea, 0),
         activeCrops: allCropFields.filter((c) => c.status === "Active").length,
@@ -194,4 +204,8 @@ export async function GET() {
             date: a.date,
         })),
     });
+    } catch (error) {
+        console.error("Failed to load dashboard stats", error);
+        return NextResponse.json({ error: "Failed to load dashboard stats" }, { status: 500 });
+    }
 }

@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, CalendarDays, ArrowLeftRight } from "lucide-react";
+import { Loader2, CalendarDays, ArrowLeftRight, Leaf, Sprout, FlaskConical, Droplets, Shovel, PackageCheck, ClipboardList } from "lucide-react";
 
 function fmt(n: number) { return new Intl.NumberFormat("en-MW").format(Math.round(n)); }
 function formatDate(d: string) {
     return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-const ACTIVITY_ICONS: Record<string, string> = {
-    Planting: "Plant", Spraying: "Spray", Weeding: "Weed", Irrigation: "Water",
-    Fertilising: "Harvest", Harvesting: "Harvest", "Land preparation": "Land prep", Other: "Record",
+const ACTIVITY_ICONS: Record<string, any> = {
+    Planting: Sprout, Spraying: FlaskConical, Weeding: Shovel, Irrigation: Droplets,
+    Fertilising: Leaf, Harvesting: PackageCheck, "Land preparation": Shovel, Other: ClipboardList,
 };
 
 const STATUS_BADGE: Record<string, { bg: string; color: string }> = {
@@ -131,7 +131,7 @@ export default function SeasonsPage() {
                                         <div key={t.name} className="rounded-xl p-4"
                                              style={{ background: "var(--farm-pale)", border: "1px solid #86efac" }}>
                                             <div className="flex items-center gap-2 mb-3">
-                                                <span className="text-lg">Plant</span>
+                                                <Leaf size={17} style={{ color: "var(--farm-green)" }} />
                                                 <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
                                                     {t.name}
                                                 </p>
@@ -197,7 +197,7 @@ export default function SeasonsPage() {
                                              onMouseOver={(e) => (e.currentTarget.style.background = "var(--bg-subtle)")}
                                              onMouseOut={(e)  => (e.currentTarget.style.background = "transparent")}>
                                             <div className="flex items-center gap-3">
-                                                <span className="text-lg">Plant</span>
+                                                <Leaf size={17} style={{ color: "var(--farm-green)" }} />
                                                 <div>
                                                     <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
                                                         {cf.cropTypeName}
@@ -237,7 +237,9 @@ export default function SeasonsPage() {
                                 </p>
                             </div>
                             <div>
-                                {data.activities.slice(0, 10).map((a: any) => (
+                                {data.activities.slice(0, 10).map((a: any) => {
+                                    const ActivityIcon = ACTIVITY_ICONS[a.activityType] ?? ClipboardList;
+                                    return (
                                     <div key={a.id}
                                          className="flex items-center justify-between px-5 py-3 transition-colors"
                                          style={{ borderBottom: "1px solid var(--border)" }}
@@ -246,7 +248,7 @@ export default function SeasonsPage() {
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
                                                  style={{ background: "var(--bg-subtle)" }}>
-                                                {ACTIVITY_ICONS[a.activityType] ?? "Record"}
+                                                <ActivityIcon size={16} style={{ color: "var(--farm-green)" }} />
                                             </div>
                                             <div>
                                                 <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
@@ -266,7 +268,7 @@ export default function SeasonsPage() {
                                             </p>
                                         </div>
                                     </div>
-                                ))}
+                                );})}
                             </div>
                         </div>
                     )}

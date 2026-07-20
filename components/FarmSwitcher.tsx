@@ -9,6 +9,12 @@ interface Farm {
     location: string;
     role: string;
     isOwned: boolean;
+    counts?: {
+        fields: number;
+        crops: number;
+        activities: number;
+        records: number;
+    };
 }
 
 interface Props {
@@ -95,7 +101,11 @@ export default function FarmSwitcher({ collapsed, userId }: Props) {
                     {!collapsed && (
                         <div className="min-w-0">
                             <p className="text-sm font-black text-white truncate leading-tight">{activeFarm.name}</p>
-                            <p className={`text-xs capitalize ${ROLE_COLORS[activeFarm.role]}`}>{activeFarm.role}</p>
+                            <p className="text-[11px] text-slate-300 truncate">{activeFarm.location || "Location not set"}</p>
+                            <p className={`text-xs capitalize ${ROLE_COLORS[activeFarm.role]}`}>
+                                {activeFarm.role}
+                                {activeFarm.counts ? ` - ${activeFarm.counts.records} records` : ""}
+                            </p>
                         </div>
                     )}
                 </div>
@@ -117,7 +127,11 @@ export default function FarmSwitcher({ collapsed, userId }: Props) {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-bold text-white truncate">{farm.name}</p>
-                                    <p className={`text-xs capitalize ${ROLE_COLORS[farm.role]}`}>{farm.role}</p>
+                                    <p className="text-[11px] text-slate-300 truncate">{farm.location || "Location not set"}</p>
+                                    <p className={`text-xs capitalize ${ROLE_COLORS[farm.role]}`}>
+                                        {farm.role}
+                                        {farm.counts ? ` - ${farm.counts.fields} fields, ${farm.counts.crops} crops, ${farm.counts.activities} activities` : ""}
+                                    </p>
                                 </div>
                                 {farm.id === activeFarmId && <Check size={15} className="text-sky-300 flex-shrink-0" />}
                             </button>

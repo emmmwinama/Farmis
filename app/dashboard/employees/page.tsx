@@ -82,7 +82,7 @@ export default function EmployeesPage() {
     const method = editingEmployee ? "PATCH" : "POST";
     const res    = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
     const d      = await res.json();
-    if (!res.ok) { setError(d.error); setSaving(false); } else { setShowForm(false); load(); }
+    if (!res.ok) { setError(d.error); setSaving(false); } else { setShowForm(false); setSaving(false); load(); }
   };
 
   const handleDelete = async (id: string) => {

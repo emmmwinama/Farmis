@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getMobileSession } from "@/lib/mobileAuth";
 import { checkLimit } from "@/lib/subscription";
+import { buildCropTimelineStatus } from "@/lib/cropTimelines";
 
 export async function GET(req: NextRequest) {
     const session = getMobileSession(req);
@@ -19,14 +20,28 @@ export async function GET(req: NextRequest) {
                     : archived === "false"
                         ? { status: { not: "Archived" } }
                         : {},
-                include: { cropType: true },
+                include: {
+                    cropType: true,
+                    activities: {
+                        orderBy: { date: "desc" },
+                        select: { id: true, activityType: true, date: true },
+                    },
+                },
                 orderBy: { createdAt: "desc" },
             },
         },
     });
 
     const crops = fields.flatMap((f) =>
-        f.cropFields.map((c) => ({
+        f.cropFields.map((c) => {
+            const guidance = buildCropTimelineStatus({
+                ...c,
+                cropTypeName: c.cropType.name,
+                fieldName: f.name,
+                activities: c.activities,
+            });
+
+            return ({
             id:                  c.id,
             cropTypeName:        c.cropType.name,
             cropTypeId:          c.cropTypeId,
@@ -40,7 +55,18 @@ export async function GET(req: NextRequest) {
             fieldName:           f.name,
             fieldCultivatable:   f.cultivatableArea,
             createdAt:           c.createdAt,
-        }))
+            activities:           c.activities,
+            timeline: guidance.timeline ? {
+                crop: guidance.timeline.crop,
+                daysAfterPlanting: guidance.daysAfterPlanting,
+                completedCount: guidance.completedCount,
+                totalSteps: guidance.steps.length,
+                dueSteps: guidance.dueSteps,
+                nextStep: guidance.nextStep,
+                steps: guidance.steps,
+            } : null,
+        });
+        })
     );
 
     return NextResponse.json(crops);

@@ -178,7 +178,7 @@ export default function WeatherPage() {
             {advices.length > 0 && (
                 <div className="mb-6">
                     <p className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: "var(--text-muted)" }}>
-                        Harvest Farming advice based on today's forecast
+                        Farming advice based on today's forecast
                     </p>
                     <div className="flex flex-col gap-2">
                         {advices.map((a, i) => (

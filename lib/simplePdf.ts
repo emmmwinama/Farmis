@@ -2,6 +2,7 @@ type PdfLine = {
   text: string;
   size?: number;
   bold?: boolean;
+  mono?: boolean;
   color?: [number, number, number];
   gapBefore?: number;
 };
@@ -50,7 +51,7 @@ export function createSimplePdf(title: string, lines: PdfLine[]) {
     const wrapped = wrapText(line.text || " ", size);
     for (const part of wrapped) {
       if (y < MARGIN + 28) newPage();
-      const font = line.bold ? "F2" : "F1";
+      const font = line.mono ? "F3" : line.bold ? "F2" : "F1";
       const [r, g, b] = line.color ?? [15, 23, 42];
       current.push(`${(r / 255).toFixed(3)} ${(g / 255).toFixed(3)} ${(b / 255).toFixed(3)} rg`);
       current.push(`BT /${font} ${size} Tf ${MARGIN} ${y.toFixed(2)} Td (${escapePdf(part)}) Tj ET`);
@@ -69,6 +70,7 @@ export function createSimplePdf(title: string, lines: PdfLine[]) {
     "",
     "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
     "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>",
   ];
   const pageIds: number[] = [];
   for (const [index, commands] of pages.entries()) {
@@ -80,7 +82,7 @@ export function createSimplePdf(title: string, lines: PdfLine[]) {
     const streamId = objects.length + 1;
     objects.push(`<< /Length ${Buffer.byteLength(stream, "utf8")} >>\nstream\n${stream}\nendstream`);
     const pageId = objects.length + 1;
-    objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PAGE_WIDTH} ${PAGE_HEIGHT}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${streamId} 0 R >>`);
+    objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PAGE_WIDTH} ${PAGE_HEIGHT}] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents ${streamId} 0 R >>`);
     pageIds.push(pageId);
   }
 

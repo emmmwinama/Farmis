@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Loader2, X, Check, Pencil, Trash2, Wallet, TrendingUp, TrendingDown } from "lucide-react";
+import { Plus, Loader2, X, Check, Pencil, Trash2, Wallet, TrendingUp, TrendingDown, Download } from "lucide-react";
 
 const INCOME_CATEGORIES   = ["Crop sales", "Livestock sales", "Grant", "Loan", "Other income"];
 const EXPENSE_CATEGORIES  = ["Seeds", "Fertiliser", "Chemicals", "Equipment", "Fuel", "Transport", "Labour", "Land rent", "Loan repayment", "Other expense"];
@@ -104,7 +104,7 @@ export default function FinancePage() {
         const method = editingTx ? "PATCH" : "POST";
         const res    = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(txForm) });
         const d      = await res.json();
-        if (!res.ok) { setError(d.error); setSaving(false); } else { setShowTxForm(false); load(); }
+        if (!res.ok) { setError(d.error); setSaving(false); } else { setShowTxForm(false); setSaving(false); load(); }
     };
 
     const handleOhSubmit = async (e: React.FormEvent) => {
@@ -113,7 +113,7 @@ export default function FinancePage() {
         const method = editingOh ? "PATCH" : "POST";
         const res    = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(ohForm) });
         const d      = await res.json();
-        if (!res.ok) { setError(d.error); setSaving(false); } else { setShowOhForm(false); load(); }
+        if (!res.ok) { setError(d.error); setSaving(false); } else { setShowOhForm(false); setSaving(false); load(); }
     };
 
     const handleDeleteTx = async (id: string) => {
@@ -148,11 +148,21 @@ export default function FinancePage() {
                         Track income, expenses and overhead costs
                     </p>
                 </div>
-                <button onClick={tab === "transactions" ? openAddTx : openAddOh}
-                        className="flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-bold text-white"
-                        style={{ background: "var(--farm-green)", boxShadow: "0 4px 12px rgba(26,61,31,0.25)" }}>
-                    <Plus size={15} /> Add {tab === "transactions" ? "transaction" : "overhead"}
-                </button>
+                <div className="flex flex-wrap gap-2 justify-end">
+                    <a href="/api/export/records?type=expense&format=pdf&section=finance&section=overhead"
+                       className="btn-secondary min-h-10">
+                        <Download size={15} /> Expense report
+                    </a>
+                    <a href="/api/export/records?type=cashflow&format=pdf&section=finance"
+                       className="btn-secondary min-h-10">
+                        <Download size={15} /> Cashflow report
+                    </a>
+                    <button onClick={tab === "transactions" ? openAddTx : openAddOh}
+                            className="flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-bold text-white"
+                            style={{ background: "var(--farm-green)", boxShadow: "0 4px 12px rgba(26,61,31,0.25)" }}>
+                        <Plus size={15} /> Add {tab === "transactions" ? "transaction" : "overhead"}
+                    </button>
+                </div>
             </div>
 
             {/* Summary cards */}

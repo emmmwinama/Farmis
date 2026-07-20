@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionFarm } from "@/lib/apiHelpers";
 import { prisma } from "@/lib/prisma";
+import { buildCropTimelineStatus } from "@/lib/cropTimelines";
 
 export async function GET(req: Request) {
     const { user, farm } = await getSessionFarm();
@@ -55,7 +56,7 @@ async function generateNotifications(userId: string, farmId: string) {
             cropFields: {
                 include: {
                     cropType: true,
-                    activities: { orderBy: { date: "desc" }, take: 1 },
+                    activities: { orderBy: { date: "desc" } },
                     yields: true,
                 },
             },
@@ -71,6 +72,32 @@ async function generateNotifications(userId: string, farmId: string) {
 
     for (const cf of allCropFields) {
         if (cf.status !== "Active") continue;
+
+        const timelineStatus = buildCropTimelineStatus({
+            ...cf,
+            cropTypeName: cf.cropType.name,
+            activities: cf.activities,
+        });
+
+        for (const dueStep of timelineStatus.dueSteps.slice(0, 2)) {
+            const existing = await prisma.notification.findFirst({
+                where: {
+                    userId,
+                    farmId,
+                    type: "crop_activity_due",
+                    title: `${cf.cropType.name}: ${dueStep.title}`,
+                },
+            });
+            if (!existing) {
+                const isOverdue = dueStep.state === "overdue";
+                notifs.push({
+                    userId, farmId, type: "crop_activity_due",
+                    title: `${cf.cropType.name}: ${dueStep.title}`,
+                    message: `${dueStep.title} is ${isOverdue ? "overdue" : "generally due"} for ${cf.cropType.name} (${cf.variety}). ${dueStep.recommendation}`,
+                    link: `/dashboard/activities/new?cropFieldId=${cf.id}&activityType=${encodeURIComponent(dueStep.title)}`,
+                });
+            }
+        }
 
         const harvestDate = new Date(cf.expectedHarvestDate);
         const daysToHarvest = Math.ceil((harvestDate.getTime() - now.getTime()) / 86400000);

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
     Plus, Loader2, X, Check, Pencil, Trash2,
-    ShoppingCart, Wheat, Sprout, Beaker, FlaskConical, Wrench, Package,
+    ShoppingCart, Wheat, Sprout, Beaker, FlaskConical, Wrench, Package, FileText,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -44,7 +44,8 @@ function formatDate(d: string) {
 
 const emptyForm = {
     name: "", category: "crop_harvest", unit: "kg",
-    quantity: "", unitWeight: "", season: "", cropFieldId: "", notes: "",
+    quantity: "", acquisitionUnitCost: "", acquiredAt: new Date().toISOString().split("T")[0],
+    unitWeight: "", season: "", cropFieldId: "", notes: "",
 };
 const emptySaleForm = {
     inventoryItemId: "", quantitySold: "", unit: "kg",
@@ -108,10 +109,16 @@ export default function InventoryPage() {
 
     const setF    = (k: string, v: any) => setForm((f)     => ({ ...f, [k]: v }));
     const setSale = (k: string, v: any) => setSaleForm((f) => ({ ...f, [k]: v }));
+    const readJson = async (response: Response) => {
+        const text = await response.text();
+        if (!text.trim()) return null;
+        return JSON.parse(text);
+    };
 
     const openAdd = () => {
         setEditingItem(null);
         setForm({ ...emptyForm });
+        setSaving(false);
         setError(""); setShowForm(true);
     };
 
@@ -122,11 +129,14 @@ export default function InventoryPage() {
             category:    item.category,
             unit:        item.unit,
             quantity:    item.quantity.toString(),
+            acquisitionUnitCost: item.acquisitionUnitCost?.toString() ?? "",
+            acquiredAt: item.acquiredAt ? new Date(item.acquiredAt).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
             unitWeight:  item.unitWeight?.toString() ?? "",
             season:      item.season ?? "",
             cropFieldId: item.cropFieldId ?? "",
             notes:       item.notes ?? "",
         });
+        setSaving(false);
         setError(""); setShowForm(true);
     };
 
@@ -134,12 +144,22 @@ export default function InventoryPage() {
         e.preventDefault(); setSaving(true); setError("");
         const url    = editingItem ? `/api/inventory/${editingItem.id}` : "/api/inventory";
         const method = editingItem ? "PATCH" : "POST";
-        const res    = await fetch(url, {
-            method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form),
-        });
-        const d = await res.json();
-        if (!res.ok) { setError(d.error); setSaving(false); }
-        else         { setShowForm(false); load(); }
+        try {
+            const res = await fetch(url, {
+                method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form),
+            });
+            const d = await readJson(res);
+            if (!res.ok) {
+                setError(d?.error ?? "Failed to save inventory item");
+                return;
+            }
+            setShowForm(false);
+            load();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to save inventory item");
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleDelete = async (id: string) => {
@@ -151,17 +171,28 @@ export default function InventoryPage() {
 
     const openSale = (item: any) => {
         setSaleForm({ ...emptySaleForm, inventoryItemId: item.id, unit: item.unit });
+        setSaleSaving(false);
         setSaleError(""); setShowSaleForm(true);
     };
 
     const handleSaleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); setSaleSaving(true); setSaleError("");
-        const res = await fetch("/api/inventory/sales", {
-            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(saleForm),
-        });
-        const d = await res.json();
-        if (!res.ok) { setSaleError(d.error); setSaleSaving(false); }
-        else         { setShowSaleForm(false); load(); }
+        try {
+            const res = await fetch("/api/inventory/sales", {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(saleForm),
+            });
+            const d = await readJson(res);
+            if (!res.ok) {
+                setSaleError(d?.error ?? "Failed to record sale");
+                return;
+            }
+            setShowSaleForm(false);
+            load();
+        } catch (err) {
+            setSaleError(err instanceof Error ? err.message : "Failed to record sale");
+        } finally {
+            setSaleSaving(false);
+        }
     };
 
     const items = (data?.items ?? []).filter((i: any) => {
@@ -169,6 +200,16 @@ export default function InventoryPage() {
         if (seasonFilter   !== "All" && i.season   !== seasonFilter)   return false;
         return true;
     });
+    const monthlyStock = Object.values(items.reduce((acc: Record<string, any>, item: any) => {
+        const key = item.acquiredAt
+            ? new Date(item.acquiredAt).toLocaleDateString("en-GB", { month: "short", year: "2-digit" })
+            : "Unknown";
+        if (!acc[key]) acc[key] = { month: key, quantity: 0, value: 0 };
+        acc[key].quantity += Number(item.quantity ?? 0);
+        acc[key].value += Number(item.quantity ?? 0) * Number(item.acquisitionUnitCost ?? 0);
+        return acc;
+    }, {})) as any[];
+    const maxStockValue = Math.max(1, ...monthlyStock.map((row) => row.value));
 
     return (
         <div className="p-8 max-w-6xl mx-auto">
@@ -239,7 +280,27 @@ export default function InventoryPage() {
                         {allSeasons.map((s) => <option key={s}>{s}</option>)}
                     </select>
                 )}
+                <a href="/api/export/records?type=inventory&format=pdf&section=inventory"
+                   className="h-9 px-4 rounded-xl text-sm font-bold inline-flex items-center gap-2"
+                   style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1.5px solid var(--border)" }}>
+                    <FileText size={14} /> Inventory report
+                </a>
             </div>
+
+            {monthlyStock.length > 0 && (
+                <div className="card p-5 mb-6">
+                    <p className="text-sm font-black mb-4" style={{ color: "var(--text-primary)" }}>Inventory levels by acquisition month</p>
+                    <div className="flex items-end gap-3 min-h-40 overflow-x-auto pb-1">
+                        {monthlyStock.map((row) => (
+                            <div key={row.month} className="min-w-20 flex flex-col items-center gap-2">
+                                <div className="w-full rounded-t-xl" style={{ height: `${Math.max(8, (row.value / maxStockValue) * 120)}px`, background: "linear-gradient(180deg, #06B6D4, #0F766E)" }} />
+                                <p className="text-[10px] font-bold" style={{ color: "var(--text-muted)" }}>{row.month}</p>
+                                <p className="text-[10px] font-black" style={{ color: "var(--text-primary)" }}>MWK {fmt(row.value)}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Items */}
             {loading ? (
@@ -401,6 +462,14 @@ export default function InventoryPage() {
                                             )}
                                         </div>
                                     )}
+                                    <div className="rounded-xl px-4 py-3" style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
+                                        <p className="text-xs font-black mb-1" style={{ color: "var(--text-primary)" }}>Inventory history</p>
+                                        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                                            Acquired {item.acquiredAt ? formatDate(item.acquiredAt) : "date not recorded"}.
+                                            {item.updatedAt ? ` Last updated ${formatDate(item.updatedAt)}.` : ""}
+                                            Quantity movements are tracked through acquisitions, sales, disposals, and activity consumption.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         );
@@ -448,13 +517,36 @@ export default function InventoryPage() {
                                         <Label>Quantity *</Label>
                                         <input type="number" step="0.01" min="0"
                                                value={form.quantity} onChange={(e) => setF("quantity", e.target.value)}
-                                               placeholder="0" required style={INP} />
+                                               placeholder="0" required disabled={Boolean(editingItem)}
+                                               style={{ ...INP, opacity: editingItem ? 0.65 : 1 }} />
+                                        {editingItem && (
+                                            <p className="text-[10px] mt-1.5" style={{ color: "var(--text-muted)" }}>
+                                                Quantity changes must be recorded as an acquisition, sale, disposal, or activity use.
+                                            </p>
+                                        )}
                                     </div>
                                     <div>
                                         <Label>Unit</Label>
                                         <select value={form.unit} onChange={(e) => setF("unit", e.target.value)} style={INP}>
                                             {UNITS.map((u) => <option key={u}>{u}</option>)}
                                         </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <Label>Acquisition cost / {form.unit}</Label>
+                                        <input type="number" step="1" min="0"
+                                               value={form.acquisitionUnitCost}
+                                               onChange={(e) => setF("acquisitionUnitCost", e.target.value)}
+                                               placeholder="0" style={INP} />
+                                    </div>
+                                    <div>
+                                        <Label>Acquisition date</Label>
+                                        <input type="date"
+                                               value={form.acquiredAt}
+                                               onChange={(e) => setF("acquiredAt", e.target.value)}
+                                               style={INP} />
                                     </div>
                                 </div>
 
@@ -595,7 +687,7 @@ export default function InventoryPage() {
                                     <Label>Buyer name (optional)</Label>
                                     <input value={saleForm.buyerName}
                                            onChange={(e) => setSale("buyerName", e.target.value)}
-                                           placeholder="e.g. ADMARC, local trader" style={INP} />
+                                           placeholder="e.g. buyer name, local trader" style={INP} />
                                 </div>
 
                                 <div>

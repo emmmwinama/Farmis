@@ -94,7 +94,7 @@ function YieldsContent() {
         });
         const d = await res.json();
         if (!res.ok) { setError(d.error); setSaving(false); }
-        else         { setShowForm(false); load(); }
+        else         { setShowForm(false); setSaving(false); load(); }
     };
 
     const handleDelete = async (id: string) => {

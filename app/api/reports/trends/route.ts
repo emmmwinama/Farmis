@@ -10,26 +10,54 @@ function toKg(quantity: number, unit: string, unitWeight?: number | null) {
     return quantity;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
     const { farm } = await getSessionFarm();
     if (!farm) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { searchParams } = new URL(req.url);
+    const seasonFilter = searchParams.get("season");
+    const includeArchived = searchParams.get("includeArchived");
+    const fieldIdFilter = searchParams.get("fieldId");
+    const cropFieldIdFilter = searchParams.get("cropFieldId");
+    const fromFilter = searchParams.get("from");
+    const toFilter = searchParams.get("to");
+    const fromDate = fromFilter ? new Date(fromFilter) : null;
+    const toDate = toFilter ? new Date(toFilter) : null;
+    const hasDateFilter = Boolean(fromDate || toDate);
+    const dateWhere = {
+        ...(fromDate ? { gte: fromDate } : {}),
+        ...(toDate ? { lte: toDate } : {}),
+    };
 
     // ── Fetch all fields with full relations ────────────────────────────────
     const allFields = await prisma.field.findMany({
-        where: { farmId: farm.id },
+        where: {
+            farmId: farm.id,
+            ...(fieldIdFilter ? { id: fieldIdFilter } : {}),
+        },
         include: {
             cropFields: {
+                where: {
+                    ...(seasonFilter ? { season: seasonFilter } : {}),
+                    ...(cropFieldIdFilter ? { id: cropFieldIdFilter } : {}),
+                    ...(includeArchived === "false" ? { isArchived: false } : {}),
+                    ...(includeArchived === "true" ? { isArchived: true } : {}),
+                },
                 include: {
                     cropType:   true,
                     activities: {
+                        ...(hasDateFilter ? { where: { date: dateWhere } } : {}),
                         include: {
                             inputs:        true,
                             labourRecords: true,
                             otherCosts:    true,
                         },
                     },
-                    yields:       true,
-                    transactions: true,
+                    yields:       {
+                        ...(hasDateFilter ? { where: { harvestDate: dateWhere } } : {}),
+                    },
+                    transactions: {
+                        ...(hasDateFilter ? { where: { date: dateWhere } } : {}),
+                    },
                 },
             },
         },
@@ -37,7 +65,10 @@ export async function GET() {
 
     // ── Fetch overhead expenses ─────────────────────────────────────────────
     const overheadExpenses = await prisma.overheadExpense.findMany({
-        where:   { farmId: farm.id },
+        where:   {
+            farmId: farm.id,
+            ...(hasDateFilter ? { date: dateWhere } : {}),
+        },
         orderBy: { date: "asc" },
     });
 

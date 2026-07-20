@@ -14,27 +14,66 @@ export async function GET(req: NextRequest) {
     const session = getMobileSession(req);
     if (!session?.farmId)
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { searchParams } = new URL(req.url);
+    const seasonFilter = searchParams.get("season");
+    const fieldIdFilter = searchParams.get("fieldId");
+    const cropFieldIdFilter = searchParams.get("cropFieldId");
+    const includeArchived = searchParams.get("includeArchived");
+    const fromFilter = searchParams.get("from");
+    const toFilter = searchParams.get("to");
+    const fromDate = fromFilter ? new Date(fromFilter) : null;
+    const toDate = toFilter ? new Date(toFilter) : null;
+    const hasDateFilter = Boolean(fromDate || toDate);
+    const dateWhere = {
+        ...(fromDate ? { gte: fromDate } : {}),
+        ...(toDate ? { lte: toDate } : {}),
+    };
 
     // ── Fetch all data ──────────────────────────────────────────
     const fields = await prisma.field.findMany({
-        where:  { farmId: session.farmId },
+        where:  {
+            farmId: session.farmId,
+            ...(fieldIdFilter ? { id: fieldIdFilter } : {}),
+        },
         include: { cropFields: { include: {
                     cropType:  true,
                     activities: { include: {
                             inputs:        true,
                             labourRecords: { include: { employee: true } },
                             otherCosts:    true,
-                        }},
-                    yields: true,
-                }}},
+                        },
+                        ...(hasDateFilter ? { where: { date: dateWhere } } : {}),
+                    },
+                    yields: {
+                        ...(hasDateFilter ? { where: { harvestDate: dateWhere } } : {}),
+                    },
+                },
+                where: {
+                    ...(seasonFilter ? { season: seasonFilter } : {}),
+                    ...(cropFieldIdFilter ? { id: cropFieldIdFilter } : {}),
+                    ...(includeArchived === "false" ? { isArchived: false } : {}),
+                    ...(includeArchived === "true" ? { isArchived: true } : {}),
+                },
+            }},
     });
 
     const transactions = await prisma.transaction.findMany({
-        where: { farmId: session.farmId },
+        where: {
+            farmId: session.farmId,
+            ...(seasonFilter ? { season: seasonFilter } : {}),
+            ...(fieldIdFilter ? { fieldId: fieldIdFilter } : {}),
+            ...(cropFieldIdFilter ? { cropFieldId: cropFieldIdFilter } : {}),
+            ...(hasDateFilter ? { date: dateWhere } : {}),
+            ...(includeArchived === "false" ? { cropField: { isArchived: false } } : {}),
+            ...(includeArchived === "true" ? { cropField: { isArchived: true } } : {}),
+        },
     });
 
     const overhead = await prisma.overheadExpense.findMany({
-        where: { farmId: session.farmId },
+        where: {
+            farmId: session.farmId,
+            ...(hasDateFilter ? { date: dateWhere } : {}),
+        },
     });
 
     // ── Finance summary ─────────────────────────────────────────
@@ -348,6 +387,14 @@ export async function GET(req: NextRequest) {
         .sort((a, b) => b.totalYieldKg - a.totalYieldKg);
 
     return NextResponse.json({
+        filters: {
+            season: seasonFilter ?? "all",
+            fieldId: fieldIdFilter ?? "all",
+            cropFieldId: cropFieldIdFilter ?? "all",
+            includeArchived: includeArchived ?? "both",
+            from: fromFilter,
+            to: toFilter,
+        },
         financeSummary,
         seasonReport,
         cropReport,

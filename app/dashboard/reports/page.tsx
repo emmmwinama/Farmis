@@ -59,14 +59,59 @@ const CustomTooltip = ({ active, payload, label, formatter }: any) => {
     );
 };
 
+function AnalyticsList({
+    title,
+    rows,
+    render,
+    empty,
+}: {
+    title: string;
+    rows: any[];
+    render: (row: any) => { label: string; meta: string; value: string; positive: boolean };
+    empty: string;
+}) {
+    return (
+        <div className="rounded-2xl p-5" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+            <p className="text-sm font-black mb-4" style={{ color: "var(--text-primary)" }}>{title}</p>
+            {rows.length === 0 ? (
+                <p className="text-sm" style={{ color: "var(--text-muted)" }}>{empty}</p>
+            ) : (
+                <div className="flex flex-col gap-3">
+                    {rows.map((row, index) => {
+                        const item = render(row);
+                        return (
+                            <div key={`${item.label}-${index}`} className="min-h-14 rounded-2xl px-4 py-3 flex items-center justify-between gap-4"
+                                 style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
+                                <div className="min-w-0">
+                                    <p className="text-sm font-bold truncate" style={{ color: "var(--text-primary)" }}>{item.label}</p>
+                                    <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>{item.meta}</p>
+                                </div>
+                                <p className="text-sm font-black flex-shrink-0" style={{ color: item.positive ? "#0D9488" : "#DC2626" }}>
+                                    {item.value}
+                                </p>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function ReportsPage() {
     const [data,          setData]          = useState<any>(null);
     const [trendsData,    setTrendsData]    = useState<any>(null);
     const [loading,       setLoading]       = useState(true);
     const [season,        setSeason]        = useState("all");
     const [archived,      setArchived]      = useState<"active" | "archived" | "both">("active");
+    const [fieldId,       setFieldId]       = useState("all");
+    const [cropFieldId,   setCropFieldId]   = useState("all");
+    const [fromDate,      setFromDate]      = useState("");
+    const [toDate,        setToDate]        = useState("");
     const [seasons,       setSeasons]       = useState<string[]>([]);
-    const [activeTab,     setActiveTab]     = useState<"overview" | "crops" | "finance" | "yields" | "overhead" |
+    const [fields,        setFields]        = useState<any[]>([]);
+    const [filterCrops,   setFilterCrops]   = useState<any[]>([]);
+    const [activeTab,     setActiveTab]     = useState<"overview" | "crops" | "finance" | "analytics" | "yields" | "overhead" |
     "trends"   | "performance" | "breakeven" | "comparison"
     >("overview");
     const [compareA,      setCompareA]      = useState("");
@@ -76,32 +121,43 @@ export default function ReportsPage() {
     const load = async () => {
         setLoading(true);
         try {
-            const [activeCrops, archivedCrops] = await Promise.all([
+            const [activeCrops, archivedCrops, fieldsData] = await Promise.all([
                 fetch("/api/crops?archived=false").then(async (r) => {
                     const t = await r.text(); return t ? JSON.parse(t) : [];
                 }),
                 fetch("/api/crops?archived=true").then(async (r) => {
                     const t = await r.text(); return t ? JSON.parse(t) : [];
                 }),
+                fetch("/api/fields").then(async (r) => {
+                    const t = await r.text(); return t ? JSON.parse(t) : [];
+                }),
             ]);
+            const allCrops = [
+                ...(Array.isArray(activeCrops) ? activeCrops : []),
+                ...(Array.isArray(archivedCrops) ? archivedCrops : []),
+            ];
 
             const uniqueSeasons = [...new Set(
-                [...(Array.isArray(activeCrops)   ? activeCrops   : []),
-                    ...(Array.isArray(archivedCrops) ? archivedCrops : [])]
-                    .map((c: any) => c.season).filter(Boolean)
+                allCrops.map((c: any) => c.season).filter(Boolean)
             )].sort().reverse() as string[];
             setSeasons(uniqueSeasons);
+            setFields(Array.isArray(fieldsData) ? fieldsData : []);
+            setFilterCrops(allCrops);
 
             const params = new URLSearchParams();
             if (season !== "all")    params.set("season", season);
             if (archived !== "both") params.set("includeArchived",
                 archived === "archived" ? "true" : "false");
+            if (fieldId !== "all") params.set("fieldId", fieldId);
+            if (cropFieldId !== "all") params.set("cropFieldId", cropFieldId);
+            if (fromDate) params.set("from", fromDate);
+            if (toDate) params.set("to", toDate);
 
             const [reportRes, trendsRes] = await Promise.all([
                 fetch(`/api/reports?${params}`).then(async (r) => {
                     const t = await r.text(); return t ? JSON.parse(t) : null;
                 }),
-                fetch("/api/reports/trends").then(async (r) => {
+                fetch(`/api/reports/trends?${params}`).then(async (r) => {
                     const t = await r.text(); return t ? JSON.parse(t) : null;
                 }),
             ]);
@@ -121,11 +177,12 @@ export default function ReportsPage() {
         }
     };
 
-    useEffect(() => { load(); }, [season, archived]);
+    useEffect(() => { load(); }, [season, archived, fieldId, cropFieldId, fromDate, toDate]);
 
     const summary      = data?.summary                  ?? {};
     const crops        = data?.crops                    ?? [];
     const finance      = data?.finance                  ?? {};
+    const analytics    = data?.analytics                ?? {};
     const yields       = data?.yields                   ?? [];
     const overhead     = data?.overheadAllocationSummary ?? {};
     const netProfit    = (summary.totalRevenue ?? 0) - (summary.totalExpenses ?? 0);
@@ -133,11 +190,22 @@ export default function ReportsPage() {
 
     const allCropTypes   = trendsData?.allCropTypes ?? [];
     const allSeasonsList = trendsData?.allSeasons   ?? [];
+    const reportParams = new URLSearchParams();
+    reportParams.set("type", "audit");
+    reportParams.set("format", "pdf");
+    ["fields", "activities", "finance", "payroll", "livestock"].forEach((section) => reportParams.append("section", section));
+    if (season !== "all") reportParams.set("season", season);
+    if (archived !== "both") reportParams.set("lifecycle", archived === "archived" ? "archived" : "active");
+    if (fieldId !== "all") reportParams.set("fieldId", fieldId);
+    if (cropFieldId !== "all") reportParams.set("cropFieldId", cropFieldId);
+    if (fromDate) reportParams.set("from", fromDate);
+    if (toDate) reportParams.set("to", toDate);
 
     const TABS = [
         { key: "overview",    label: "Overview"            },
         { key: "crops",       label: "Crop summary"        },
         { key: "finance",     label: "Financials"          },
+        { key: "analytics",   label: "Analytics"           },
         { key: "yields",      label: "Yields"              },
         { key: "overhead",    label: "Overhead"            },
         { key: "trends",      label: "Yield trends"     },
@@ -162,7 +230,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <a
-                        href="/api/export/records?type=audit&format=pdf&section=fields&section=activities&section=finance&section=payroll&section=livestock"
+                        href={`/api/export/records?${reportParams.toString()}`}
                         className="btn-primary min-h-11"
                     >
                         <Download size={16} />
@@ -172,19 +240,6 @@ export default function ReportsPage() {
                         Build pack
                     </a>
                 </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-                {[
-                    "Cashflow by month for loan repayment planning",
-                    "Input efficiency by crop and field",
-                    "Buyer traceability report by crop lot",
-                ].map((label) => (
-                    <div key={label} className="rounded-2xl p-4"
-                         style={{ background: "#F0F9FF", border: "1px solid #BAE6FD" }}>
-                        <p className="text-xs font-bold" style={{ color: "#075985" }}>{label}</p>
-                    </div>
-                ))}
             </div>
 
             {/* Filters */}
@@ -224,8 +279,52 @@ export default function ReportsPage() {
                     </div>
                 </div>
 
-                {(season !== "all" || archived !== "active") && (
-                    <button onClick={() => { setSeason("all"); setArchived("active"); }}
+                <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
+                           style={{ color: "var(--text-muted)" }}>Field</label>
+                    <select value={fieldId} onChange={(e) => { setFieldId(e.target.value); setCropFieldId("all"); }}
+                            className="h-10 px-3 rounded-xl text-sm outline-none min-w-44"
+                            style={{ border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-primary)" }}>
+                        <option value="all">All fields</option>
+                        {fields.map((field) => <option key={field.id} value={field.id}>{field.name}</option>)}
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
+                           style={{ color: "var(--text-muted)" }}>Crop</label>
+                    <select value={cropFieldId} onChange={(e) => setCropFieldId(e.target.value)}
+                            className="h-10 px-3 rounded-xl text-sm outline-none min-w-56"
+                            style={{ border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-primary)" }}>
+                        <option value="all">All crops</option>
+                        {filterCrops
+                            .filter((crop) => fieldId === "all" || crop.fieldId === fieldId)
+                            .map((crop) => (
+                                <option key={crop.id} value={crop.id}>
+                                    {crop.cropTypeName} {crop.variety} - {crop.fieldName} - {crop.season}
+                                </option>
+                            ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
+                           style={{ color: "var(--text-muted)" }}>From</label>
+                    <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)}
+                           className="h-10 px-3 rounded-xl text-sm outline-none"
+                           style={{ border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-primary)" }} />
+                </div>
+
+                <div>
+                    <label className="block text-[10px] font-black uppercase tracking-wider mb-1.5"
+                           style={{ color: "var(--text-muted)" }}>To</label>
+                    <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)}
+                           className="h-10 px-3 rounded-xl text-sm outline-none"
+                           style={{ border: "1px solid var(--border)", background: "var(--bg-card)", color: "var(--text-primary)" }} />
+                </div>
+
+                {(season !== "all" || archived !== "active" || fieldId !== "all" || cropFieldId !== "all" || fromDate || toDate) && (
+                    <button onClick={() => { setSeason("all"); setArchived("active"); setFieldId("all"); setCropFieldId("all"); setFromDate(""); setToDate(""); }}
                             className="flex items-center gap-2 h-10 px-3 rounded-xl text-xs font-bold"
                             style={{ background: "var(--bg-subtle)", color: "#EF4444", border: "1px solid var(--border)" }}>
                         <Filter size={12} /> Clear filters
@@ -657,6 +756,80 @@ export default function ReportsPage() {
                         </div>
                     )}
 
+                    {/* -- ANALYTICS ------------------------------------------ */}
+                    {activeTab === "analytics" && (
+                        <div className="flex flex-col gap-6">
+                            <div className="rounded-2xl p-5" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                                <p className="text-sm font-black mb-4" style={{ color: "var(--text-primary)" }}>Cashflow by month</p>
+                                {(finance.cashflowByMonth ?? []).length === 0 ? (
+                                    <NoData label="No monthly cashflow yet" />
+                                ) : (
+                                    <div className="h-72">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={finance.cashflowByMonth}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                                                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                                                <YAxis tickFormatter={(v) => `${Math.round(Number(v) / 1000)}k`} tick={{ fontSize: 11 }} />
+                                                <Tooltip content={<CustomTooltip formatter={(v: number) => `MWK ${fmt(v)}`} />} />
+                                                <Legend />
+                                                <Bar dataKey="income" name="Income" fill="#0D9488" radius={[6, 6, 0, 0]} />
+                                                <Bar dataKey="expenses" name="Expenses" fill="#DC2626" radius={[6, 6, 0, 0]} />
+                                                <Bar dataKey="net" name="Net" fill="#0284C7" radius={[6, 6, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <AnalyticsList
+                                    title="Crop profitability ranking"
+                                    rows={(analytics.cropProfitabilityRanking ?? []).slice(0, 6)}
+                                    render={(row: any) => ({
+                                        label: `${row.cropName} - ${row.variety}`,
+                                        meta: `${row.fieldName} - ${row.season}`,
+                                        value: `MWK ${fmt(row.netProfit ?? 0)}`,
+                                        positive: (row.netProfit ?? 0) >= 0,
+                                    })}
+                                    empty="No crop profitability data yet"
+                                />
+                                <AnalyticsList
+                                    title="Field profitability comparison"
+                                    rows={(analytics.fieldProfitabilityComparison ?? []).slice(0, 6)}
+                                    render={(row: any) => ({
+                                        label: row.fieldName,
+                                        meta: `${(row.area ?? 0).toFixed(2)} ha - MWK ${fmt(row.profitPerHa ?? 0)}/ha`,
+                                        value: `MWK ${fmt(row.netProfit ?? 0)}`,
+                                        positive: (row.netProfit ?? 0) >= 0,
+                                    })}
+                                    empty="No field profitability data yet"
+                                />
+                                <AnalyticsList
+                                    title="Input efficiency report"
+                                    rows={(analytics.inputEfficiencyReport ?? []).slice(0, 6)}
+                                    render={(row: any) => ({
+                                        label: `${row.cropName} - ${row.fieldName}`,
+                                        meta: `MWK ${fmt(row.costPerHa ?? 0)}/ha - MWK ${fmt(row.costPerKg ?? 0)}/kg`,
+                                        value: `${(row.yieldResponse ?? 0).toFixed(2)} kg/MWK`,
+                                        positive: (row.yieldResponse ?? 0) > 0,
+                                    })}
+                                    empty="No input efficiency data yet"
+                                />
+                                <AnalyticsList
+                                    title="Livestock profitability and health cost"
+                                    rows={(analytics.livestockProfitability ?? []).slice(0, 6)}
+                                    render={(row: any) => ({
+                                        label: row.type,
+                                        meta: `${row.count} animals - health MWK ${fmt(row.healthCost ?? 0)}`,
+                                        value: `MWK ${fmt(row.netProfit ?? 0)}`,
+                                        positive: (row.netProfit ?? 0) >= 0,
+                                    })}
+                                    empty="No livestock analytics yet"
+                                />
+                            </div>
+                        </div>
+                    )}
+
                     {/* -- YIELDS --------------------------------------------- */}
                     {activeTab === "yields" && (
                         <div className="flex flex-col gap-5">
@@ -1066,7 +1239,7 @@ export default function ReportsPage() {
                                 </p>
                                 <p className="text-sm" style={{ color: "#166534" }}>
                                     Break-even price = Total cost Ã· kg harvested. This is the minimum price per kg
-                                    you must sell at to cover all costs. Compare it to ADMARC prices to see if
+                                    you must sell at to cover all costs. Compare it to market prices to see if
                                     you're operating profitably.
                                 </p>
                             </div>

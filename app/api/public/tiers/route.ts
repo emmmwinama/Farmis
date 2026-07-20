@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
 export async function GET() {
     try {
         const tiers = await prisma.subscriptionTier.findMany({
@@ -12,6 +13,10 @@ export async function GET() {
                 description:           true,
                 priceMonthly:          true,
                 priceAnnual:           true,
+                audience:              true,
+                ctaLabel:              true,
+                ctaHref:               true,
+                offerItems:            true,
                 isFeatured:            true,
                 isActive:              true,
                 sortOrder:             true,

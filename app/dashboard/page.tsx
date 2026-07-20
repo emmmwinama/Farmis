@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
     TrendingUp, TrendingDown, Map, Sprout, Wheat,
-    Users, Wallet, ArrowRight, Sparkles, AlertTriangle,
-    CheckCircle, Info, Lightbulb, Loader2, RefreshCw,
-    Package, Plus, ClipboardList, BarChart2, Beaker,
+    Users, Wallet, ArrowRight, AlertTriangle,
+    CheckCircle, Loader2,
+    Package, Plus, ClipboardList, BarChart2, FileBarChart,
+    Beaker,
     Droplets, Leaf, Tractor, Scissors, Search,
 } from "lucide-react";
 
@@ -29,28 +30,6 @@ const ACTIVITY_ICONS: Record<string, any> = {
     Pruning: Scissors,
     Scouting: Search,
     Other: ClipboardList,
-};
-
-const INSIGHT_CONFIG: Record<string, {
-    bg: string; border: string; iconBg: string;
-    icon: any; iconColor: string; titleColor: string; msgColor: string;
-}> = {
-    warning: {
-        bg: "#F0F9FF", border: "#BAE6FD",
-        iconBg: "#E0F2FE", icon: AlertTriangle, iconColor: "#0284C7", titleColor: "#075985", msgColor: "#0369A1",
-    },
-    success: {
-        bg: "#F0FDF4", border: "#BBF7D0",
-        iconBg: "#DCFCE7", icon: CheckCircle, iconColor: "#16A34A", titleColor: "#14532D", msgColor: "#166534",
-    },
-    info: {
-        bg: "#EFF6FF", border: "#BFDBFE",
-        iconBg: "#DBEAFE", icon: Info, iconColor: "#2563EB", titleColor: "#1E3A8A", msgColor: "#1D4ED8",
-    },
-    tip: {
-        bg: "#FAF5FF", border: "#E9D5FF",
-        iconBg: "#F3E8FF", icon: Lightbulb, iconColor: "#9333EA", titleColor: "#581C87", msgColor: "#7E22CE",
-    },
 };
 
 function StatCard({
@@ -93,48 +72,168 @@ function StatCard({
     return href ? <Link href={href} className="block h-full">{content}</Link> : content;
 }
 
-function QuickAction({ href, icon: Icon, label, color }: { href: string; icon: any; label: string; color: string }) {
+function GuidedOnboarding({ stats }: { stats: any }) {
+    const steps = [
+        { label: "Create farm", href: "/dashboard/farm", done: Boolean(stats?.farmName) },
+        { label: "Add fields", href: "/dashboard/fields", done: (stats?.totalFields ?? 0) > 0 },
+        { label: "Add crops", href: "/dashboard/crops", done: (stats?.activeCrops ?? 0) + (stats?.harvestedCrops ?? 0) > 0 },
+        { label: "Record activity", href: "/dashboard/activities/new", done: (stats?.recentActivities ?? []).length > 0 },
+        { label: "Export report", href: "/dashboard/records", done: false },
+    ];
+    const complete = steps.filter((step) => step.done).length;
+    if (complete === steps.length) return null;
+
     return (
-        <Link href={href}
-              className="flex min-h-28 flex-col items-center justify-center gap-3 p-4 rounded-2xl transition-all hover:-translate-y-0.5 group"
-              style={{ background: "var(--bg-card)", border: "1.5px solid var(--border)", boxShadow: "0 1px 3px rgba(28,25,23,0.06)" }}>
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all group-hover:scale-105"
-                 style={{ background: color + "20" }}>
-                <Icon size={22} style={{ color }} />
+        <div className="rounded-2xl p-5 mb-6" style={{ background: "linear-gradient(135deg, #E0F2FE, #F8FAFC)", border: "1px solid #BAE6FD" }}>
+            <div className="flex items-start justify-between gap-4 mb-4">
+                <div>
+                    <p className="text-sm font-black" style={{ color: "#075985" }}>Getting started</p>
+                    <p className="text-sm mt-1" style={{ color: "#0369A1" }}>Set up the minimum record trail lenders, buyers, and managers expect.</p>
+                </div>
+                <span className="badge badge-blue">{complete}/{steps.length}</span>
             </div>
-            <span className="text-sm font-bold text-center leading-tight" style={{ color: "var(--text-secondary)" }}>
-        {label}
-      </span>
-        </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {steps.map((step) => (
+                    <Link key={step.label} href={step.href}
+                          className="min-h-14 rounded-2xl px-4 flex items-center gap-3 transition-all hover:-translate-y-0.5"
+                          style={{ background: step.done ? "rgba(255,255,255,0.78)" : "white", border: "1px solid #BAE6FD" }}>
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: step.done ? "#CCFBF1" : "#E0F2FE", color: step.done ? "#0F766E" : "#0284C7" }}>
+                            {step.done ? <CheckCircle size={16} /> : <Plus size={16} />}
+                        </div>
+                        <span className="text-sm font-bold" style={{ color: "#0F172A" }}>{step.label}</span>
+                    </Link>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function RoleNextActions({ role }: { role: string }) {
+    const actions: Record<string, { label: string; href: string; icon: any }[]> = {
+        owner: [
+            { label: "Review profitability", href: "/dashboard/reports", icon: BarChart2 },
+            { label: "Invite team", href: "/dashboard/team", icon: Users },
+        ],
+        manager: [
+            { label: "Plan field work", href: "/dashboard/calendar", icon: ClipboardList },
+            { label: "Check active crops", href: "/dashboard/crops", icon: Sprout },
+        ],
+        accountant: [
+            { label: "Add transaction", href: "/dashboard/finance", icon: Wallet },
+            { label: "Export records", href: "/dashboard/records", icon: FileBarChart },
+        ],
+        agronomist: [
+            { label: "Log scouting", href: "/dashboard/activities/new", icon: Search },
+            { label: "Open farm map", href: "/dashboard/map", icon: Map },
+        ],
+        viewer: [
+            { label: "View reports", href: "/dashboard/reports", icon: FileBarChart },
+            { label: "View records", href: "/dashboard/records", icon: ClipboardList },
+        ],
+    };
+    const items = actions[role] ?? actions.viewer;
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+            {items.map((item) => {
+                const Icon = item.icon;
+                return (
+                    <Link key={item.label} href={item.href}
+                          className="min-h-14 rounded-2xl px-4 flex items-center gap-3"
+                          style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                        <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: "var(--info-bg)", color: "var(--info-text)" }}>
+                            <Icon size={17} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-black" style={{ color: "var(--text-primary)" }}>{item.label}</p>
+                            <p className="text-xs capitalize" style={{ color: "var(--text-muted)" }}>{role} action</p>
+                        </div>
+                    </Link>
+                );
+            })}
+        </div>
+    );
+}
+
+function FarmAlerts({ stats }: { stats: any }) {
+    const alerts = [
+        (stats?.activeCrops ?? 0) > 0 && (stats?.recentActivities ?? []).length === 0
+            ? "Missing activity records for active crops."
+            : null,
+        (stats?.net ?? 0) < 0 ? "Low margin detected from current costs and income." : null,
+        (stats?.totalActivityCost ?? 0) > Math.max((stats?.income ?? 0) * 0.7, 1)
+            ? "Input and activity costs are high compared with recorded income."
+            : null,
+    ].filter(Boolean);
+    if (alerts.length === 0) return null;
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
+            {alerts.map((alert) => (
+                <div key={alert} className="min-h-14 rounded-2xl px-4 py-3 flex items-center gap-3" style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
+                    <AlertTriangle size={17} style={{ color: "#2563EB" }} />
+                    <p className="text-sm font-bold" style={{ color: "#1E3A8A" }}>{alert}</p>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function EmptyFarmNotice({ stats }: { stats: any }) {
+    const hasRecords = [
+        stats?.totalFields,
+        stats?.activeCrops,
+        stats?.harvestedCrops,
+        stats?.activeEmployees,
+        stats?.totalInventoryItems,
+        stats?.recentActivities?.length,
+    ].some((value) => (value ?? 0) > 0);
+
+    if (hasRecords) return null;
+
+    return (
+        <div className="rounded-2xl p-5 mb-6" style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <p className="text-sm font-black" style={{ color: "#1E3A8A" }}>
+                        This active farm has no records yet
+                    </p>
+                    <p className="text-sm mt-1" style={{ color: "#1D4ED8" }}>
+                        You are viewing {stats?.farmName ?? "the selected farm"} under {stats?.userEmail ?? "this account"}. If your data is under another farm or account, use the farm switcher in the sidebar or sign in with that account.
+                    </p>
+                </div>
+                <Link href="/dashboard/settings" className="btn-secondary min-h-10 text-xs flex-shrink-0">
+                    Check farms
+                </Link>
+            </div>
+        </div>
     );
 }
 
 export default function DashboardPage() {
     const [stats, setStats] = useState<any>(null);
-    const [insights, setInsights] = useState<any[]>([]);
     const [loadingStats, setLoadingStats] = useState(true);
-    const [loadingInsights, setLoadingInsights] = useState(true);
-    const [refreshingInsights, setRefreshingInsights] = useState(false);
+    const [statsError, setStatsError] = useState("");
+
+    const readJson = async (response: Response) => {
+        const text = await response.text();
+        if (!text.trim()) return null;
+        return JSON.parse(text);
+    };
 
     const loadStats = () => {
         setLoadingStats(true);
-        fetch("/api/stats").then((r) => r.json()).then((d) => { setStats(d); setLoadingStats(false); });
-    };
-
-    const loadInsights = (refresh = false) => {
-        if (refresh) setRefreshingInsights(true);
-        else setLoadingInsights(true);
-        fetch("/api/ai/insights")
-            .then((r) => r.json())
-            .then((d) => {
-                setInsights(d.insights ?? []);
-                setLoadingInsights(false);
-                setRefreshingInsights(false);
+        setStatsError("");
+        fetch("/api/stats")
+            .then(async (r) => {
+                const data = await readJson(r);
+                if (!r.ok) throw new Error(data?.error ?? "Failed to load dashboard stats");
+                return data;
             })
-            .catch(() => { setLoadingInsights(false); setRefreshingInsights(false); });
+            .then((d) => { setStats(d ?? {}); setLoadingStats(false); })
+            .catch((error) => { setStats(null); setStatsError(error.message ?? "Dashboard stats could not be loaded"); setLoadingStats(false); });
     };
 
-    useEffect(() => { loadStats(); loadInsights(); }, []);
+    useEffect(() => { loadStats(); }, []);
 
     if (loadingStats) {
         return (
@@ -154,6 +253,20 @@ export default function DashboardPage() {
     }
 
     const netPositive = (stats?.net ?? 0) >= 0;
+
+    if (statsError) {
+        return (
+            <div className="p-8 max-w-4xl mx-auto">
+                <div className="card p-8 text-center">
+                    <p className="section-title mb-2">Dashboard data unavailable</p>
+                    <p className="section-subtitle mb-5">{statsError}</p>
+                    <button type="button" onClick={loadStats} className="btn-primary min-h-11">
+                        Try again
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-8 max-w-7xl mx-auto animate-fade-in">
@@ -180,14 +293,9 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* -- Quick actions ----------------------------------------------- */}
-            <div className="grid grid-cols-5 gap-3 mb-8">
-                <QuickAction href="/dashboard/activities/new" icon={ClipboardList} label="Log activity"    color="#0284C7" />
-                <QuickAction href="/dashboard/yields"         icon={Wheat}         label="Record harvest"  color="#0284C7" />
-                <QuickAction href="/dashboard/finance"        icon={Wallet}        label="Add transaction" color="#2563EB" />
-                <QuickAction href="/dashboard/market"         icon={BarChart2}     label="Market prices"   color="#7C3AED" />
-                <QuickAction href="/dashboard/reports"        icon={Sprout}        label="View reports"    color="#059669" />
-            </div>
+            <GuidedOnboarding stats={stats} />
+            <EmptyFarmNotice stats={stats} />
+            <FarmAlerts stats={stats} />
 
             {/* -- Primary stats ----------------------------------------------- */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
@@ -286,143 +394,10 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* -- Main grid --------------------------------------------------- */}
+            <RoleNextActions role={stats?.farmRole ?? "viewer"} />
+
+            {/* -- Operational panels ------------------------------------------ */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                {/* AI Insights - takes 2 cols */}
-                <div className="lg:col-span-2 flex flex-col gap-4">
-
-                    {/* Insights header */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                                 style={{ background: "linear-gradient(135deg, #1a3d1f, #3d8c47)" }}>
-                                <Sparkles size={14} className="text-white" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>AI Farm Insights</p>
-                                <p className="text-xs" style={{ color: "var(--text-muted)" }}>Powered by your farm data</p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => loadInsights(true)}
-                            disabled={refreshingInsights}
-                            className="btn-secondary h-8 px-3 text-xs disabled:opacity-50"
-                        >
-                            <RefreshCw size={11} className={refreshingInsights ? "animate-spin" : ""} />
-                            Refresh
-                        </button>
-                    </div>
-
-                    {/* Insight cards */}
-                    {loadingInsights ? (
-                        <div className="flex flex-col gap-3">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="rounded-2xl p-4 animate-pulse"
-                                     style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
-                                    <div className="flex gap-3">
-                                        <div className="w-9 h-9 rounded-xl" style={{ background: "var(--bg-muted)" }} />
-                                        <div className="flex-1">
-                                            <div className="h-4 rounded-lg w-40 mb-2" style={{ background: "var(--bg-muted)" }} />
-                                            <div className="h-3 rounded-lg w-full" style={{ background: "var(--bg-subtle)" }} />
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                            <p className="text-xs text-center flex items-center justify-center gap-1.5"
-                               style={{ color: "var(--text-muted)" }}>
-                                <Sparkles size={11} /> Analysing your farm data...
-                            </p>
-                        </div>
-                    ) : insights.length === 0 ? (
-                        <div className="rounded-2xl p-10 text-center"
-                             style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
-                            <Sparkles size={28} style={{ color: "var(--text-hint)" }} className="mx-auto mb-3" />
-                            <p className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
-                                Add more farm data to unlock AI insights
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col gap-3">
-                            {insights.map((insight: any, i: number) => {
-                                const cfg = INSIGHT_CONFIG[insight.type] ?? INSIGHT_CONFIG.info;
-                                const Icon = cfg.icon;
-                                return (
-                                    <div key={i} className="rounded-2xl p-4 transition-all hover:shadow-warm-sm animate-slide-up"
-                                         style={{ background: cfg.bg, border: `1.5px solid ${cfg.border}` }}>
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                                                 style={{ background: cfg.iconBg }}>
-                                                <Icon size={16} style={{ color: cfg.iconColor }} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between gap-2 mb-1">
-                                                    <p className="text-sm font-extrabold" style={{ color: cfg.titleColor }}>
-                                                        {insight.title}
-                                                    </p>
-                                                    {insight.metric && (
-                                                        <span className="text-xs font-bold px-2.5 py-1 rounded-lg flex-shrink-0"
-                                                              style={{ background: "rgba(255,255,255,0.7)", color: cfg.titleColor }}>
-                              {insight.metric}
-                            </span>
-                                                    )}
-                                                </div>
-                                                <p className="text-sm leading-relaxed" style={{ color: cfg.msgColor }}>
-                                                    {insight.message}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-
-                    {/* Season performance */}
-                    {(stats?.seasons ?? []).length > 0 && (
-                        <div className="rounded-2xl p-5"
-                             style={{ background: "var(--bg-card)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(28,25,23,0.06)" }}>
-                            <p className="text-xs font-extrabold uppercase tracking-widest mb-4"
-                               style={{ color: "var(--text-muted)" }}>
-                                Season performance
-                            </p>
-                            <div className="flex flex-col gap-3">
-                                {stats.seasons.slice(0, 3).map((s: any) => {
-                                    const maxCost = Math.max(...stats.seasons.map((ss: any) => ss.totalCost || 1));
-                                    const pct = maxCost > 0 ? Math.round((s.totalCost / maxCost) * 100) : 0;
-                                    const profitable = s.netRevenue >= 0;
-                                    return (
-                                        <div key={s.name}>
-                                            <div className="flex items-center justify-between mb-1.5">
-                                                <div className="flex items-center gap-2">
-                                                    <p className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>{s.name}</p>
-                                                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>{s.crops?.join(", ")}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                          <span className={`badge ${profitable ? "badge-green" : "badge-red"}`}>
-                            {profitable ? "+" : ""}MWK {fmt(Math.abs(s.netRevenue ?? 0))}
-                          </span>
-                                                </div>
-                                            </div>
-                                            <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--bg-muted)" }}>
-                                                <div className={`h-full rounded-full transition-all`}
-                                                     style={{
-                                                         width: `${pct}%`,
-                                                         background: profitable
-                                                             ? "linear-gradient(90deg, #16a34a, #22c55e)"
-                                                             : "linear-gradient(90deg, #dc2626, #ef4444)",
-                                                     }} />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Right column */}
-                <div className="flex flex-col gap-4">
 
                     {/* Land use */}
                     <div className="rounded-2xl p-5"
@@ -550,7 +525,6 @@ export default function DashboardPage() {
                     </div>
 
                 </div>
-            </div>
         </div>
     );
 }

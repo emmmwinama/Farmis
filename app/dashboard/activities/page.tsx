@@ -413,6 +413,18 @@ export default function ActivitiesPage() {
                                         ))}
                                     </div>
 
+                                    {(activity.responsibleEmployee || activity.responsiblePersonName) && (
+                                        <div className="rounded-xl px-3 py-2 mb-3 text-xs flex items-center justify-between"
+                                             style={{ background: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
+                                            <span className="font-black uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
+                                                Responsible
+                                            </span>
+                                            <span className="font-bold" style={{ color: "var(--text-primary)" }}>
+                                                {activity.responsibleEmployee?.name ?? activity.responsiblePersonName}
+                                            </span>
+                                        </div>
+                                    )}
+
                                     {/* Labour records */}
                                     {activity.labourRecords?.length > 0 && (
                                         <div className="mb-3">

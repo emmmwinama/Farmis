@@ -4,6 +4,7 @@ import { getSessionFarm } from "@/lib/apiHelpers";
 import { checkLimit } from "@/lib/subscription";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/lib/auth";
+import { requireFarmPermission } from "@/lib/roleAccess";
 
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
@@ -32,6 +33,10 @@ export async function GET(req: Request) {
             cropType:  true,
             field:     true,
             yields:    true,
+            activities: {
+                orderBy: { date: "desc" },
+                select: { id: true, activityType: true, date: true },
+            },
             fieldZones: true,
         },
         orderBy: { createdAt: "desc" },
@@ -45,8 +50,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { user, farm } = await getSessionFarm();
-    if (!farm || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const access = await requireFarmPermission("crops", "write");
+    if (access.error) return access.error;
+    const { user, farm } = access;
 
     try {
         await checkLimit(user.id, "Crops");
@@ -60,16 +66,41 @@ export async function POST(req: Request) {
         season, plantingDate, expectedHarvestDate,
     } = body;
 
-    if (!fieldId || !cropTypeId || !variety || !areaPlanted || !season || !plantingDate || !expectedHarvestDate) {
-        return NextResponse.json({ error: "All fields are required" }, { status: 400 });
+    if (!fieldId || !cropTypeId || !variety || !areaPlanted || !season) {
+        return NextResponse.json({ error: "Field, crop, variety, area and season are required" }, { status: 400 });
+    }
+
+    const plantedAt = plantingDate ? new Date(plantingDate) : new Date();
+    const harvestAt = expectedHarvestDate ? new Date(expectedHarvestDate) : new Date(plantedAt.getTime() + 120 * 86400000);
+    if (Number.isNaN(plantedAt.getTime()) || Number.isNaN(harvestAt.getTime())) {
+        return NextResponse.json({ error: "Crop schedule dates must be valid" }, { status: 400 });
+    }
+    if (harvestAt <= plantedAt) {
+        return NextResponse.json({ error: "Expected harvest date must be after planting date" }, { status: 400 });
+    }
+    if (parseFloat(areaPlanted) <= 0) {
+        return NextResponse.json({ error: "Area planted must be greater than zero" }, { status: 400 });
     }
 
     const field = await prisma.field.findUnique({
         where: { id: fieldId },
-        include: { cropFields: { where: { status: "Active" } } },
+        include: { cropFields: { where: { status: "Active", isArchived: false } } },
     });
 
-    if (!field) return NextResponse.json({ error: "Field not found" }, { status: 404 });
+    if (!field || field.farmId !== farm.id) return NextResponse.json({ error: "Field not found" }, { status: 404 });
+
+    const duplicate = await prisma.cropField.findFirst({
+        where: {
+            fieldId,
+            cropTypeId,
+            season: season.trim(),
+            variety: { equals: variety.trim() },
+            isArchived: false,
+        },
+    });
+    if (duplicate) {
+        return NextResponse.json({ error: "This crop, variety, field, and season already exists" }, { status: 409 });
+    }
 
     const allocated = field.cropFields.reduce((s, c) => s + c.areaPlanted, 0);
     const remaining = field.cultivatableArea - allocated;
@@ -85,11 +116,11 @@ export async function POST(req: Request) {
         data: {
             fieldId,
             cropTypeId,
-            variety,
+            variety: variety.trim(),
             areaPlanted: parseFloat(areaPlanted),
-            season,
-            plantingDate: new Date(plantingDate),
-            expectedHarvestDate: new Date(expectedHarvestDate),
+            season: season.trim(),
+            plantingDate: plantedAt,
+            expectedHarvestDate: harvestAt,
         },
     });
 

@@ -182,8 +182,8 @@ export default function TeamPage() {
                             {Object.keys(ROLES).map((role) => (
                                 <td key={role} className="py-2 px-2 text-center">
                                     {ROLE_DEFAULTS[role as keyof typeof ROLE_DEFAULTS][key as keyof typeof ROLE_DEFAULTS.owner]
-                                        ? <span className="font-extrabold" style={{ color: "#16A34A" }}>OK</span>
-                                        : <span style={{ color: "var(--border)" }}>—</span>}
+                                        ? <Check size={15} className="mx-auto" style={{ color: "#16A34A" }} />
+                                        : <X size={15} className="mx-auto" style={{ color: "#CBD5E1" }} />}
                                 </td>
                             ))}
                         </tr>

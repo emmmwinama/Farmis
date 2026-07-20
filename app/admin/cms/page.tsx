@@ -67,10 +67,6 @@ function SiteContentSection() {
             keys:  ["features_headline", "features_sub"],
         },
         {
-            label: "Impact section",
-            keys:  ["impact_headline"],
-        },
-        {
             label: "Testimonials section",
             keys:  ["testimonials_headline"],
         },
@@ -299,7 +295,7 @@ function TestimonialsSection() {
     };
     const openEdit = (t: any) => {
         setEditing(t);
-        setForm({ name: t.name, role: t.role ?? "", company: t.company ?? "", content: t.content, rating: String(t.rating ?? 5), avatar: t.avatar ?? "U3‍Harvest", isActive: t.isActive });
+        setForm({ name: t.name, role: t.role ?? "", company: t.company ?? "", content: t.content, rating: String(t.rating ?? 5), avatar: t.avatar ?? "AV", isActive: t.isActive });
         setShowForm(true);
     };
 
@@ -387,7 +383,7 @@ function TestimonialsSection() {
                             <div className="flex gap-2 flex-wrap">
                                 {AVATARS.map((a) => (
                                     <button key={a} type="button" onClick={() => setForm((f) => ({ ...f, avatar: a }))}
-                                            className="w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-all"
+                                            className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black transition-all"
                                             style={{
                                                 background: form.avatar === a ? "#ECFDF5" : "#F8FAFC",
                                                 border:     `1.5px solid ${form.avatar === a ? "#34D399" : "#E2E8F0"}`,

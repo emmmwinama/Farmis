@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFarm } from "@/lib/apiHelpers";
 import { checkLimit } from "@/lib/subscription";
+import { requireFarmPermission } from "@/lib/roleAccess";
 
 export async function GET() {
     const { farm } = await getSessionFarm();
@@ -37,8 +38,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    const { user, farm } = await getSessionFarm();
-    if (!farm || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const access = await requireFarmPermission("fields", "write");
+    if (access.error) return access.error;
+    const { user, farm } = access;
 
     try {
         await checkLimit(user.id, "Fields");
@@ -53,6 +55,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    if (parseFloat(totalArea) <= 0 || parseFloat(cultivatableArea) <= 0) {
+        return NextResponse.json({ error: "Area values must be greater than zero" }, { status: 400 });
+    }
+
     if (parseFloat(cultivatableArea) > parseFloat(totalArea)) {
         return NextResponse.json(
             { error: "Cultivatable area cannot exceed total area" },
@@ -60,10 +66,17 @@ export async function POST(req: Request) {
         );
     }
 
+    const duplicate = await prisma.field.findFirst({
+        where: { farmId: farm.id, name: { equals: name.trim() } },
+    });
+    if (duplicate) {
+        return NextResponse.json({ error: "A field with this name already exists" }, { status: 409 });
+    }
+
     const field = await prisma.field.create({
         data: {
             farmId: farm.id,
-            name,
+            name: name.trim(),
             totalArea: parseFloat(totalArea),
             cultivatableArea: parseFloat(cultivatableArea),
             soilType,

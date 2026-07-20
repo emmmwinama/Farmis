@@ -10,8 +10,8 @@ const config: Config = {
     theme: {
         extend: {
             fontFamily: {
-                nunito: ["var(--font-nunito)", "system-ui", "sans-serif"],
-                sans:   ["var(--font-nunito)", "system-ui", "sans-serif"],
+                nunito: ["var(--font-nunito)", "Nunito", "Segoe UI", "Arial", "sans-serif"],
+                sans:   ["var(--font-nunito)", "Nunito", "Segoe UI", "Arial", "sans-serif"],
             },
             colors: {
                 farm: {

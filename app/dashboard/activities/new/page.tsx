@@ -4,10 +4,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, Loader2, Check, X, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { submitWithOfflineQueue } from "@/lib/offlineQueue";
+import { getCropTimeline } from "@/lib/cropTimelines";
 
 const ACTIVITY_TYPES = [
-    "Planting", "Irrigation", "Spraying", "Weeding",
-    "Harvesting", "Fertilizing", "Soil Preparation", "Pest Control", "Other",
+    "Land preparation", "Soil Preparation", "Nursery and land preparation", "Planting", "Transplanting", "Gap filling and thinning",
+    "Seed selection and treatment", "Seed inoculation and treatment", "Irrigation", "Water management",
+    "Spraying", "Pest Control", "Pest and disease scouting", "Pest and disease control", "Weeding", "First weeding", "Second weeding",
+    "Top dressing", "Fertilizing", "Topping and suckering", "Harvesting", "Drying and storage",
+    "Drying, grading, and storage", "Curing and storage", "Sorting and storage", "Grading and storage",
+    "Cutting and loading", "Other",
 ];
 
 const INPUT_CATEGORIES = [
@@ -15,11 +21,31 @@ const INPUT_CATEGORIES = [
 ];
 
 const emptyLabour = { employeeId: "", hoursWorked: "", daysWorked: "", totalCost: "" };
-const emptyInput = { inputName: "", category: "Seed", quantity: "", unit: "kg", unitCost: "" };
+const emptyInput = { inventoryItemId: "", inputName: "", category: "Seed", quantity: "", unit: "kg", unitCost: "" };
 const emptyOtherCost = { description: "", amount: "" };
 
 function fmt(n: number) {
     return new Intl.NumberFormat("en-MW").format(Math.round(n));
+}
+
+function inventoryCategoryToInputCategory(category: string) {
+    const normalized = category.toLowerCase();
+    if (normalized.includes("seed")) return "Seed";
+    if (normalized.includes("fertil")) return "Fertilizer";
+    if (normalized.includes("chemical") || normalized.includes("pesticide")) return "Chemical / Pesticide";
+    if (normalized.includes("feed")) return "Feed";
+    if (normalized.includes("fuel")) return "Fuel";
+    return "Other";
+}
+
+function calculateInventoryUnitCost(item: any, activityDate: string) {
+    const baseCost = Number(item.acquisitionUnitCost ?? 0);
+    if (!baseCost) return 0;
+    if (!item.acquiredAt) return baseCost;
+    const acquiredAt = new Date(item.acquiredAt).getTime();
+    const usedAt = new Date(activityDate).getTime();
+    const daysHeld = Math.max(0, Math.ceil((usedAt - acquiredAt) / 86_400_000));
+    return baseCost + baseCost * 0.12 * (daysHeld / 365);
 }
 
 export default function NewActivityPage() {
@@ -27,6 +53,7 @@ export default function NewActivityPage() {
     const [fields, setFields] = useState<any[]>([]);
     const [employees, setEmployees] = useState<any[]>([]);
     const [cropFields, setCropFields] = useState<any[]>([]);
+    const [inventoryItems, setInventoryItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
@@ -37,6 +64,8 @@ export default function NewActivityPage() {
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
     const [notes, setNotes] = useState("");
     const [responsibleEmployeeId, setResponsibleEmployeeId] = useState("");
+    const [responsibleMode, setResponsibleMode] = useState<"employee" | "custom">("employee");
+    const [responsiblePersonName, setResponsiblePersonName] = useState("");
     const [labourRecords, setLabourRecords] = useState([{ ...emptyLabour }]);
     const [inputs, setInputs] = useState([{ ...emptyInput }]);
     const [otherCosts, setOtherCosts] = useState([{ ...emptyOtherCost }]);
@@ -46,15 +75,39 @@ export default function NewActivityPage() {
             fetch("/api/fields").then((r) => r.json()),
             fetch("/api/employees").then((r) => r.json()),
             fetch("/api/crops").then((r) => r.json()),
-        ]).then(([f, e, c]) => {
+            fetch("/api/inventory").then((r) => r.ok ? r.json() : { items: [] }).catch(() => ({ items: [] })),
+        ]).then(([f, e, c, inv]) => {
             setFields(f);
             setEmployees(e);
             setCropFields(c);
+            setInventoryItems((inv?.items ?? []).filter((item: any) => item.quantity > 0 && item.category !== "crop_harvest"));
+            const params = new URLSearchParams(window.location.search);
+            const requestedCropId = params.get("cropFieldId");
+            const requestedActivity = params.get("activityType");
+            const requestedCrop = Array.isArray(c) ? c.find((crop) => crop.id === requestedCropId) : null;
+            if (requestedCrop) {
+                setFieldId(requestedCrop.fieldId);
+                setCropFieldId(requestedCrop.id);
+            }
+            if (requestedActivity) setActivityType(requestedActivity);
             setLoading(false);
         });
     }, []);
 
+    useEffect(() => {
+        setInputs((current) => current.map((input) => {
+            if (!input.inventoryItemId) return input;
+            const item = inventoryItems.find((inventory) => inventory.id === input.inventoryItemId);
+            return item ? { ...input, unitCost: calculateInventoryUnitCost(item, date).toFixed(2) } : input;
+        }));
+    }, [date, inventoryItems]);
+
     const filteredCrops = cropFields.filter((c) => c.fieldId === fieldId && c.status === "Active");
+    const selectedCrop = cropFields.find((crop) => crop.id === cropFieldId);
+    const cropTimeline = getCropTimeline(selectedCrop?.cropTypeName);
+    const activityOptions = cropTimeline
+        ? [...cropTimeline.steps.map((step) => step.title), "Other"]
+        : ACTIVITY_TYPES;
 
     const totalLabour = labourRecords.reduce((s, l) => s + (parseFloat(l.totalCost) || 0), 0);
     const totalInput = inputs.reduce((s, i) => s + ((parseFloat(i.quantity) || 0) * (parseFloat(i.unitCost) || 0)), 0);
@@ -80,6 +133,23 @@ export default function NewActivityPage() {
     const updateInput = (i: number, k: string, v: string) => {
         const updated = [...inputs];
         updated[i] = { ...updated[i], [k]: v };
+        if (k === "inventoryItemId") {
+            const item = inventoryItems.find((inventory) => inventory.id === v);
+            updated[i] = item
+                ? {
+                    ...updated[i],
+                    inventoryItemId: item.id,
+                    inputName: item.name,
+                    category: inventoryCategoryToInputCategory(item.category),
+                    unit: item.unit,
+                    unitCost: calculateInventoryUnitCost(item, date).toFixed(2),
+                }
+                : { ...updated[i], inventoryItemId: "", inputName: "", unitCost: "" };
+        }
+        if (k === "quantity" && updated[i].inventoryItemId) {
+            const item = inventoryItems.find((inventory) => inventory.id === updated[i].inventoryItemId);
+            if (item) updated[i].unitCost = calculateInventoryUnitCost(item, date).toFixed(2);
+        }
         setInputs(updated);
     };
 
@@ -95,10 +165,10 @@ export default function NewActivityPage() {
         setError("");
 
         const validLabour = labourRecords.filter((l) => l.employeeId);
-        const validInputs = inputs.filter((i) => i.inputName.trim());
+        const validInputs = inputs.filter((i) => i.inputName.trim() || i.inventoryItemId);
         const validOther = otherCosts.filter((o) => o.description.trim());
 
-        const res = await fetch("/api/activities", {
+        const result = await submitWithOfflineQueue("/api/activities", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -107,16 +177,23 @@ export default function NewActivityPage() {
                 activityType,
                 date,
                 notes,
-                responsibleEmployeeId: responsibleEmployeeId || null,
+                responsibleEmployeeId: responsibleMode === "employee" ? responsibleEmployeeId || null : null,
+                responsiblePersonName: responsibleMode === "custom" ? responsiblePersonName : null,
                 labourRecords: validLabour,
                 inputs: validInputs,
                 otherCosts: validOther,
             }),
-        });
+        }, `${activityType} activity`);
 
-        const data = await res.json();
-        if (!res.ok) {
-            setError(data.error);
+        if (result.queued) {
+            setSaving(false);
+            alert("Saved offline. AgriVault will sync this activity when the connection returns.");
+            router.push("/dashboard/activities");
+            return;
+        }
+
+        if (!result.response?.ok) {
+            setError(result.data?.error ?? "Failed to save activity");
             setSaving(false);
         } else {
             router.push("/dashboard/activities");
@@ -171,7 +248,15 @@ export default function NewActivityPage() {
                             </label>
                             <select
                                 value={cropFieldId}
-                                onChange={(e) => setCropFieldId(e.target.value)}
+                                onChange={(e) => {
+                                    const nextCropId = e.target.value;
+                                    setCropFieldId(nextCropId);
+                                    const nextCrop = cropFields.find((crop) => crop.id === nextCropId);
+                                    const nextTimeline = getCropTimeline(nextCrop?.cropTypeName);
+                                    if (nextTimeline && !nextTimeline.steps.some((step) => step.title === activityType)) {
+                                        setActivityType(nextTimeline.steps[0]?.title ?? "Other");
+                                    }
+                                }}
                                 disabled={!fieldId}
                                 className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400 transition-colors disabled:opacity-50"
                             >
@@ -190,8 +275,13 @@ export default function NewActivityPage() {
                                 required
                                 className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400 transition-colors"
                             >
-                                {ACTIVITY_TYPES.map((t) => <option key={t}>{t}</option>)}
+                                {activityOptions.map((t) => <option key={t}>{t}</option>)}
                             </select>
+                            {cropTimeline && (
+                                <p className="text-xs text-slate-400 mt-1.5">
+                                    Activity options are guided by the {selectedCrop?.cropTypeName} timeline.
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -207,18 +297,51 @@ export default function NewActivityPage() {
 
                         <div>
                             <label className="text-sm text-slate-500 mb-1.5 block">
-                                Responsible employee <span className="text-slate-300">(optional)</span>
+                                Responsible person <span className="text-slate-300">(optional)</span>
                             </label>
-                            <select
-                                value={responsibleEmployeeId}
-                                onChange={(e) => setResponsibleEmployeeId(e.target.value)}
-                                className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400 transition-colors"
-                            >
-                                <option value="">Select employee...</option>
-                                {employees.filter((e) => e.isActive).map((e) => (
-                                    <option key={e.id} value={e.id}>{e.name} ({e.role})</option>
+                            <div className="grid grid-cols-2 gap-2 mb-2">
+                                {[
+                                    { key: "employee", label: "Employee" },
+                                    { key: "custom", label: "Piece worker" },
+                                ].map((option) => (
+                                    <button
+                                        key={option.key}
+                                        type="button"
+                                        onClick={() => {
+                                            setResponsibleMode(option.key as "employee" | "custom");
+                                            setResponsibleEmployeeId("");
+                                            setResponsiblePersonName("");
+                                        }}
+                                        className="h-10 rounded-xl text-xs font-bold border"
+                                        style={{
+                                            background: responsibleMode === option.key ? "#EFF6FF" : "#F8FAFC",
+                                            borderColor: responsibleMode === option.key ? "#BFDBFE" : "#E2E8F0",
+                                            color: responsibleMode === option.key ? "#1E3A8A" : "#64748B",
+                                        }}
+                                    >
+                                        {option.label}
+                                    </button>
                                 ))}
-                            </select>
+                            </div>
+                            {responsibleMode === "employee" ? (
+                                <select
+                                    value={responsibleEmployeeId}
+                                    onChange={(e) => setResponsibleEmployeeId(e.target.value)}
+                                    className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400 transition-colors"
+                                >
+                                    <option value="">Select employee...</option>
+                                    {employees.filter((e) => e.isActive).map((e) => (
+                                        <option key={e.id} value={e.id}>{e.name} ({e.role})</option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <input
+                                    value={responsiblePersonName}
+                                    onChange={(e) => setResponsiblePersonName(e.target.value)}
+                                    placeholder="e.g. Banda piece-work crew"
+                                    className="w-full h-12 px-4 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400 transition-colors"
+                                />
+                            )}
                         </div>
 
                         <div>
@@ -327,60 +450,79 @@ export default function NewActivityPage() {
                     </div>
                     <div className="flex flex-col gap-3">
                         {inputs.map((inp, i) => (
-                            <div key={i} className="grid grid-cols-12 gap-3 items-end">
-                                <div className="col-span-3">
+                            <div key={i} className="grid grid-cols-12 gap-3 items-end rounded-2xl border border-slate-100 bg-slate-50/50 p-3">
+                                <div className="col-span-12 md:col-span-5">
+                                    {i === 0 && <label className="text-xs text-slate-400 mb-1.5 block">Inventory stock</label>}
+                                    <select
+                                        value={inp.inventoryItemId}
+                                        onChange={(e) => updateInput(i, "inventoryItemId", e.target.value)}
+                                        className="w-full h-11 px-3 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:border-slate-400"
+                                    >
+                                        <option value="">Manual input</option>
+                                        {inventoryItems.map((item) => (
+                                            <option key={item.id} value={item.id}>
+                                                {item.name} - {item.quantity} {item.unit} available
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="col-span-12 md:col-span-4">
                                     {i === 0 && <label className="text-xs text-slate-400 mb-1.5 block">Input name</label>}
                                     <input
                                         value={inp.inputName}
                                         onChange={(e) => updateInput(i, "inputName", e.target.value)}
                                         placeholder="e.g. Urea"
-                                        className="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400"
+                                        readOnly={Boolean(inp.inventoryItemId)}
+                                        className="w-full h-11 px-3 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:border-slate-400 read-only:bg-slate-100"
                                     />
                                 </div>
-                                <div className="col-span-2">
+                                <div className="col-span-12 md:col-span-3">
                                     {i === 0 && <label className="text-xs text-slate-400 mb-1.5 block">Category</label>}
                                     <select
                                         value={inp.category}
                                         onChange={(e) => updateInput(i, "category", e.target.value)}
-                                        className="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400"
+                                        disabled={Boolean(inp.inventoryItemId)}
+                                        className="w-full h-11 px-3 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:border-slate-400 disabled:bg-slate-100"
                                     >
                                         {INPUT_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                                     </select>
                                 </div>
-                                <div className="col-span-2">
+                                <div className="col-span-4 md:col-span-2">
                                     {i === 0 && <label className="text-xs text-slate-400 mb-1.5 block">Qty</label>}
                                     <input
                                         type="number" step="0.01" min="0"
                                         value={inp.quantity}
                                         onChange={(e) => updateInput(i, "quantity", e.target.value)}
                                         placeholder="0"
-                                        className="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400"
+                                        className="w-full h-11 px-3 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:border-slate-400"
                                     />
                                 </div>
-                                <div className="col-span-1">
+                                <div className="col-span-3 md:col-span-2">
                                     {i === 0 && <label className="text-xs text-slate-400 mb-1.5 block">Unit</label>}
                                     <input
                                         value={inp.unit}
                                         onChange={(e) => updateInput(i, "unit", e.target.value)}
                                         placeholder="kg"
-                                        className="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400"
+                                        readOnly={Boolean(inp.inventoryItemId)}
+                                        className="w-full h-11 px-3 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:border-slate-400 read-only:bg-slate-100"
                                     />
                                 </div>
-                                <div className="col-span-2">
-                                    {i === 0 && <label className="text-xs text-slate-400 mb-1.5 block">Unit cost</label>}
+                                <div className="col-span-4 md:col-span-3">
+                                    {i === 0 && <label className="text-xs text-slate-400 mb-1.5 block">Unit cost at use</label>}
                                     <input
                                         type="number" step="1" min="0"
                                         value={inp.unitCost}
                                         onChange={(e) => updateInput(i, "unitCost", e.target.value)}
                                         placeholder="0"
-                                        className="w-full h-11 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-400"
+                                        readOnly={Boolean(inp.inventoryItemId)}
+                                        className="w-full h-11 px-3 text-sm bg-white border border-slate-200 rounded-xl outline-none focus:border-slate-400 read-only:bg-slate-100"
                                     />
                                 </div>
-                                <div className="col-span-1 flex items-end">
+                                <div className="col-span-3 md:col-span-2 flex items-end">
                                     <div className="h-11 flex items-center">
-                    <span className="text-xs text-slate-400">
-                      {fmt((parseFloat(inp.quantity) || 0) * (parseFloat(inp.unitCost) || 0))}
-                    </span>
+                                        <span className="text-xs text-slate-500 font-bold">
+                                            MWK {fmt((parseFloat(inp.quantity) || 0) * (parseFloat(inp.unitCost) || 0))}
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="col-span-1 flex justify-end">
@@ -394,6 +536,11 @@ export default function NewActivityPage() {
                                         </button>
                                     )}
                                 </div>
+                                {inp.inventoryItemId && (
+                                    <p className="col-span-12 text-[11px] text-slate-500">
+                                        Cost uses acquisition cost plus 12% annual carrying cost up to the activity date. Stock will be deducted when saved.
+                                    </p>
+                                )}
                             </div>
                         ))}
                     </div>

@@ -133,6 +133,7 @@ model FarmActivity {
   activityType          String
   date                  DateTime
   notes                 String?
+  responsiblePersonName String?
   createdAt             DateTime @default(now())
   fieldId               String
   cropFieldId           String?
@@ -161,16 +162,20 @@ model ActivityLabour {
 }
 
 model ActivityInput {
-  id         String @id @default(cuid())
-  inputName  String
-  category   String
-  quantity   Float
-  unit       String
-  unitCost   Float
-  totalCost  Float
-  activityId String
+  id                  String  @id @default(cuid())
+  inputName           String
+  category            String
+  quantity            Float
+  unit                String
+  unitCost            Float
+  totalCost           Float
+  acquisitionUnitCost Float?
+  timeValueCost       Float?
+  inventoryItemId     String?
+  activityId          String
 
-  activity FarmActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activity      FarmActivity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  inventoryItem InventoryItem? @relation(fields: [inventoryItemId], references: [id])
 }
 
 model ActivityOtherCost {
@@ -243,6 +248,10 @@ model SubscriptionTier {
   description  String
   priceMonthly Float
   priceAnnual  Float?
+  audience     String?
+  ctaLabel     String?
+  ctaHref      String?
+  offerItems   Json?
   isActive     Boolean  @default(true)
   isPublic     Boolean  @default(true)
   createdAt    DateTime @default(now())
@@ -446,6 +455,8 @@ model InventoryItem {
   category       String // crop_harvest, seed, fertiliser, chemical, equipment, other
   unit           String // kg, bags, tonnes, litres, units
   quantity       Float    @default(0)
+  acquisitionUnitCost Float?
+  acquiredAt      DateTime?
   unitWeight     Float? // for bags — weight per bag in kg
   season         String?
   cropFieldId    String? // if from a harvest
@@ -459,6 +470,7 @@ model InventoryItem {
   harvestYield       HarvestYield?       @relation(fields: [harvestYieldId], references: [id])
   sales              InventorySale[]
   inventorySaleLinks InventorySaleLink[]
+  activityInputs     ActivityInput[]
 }
 
 model InventorySale {

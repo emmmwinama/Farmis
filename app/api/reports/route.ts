@@ -17,6 +17,19 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const seasonFilter    = searchParams.get("season");
     const includeArchived = searchParams.get("includeArchived");
+    const fieldIdFilter   = searchParams.get("fieldId");
+    const cropFieldIdFilter = searchParams.get("cropFieldId");
+    const fromFilter      = searchParams.get("from");
+    const toFilter        = searchParams.get("to");
+    const fromDate        = fromFilter ? new Date(fromFilter) : null;
+    const toDate          = toFilter ? new Date(toFilter) : null;
+    const hasDateFilter   = Boolean(fromDate || toDate);
+    const dateWhere = {
+        ...(fromDate ? { gte: fromDate } : {}),
+        ...(toDate ? { lte: toDate } : {}),
+    };
+    const inDateRange = (date: Date) =>
+        (!fromDate || date >= fromDate) && (!toDate || date <= toDate);
     // includeArchived=false → active only
     // includeArchived=true  → archived only
     // not set               → both
@@ -49,7 +62,10 @@ export async function GET(req: Request) {
 
     // ── Step 2: Fetch overhead expenses ─────────────────────────────────────
     const overheadExpenses = await prisma.overheadExpense.findMany({
-        where:   { farmId: farm.id },
+        where:   {
+            farmId: farm.id,
+            ...(hasDateFilter ? { date: dateWhere } : {}),
+        },
         orderBy: { date: "asc" },
     });
 
@@ -86,14 +102,16 @@ export async function GET(req: Request) {
     const totalOverhead = overheadExpenses.reduce((s, o) => s + o.amount, 0);
 
     // ── Step 4: Now apply the display filter ────────────────────────────────
-    const displayFilter = (c: { status: string }) =>
-        includeArchived === "false" ? c.status !== "Archived" :
-            includeArchived === "true"  ? c.status === "Archived"  :
+    const displayFilter = (c: { status: string; isArchived?: boolean }) =>
+        includeArchived === "false" ? !c.isArchived && c.status !== "Archived" :
+            includeArchived === "true"  ? Boolean(c.isArchived) || c.status === "Archived"  :
                 true;
 
     const displayFields = allFields.map((f) => ({
         ...f,
         cropFields: f.cropFields.filter((c) => {
+            if (fieldIdFilter && f.id !== fieldIdFilter) return false;
+            if (cropFieldIdFilter && c.id !== cropFieldIdFilter) return false;
             if (!displayFilter(c))                         return false;
             if (seasonFilter && c.season !== seasonFilter) return false;
             return true;
@@ -106,15 +124,25 @@ export async function GET(req: Request) {
 
     // ── Step 5: Calculate per-crop costs using FIXED overhead allocation ────
     const cropRows = displayCropFields.map((crop) => {
-        const inputCost  = crop.activities
+        const scopedActivities = hasDateFilter
+            ? crop.activities.filter((activity) => inDateRange(activity.date))
+            : crop.activities;
+        const scopedYields = hasDateFilter
+            ? crop.yields.filter((yieldRecord) => inDateRange(yieldRecord.harvestDate))
+            : crop.yields;
+        const scopedTransactions = hasDateFilter
+            ? crop.transactions.filter((transaction) => inDateRange(transaction.date))
+            : crop.transactions;
+
+        const inputCost  = scopedActivities
             .flatMap((a) => a.inputs)
             .reduce((s, i) => s + i.totalCost, 0);
 
-        const labourCost = crop.activities
+        const labourCost = scopedActivities
             .flatMap((a) => a.labourRecords)
             .reduce((s, l) => s + l.totalCost, 0);
 
-        const otherCost  = crop.activities
+        const otherCost  = scopedActivities
             .flatMap((a) => a.otherCosts)
             .reduce((s, o) => s + o.amount, 0);
 
@@ -123,11 +151,11 @@ export async function GET(req: Request) {
         const activityCost      = inputCost + labourCost + otherCost;
         const totalCost         = activityCost + allocatedOverhead;
 
-        const totalYieldKg = crop.yields.reduce(
+        const totalYieldKg = scopedYields.reduce(
             (s, y) => s + toKg(y.quantity, y.unit, y.unitWeight), 0
         );
 
-        const revenue = crop.transactions
+        const revenue = scopedTransactions
             .filter((t) => t.type === "Income")
             .reduce((s, t) => s + t.amount, 0);
 
@@ -142,7 +170,7 @@ export async function GET(req: Request) {
             areaPlanted:         crop.areaPlanted,
             plantingDate:        crop.plantingDate,
             expectedHarvestDate: crop.expectedHarvestDate,
-            activityCount:       crop.activities.length,
+            activityCount:       scopedActivities.length,
             inputCost,
             labourCost,
             otherCost,
@@ -201,6 +229,11 @@ export async function GET(req: Request) {
         where: {
             farmId: farm.id,
             ...(seasonFilter ? { season: seasonFilter } : {}),
+            ...(fieldIdFilter ? { fieldId: fieldIdFilter } : {}),
+            ...(cropFieldIdFilter ? { cropFieldId: cropFieldIdFilter } : {}),
+            ...(hasDateFilter ? { date: dateWhere } : {}),
+            ...(includeArchived === "false" ? { cropField: { isArchived: false } } : {}),
+            ...(includeArchived === "true" ? { cropField: { isArchived: true } } : {}),
         },
         orderBy: { date: "desc" },
     });
@@ -208,6 +241,16 @@ export async function GET(req: Request) {
     const totalTransactionIncome = transactions
         .filter((t) => t.type === "Income")
         .reduce((s, t) => s + t.amount, 0);
+
+    const cashflowByMonth = Object.values(transactions.reduce((acc, transaction) => {
+        const month = transaction.date.toISOString().slice(0, 7);
+        if (!acc[month]) acc[month] = { month, income: 0, expenses: 0, net: 0 };
+        if (transaction.type === "Income") acc[month].income += transaction.amount;
+        else acc[month].expenses += transaction.amount;
+        acc[month].net = acc[month].income - acc[month].expenses;
+        return acc;
+    }, {} as Record<string, { month: string; income: number; expenses: number; net: number }>))
+        .sort((a, b) => a.month.localeCompare(b.month));
 
     // Income by category
     const incomeMap: Record<string, number> = {};
@@ -234,7 +277,7 @@ export async function GET(req: Request) {
 
     // ── Yields ───────────────────────────────────────────────────────────────
     const yieldRecords = displayCropFields.flatMap((crop) =>
-        crop.yields.map((y) => {
+        crop.yields.filter((y) => !hasDateFilter || inDateRange(y.harvestDate)).map((y) => {
             const kg = toKg(y.quantity, y.unit, y.unitWeight);
             const u  = y.unit.toLowerCase();
             return {
@@ -267,6 +310,91 @@ export async function GET(req: Request) {
         }))
         .sort((a, b) => b.allocatedOverhead - a.allocatedOverhead);
 
+    const cropProfitabilityRanking = [...cropRows]
+        .sort((a, b) => b.netProfit - a.netProfit)
+        .map((crop) => ({
+            cropName: crop.cropTypeName,
+            variety: crop.variety,
+            fieldName: crop.fieldName,
+            season: crop.season,
+            revenue: crop.revenue,
+            totalCost: crop.totalCost,
+            netProfit: crop.netProfit,
+            margin: crop.revenue > 0 ? (crop.netProfit / crop.revenue) * 100 : 0,
+        }));
+
+    const fieldProfitabilityMap: Record<string, { fieldName: string; area: number; revenue: number; cost: number; netProfit: number }> = {};
+    for (const crop of cropRows) {
+        if (!fieldProfitabilityMap[crop.fieldName]) {
+            fieldProfitabilityMap[crop.fieldName] = { fieldName: crop.fieldName, area: 0, revenue: 0, cost: 0, netProfit: 0 };
+        }
+        fieldProfitabilityMap[crop.fieldName].area += crop.areaPlanted;
+        fieldProfitabilityMap[crop.fieldName].revenue += crop.revenue;
+        fieldProfitabilityMap[crop.fieldName].cost += crop.totalCost;
+        fieldProfitabilityMap[crop.fieldName].netProfit += crop.netProfit;
+    }
+    const fieldProfitabilityComparison = Object.values(fieldProfitabilityMap)
+        .map((field) => ({
+            ...field,
+            profitPerHa: field.area > 0 ? field.netProfit / field.area : 0,
+        }))
+        .sort((a, b) => b.netProfit - a.netProfit);
+
+    const inputEfficiencyReport = cropRows
+        .map((crop) => ({
+            cropName: crop.cropTypeName,
+            variety: crop.variety,
+            fieldName: crop.fieldName,
+            season: crop.season,
+            areaPlanted: crop.areaPlanted,
+            totalYieldKg: crop.totalYieldKg,
+            inputCost: crop.inputCost,
+            costPerHa: crop.areaPlanted > 0 ? crop.inputCost / crop.areaPlanted : 0,
+            costPerKg: crop.totalYieldKg > 0 ? crop.inputCost / crop.totalYieldKg : 0,
+            yieldResponse: crop.inputCost > 0 ? crop.totalYieldKg / crop.inputCost : 0,
+        }))
+        .sort((a, b) => b.yieldResponse - a.yieldResponse);
+
+    const animals = await prisma.animal.findMany({
+        where: { farmId: farm.id },
+        include: {
+            livestockType: true,
+            healthRecords: true,
+            expenses: true,
+            productions: true,
+            sales: true,
+        },
+    });
+
+    const livestockProfitabilityMap: Record<string, {
+        type: string;
+        count: number;
+        sales: number;
+        productionValue: number;
+        expenses: number;
+        healthCost: number;
+        netProfit: number;
+    }> = {};
+    for (const animal of animals) {
+        const type = animal.livestockType.name;
+        if (!livestockProfitabilityMap[type]) {
+            livestockProfitabilityMap[type] = { type, count: 0, sales: 0, productionValue: 0, expenses: 0, healthCost: 0, netProfit: 0 };
+        }
+        const row = livestockProfitabilityMap[type];
+        const sales = animal.sales.reduce((sum, sale) => sum + sale.totalAmount, 0);
+        const productionValue = animal.productions.reduce((sum, production) => sum + (production.totalValue ?? 0), 0);
+        const expenses = animal.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+        const healthCost = animal.healthRecords.reduce((sum, health) => sum + health.cost, 0);
+        row.count += 1;
+        row.sales += sales;
+        row.productionValue += productionValue;
+        row.expenses += expenses;
+        row.healthCost += healthCost;
+        row.netProfit += sales + productionValue - expenses - healthCost - (animal.acquisitionCost ?? 0);
+    }
+    const livestockProfitability = Object.values(livestockProfitabilityMap)
+        .sort((a, b) => b.netProfit - a.netProfit);
+
     return NextResponse.json({
         summary: {
             totalCrops:          cropRows.length,
@@ -287,6 +415,13 @@ export async function GET(req: Request) {
             totalIncome:    totalTransactionIncome,
             totalExpenses,
             transactions,
+            cashflowByMonth,
+        },
+        analytics: {
+            cropProfitabilityRanking,
+            fieldProfitabilityComparison,
+            inputEfficiencyReport,
+            livestockProfitability,
         },
         yields: yieldRecords,
         overheadAllocationSummary: {

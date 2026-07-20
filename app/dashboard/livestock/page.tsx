@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
     Plus, Loader2, X, Check, Pencil, Trash2,
     Heart, TrendingUp, ShoppingCart, AlertTriangle,
-    Filter, ChevronDown, ChevronRight,
+    Filter, ChevronDown, ChevronRight, Beef, Bird, Fish, PawPrint, ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -17,7 +17,7 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; d
 
 const SEX_ICONS: Record<string, string> = { Male: "M", Female: "F", Unknown: "?" };
 
-const ACQ_TYPES = ["Born on farm", "Purchased", "Donated", "Gifted"];
+const ACQ_TYPES = ["Born on farm", "Purchased", "Hired", "Donated", "Gifted"];
 const STATUSES  = ["Active", "Sold", "Deceased", "Slaughtered"];
 const CATEGORIES = ["Large livestock", "Small livestock", "Poultry", "Aquaculture", "Other"];
 const DEFAULT_TYPES = [
@@ -43,6 +43,25 @@ const emptyAnimalForm = {
 };
 
 const emptyTypeForm = { name: "", category: "Large livestock", icon: "Cattle" };
+const emptyGeneralExpense = {
+    category: "Housing",
+    description: "",
+    amount: "",
+    date: new Date().toISOString().split("T")[0],
+    notes: "",
+};
+
+function LivestockIcon({ name, className = "" }: { name?: string; className?: string }) {
+    const value = `${name ?? ""}`.toLowerCase();
+    const Icon = value.includes("cattle") || value.includes("cow") || value.includes("goat") || value.includes("sheep") || value.includes("pig")
+        ? Beef
+        : value.includes("chicken") || value.includes("duck") || value.includes("poultry")
+            ? Bird
+            : value.includes("fish")
+                ? Fish
+                : PawPrint;
+    return <Icon size={18} className={className} style={{ color: "var(--farm-green)" }} />;
+}
 
 export default function LivestockPage() {
     const [data, setData]             = useState<any>(null);
@@ -60,6 +79,8 @@ export default function LivestockPage() {
     const [saving, setSaving]     = useState(false);
     const [error, setError]       = useState("");
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [showGeneralExpense, setShowGeneralExpense] = useState(false);
+    const [generalExpense, setGeneralExpense] = useState({ ...emptyGeneralExpense });
 
     const load = () => {
         setLoading(true);
@@ -121,7 +142,7 @@ export default function LivestockPage() {
         });
         const d = await res.json();
         if (!res.ok) { setError(d.error); setSaving(false); }
-        else { setShowAnimalForm(false); load(); }
+        else { setShowAnimalForm(false); setSaving(false); load(); }
     };
 
     const handleTypeSubmit = async (e: React.FormEvent) => {
@@ -134,7 +155,7 @@ export default function LivestockPage() {
         });
         const d = await res.json();
         if (!res.ok) { setError(d.error); setSaving(false); }
-        else { setShowTypeForm(false); setTypeForm({ ...emptyTypeForm }); load(); }
+        else { setShowTypeForm(false); setTypeForm({ ...emptyTypeForm }); setSaving(false); load(); }
     };
 
     const handleDelete = async (id: string) => {
@@ -142,6 +163,23 @@ export default function LivestockPage() {
         setDeletingId(id);
         await fetch(`/api/livestock/animals/${id}`, { method: "DELETE" });
         setDeletingId(null);
+        load();
+    };
+
+    const handleGeneralExpenseSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSaving(true);
+        setError("");
+        const res = await fetch("/api/livestock/expenses", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...generalExpense, animalId: "" }),
+        });
+        const d = await res.json();
+        if (!res.ok) { setError(d.error ?? "Failed to save livestock expense"); setSaving(false); return; }
+        setGeneralExpense({ ...emptyGeneralExpense });
+        setShowGeneralExpense(false);
+        setSaving(false);
         load();
     };
 
@@ -167,6 +205,9 @@ export default function LivestockPage() {
                     <button onClick={() => { setTypeForm({ ...emptyTypeForm }); setShowTypeForm(true); }}
                             className="btn-secondary text-xs">
                         <Plus size={14} /> Livestock type
+                    </button>
+                    <button onClick={() => setShowGeneralExpense(true)} className="btn-secondary text-xs">
+                        <ShieldCheck size={14} /> General activity/cost
                     </button>
                     <button onClick={openAdd} className="btn-primary">
                         <Plus size={15} /> Add animal
@@ -233,7 +274,7 @@ export default function LivestockPage() {
                                     color:      typeFilter === t.name ? "white" : "var(--text-secondary)",
                                     border:     `1.5px solid ${typeFilter === t.name ? "transparent" : "var(--border)"}`,
                                 }}>
-                            <span>{t.icon}</span>
+                            <LivestockIcon name={t.icon || t.name} />
                             {t.name}
                             <span className="text-xs font-bold px-2 py-0.5 rounded-full"
                                   style={{ background: typeFilter === t.name ? "rgba(255,255,255,0.2)" : "var(--bg-muted)" }}>
@@ -278,7 +319,7 @@ export default function LivestockPage() {
                      style={{ background: "var(--bg-card)", border: "1.5px dashed var(--border)" }}>
                     <div className="empty-state">
                         <div className="empty-icon">
-                            <span className="text-3xl">Cattle</span>
+                            <LivestockIcon name="Cattle" />
                         </div>
                         <p className="section-title mb-2">No animals found</p>
                         <p className="section-subtitle mb-6">
@@ -317,7 +358,7 @@ export default function LivestockPage() {
                                     {/* Header */}
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-2xl">{animal.typeIcon}</span>
+                                            <LivestockIcon name={animal.typeIcon || animal.typeName} />
                                             <div>
                                                 <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>
                                                     {animal.name || animal.tag || `${animal.typeName} #${animal.id.slice(-4)}`}
@@ -420,7 +461,7 @@ export default function LivestockPage() {
                                         required className="input">
                                     <option value="">Select type...</option>
                                     {allTypes.map((t: any) => (
-                                        <option key={t.id} value={t.id}>{t.icon} {t.name}</option>
+                                        <option key={t.id} value={t.id}>{t.name}</option>
                                     ))}
                                 </select>
                             </div>
@@ -559,8 +600,10 @@ export default function LivestockPage() {
                             <div>
                                 <label className="form-label">Name *</label>
                                 <div className="flex gap-2">
-                                    <input value={typeForm.icon} onChange={(e) => setTypeForm((f) => ({ ...f, icon: e.target.value }))}
-                                           className="input w-16 text-center text-xl" placeholder="Cattle" maxLength={2} />
+                                    <select value={typeForm.icon} onChange={(e) => setTypeForm((f) => ({ ...f, icon: e.target.value }))}
+                                            className="input w-28">
+                                        {DEFAULT_TYPES.map((t) => <option key={t.icon} value={t.icon}>{t.icon}</option>)}
+                                    </select>
                                     <input value={typeForm.name} onChange={(e) => setTypeForm((f) => ({ ...f, name: e.target.value }))}
                                            placeholder="e.g. Donkeys" required className="input flex-1" />
                                 </div>
@@ -570,7 +613,7 @@ export default function LivestockPage() {
                                                 onClick={() => setTypeForm({ name: t.name, category: t.category, icon: t.icon })}
                                                 className="text-xs px-2.5 py-1.5 rounded-xl font-bold transition-all"
                                                 style={{ background: "var(--bg-subtle)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}>
-                                            {t.icon} {t.name}
+                                            {t.name}
                                         </button>
                                     ))}
                                 </div>
@@ -587,6 +630,41 @@ export default function LivestockPage() {
                                 <button type="button" onClick={() => setShowTypeForm(false)} className="btn-secondary flex-1">Cancel</button>
                                 <button type="submit" disabled={saving} className="btn-primary flex-1">
                                     {saving ? <Loader2 size={14} className="animate-spin" /> : "Add type"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {showGeneralExpense && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div className="flex-1 absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowGeneralExpense(false)} />
+                    <div className="relative w-full max-w-md rounded-3xl shadow-2xl z-10 p-6"
+                         style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+                        <h2 className="section-title mb-1">General livestock activity or cost</h2>
+                        <p className="section-subtitle mb-5">Use this for housing rehabilitation, security, shared feeding, cleaning, or other livestock-wide costs.</p>
+                        <form onSubmit={handleGeneralExpenseSubmit} className="flex flex-col gap-3">
+                            <select className="input min-h-12" value={generalExpense.category}
+                                    onChange={(e) => setGeneralExpense((p) => ({ ...p, category: e.target.value }))}>
+                                {["Housing", "Security", "Feed", "Labour", "Transport", "Utilities", "Other"].map((category) => <option key={category}>{category}</option>)}
+                            </select>
+                            <input className="input min-h-12" required placeholder="Description"
+                                   value={generalExpense.description}
+                                   onChange={(e) => setGeneralExpense((p) => ({ ...p, description: e.target.value }))} />
+                            <input className="input min-h-12" required type="number" min="0" placeholder="Amount"
+                                   value={generalExpense.amount}
+                                   onChange={(e) => setGeneralExpense((p) => ({ ...p, amount: e.target.value }))} />
+                            <input className="input min-h-12" type="date" value={generalExpense.date}
+                                   onChange={(e) => setGeneralExpense((p) => ({ ...p, date: e.target.value }))} />
+                            <textarea className="input min-h-24 p-4" placeholder="Notes"
+                                      value={generalExpense.notes}
+                                      onChange={(e) => setGeneralExpense((p) => ({ ...p, notes: e.target.value }))} />
+                            {error && <p className="text-sm text-red-600">{error}</p>}
+                            <div className="flex gap-3">
+                                <button type="button" onClick={() => setShowGeneralExpense(false)} className="btn-secondary flex-1 min-h-11">Cancel</button>
+                                <button className="btn-primary flex-1 min-h-11" disabled={saving}>
+                                    {saving ? <Loader2 size={14} className="animate-spin" /> : "Save cost"}
                                 </button>
                             </div>
                         </form>
