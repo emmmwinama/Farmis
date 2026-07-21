@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getMobileSession } from "@/lib/mobileAuth";
+import { validateDocumentInput } from "@/lib/documentValidation";
+import { assertSubscriptionCanWrite } from "@/lib/subscription";
 
 async function handleItem(session: NonNullable<ReturnType<typeof getMobileSession>>, item: any) {
   const type = item.type;
@@ -59,13 +61,16 @@ async function handleItem(session: NonNullable<ReturnType<typeof getMobileSessio
   }
 
   if (type === "document") {
+    const validated = validateDocumentInput(payload);
+    if (!validated.ok) return { clientId: item.clientId, status: "failed", error: validated.error };
+
     const doc = await prisma.farmDocument.create({
       data: {
         farmId: session.farmId!,
-        name: payload.name,
-        type: payload.type,
-        url: payload.url,
-        size: payload.size ? Number(payload.size) : null,
+        name: validated.name,
+        type: validated.type,
+        url: validated.url,
+        size: validated.size,
         linkedTo: payload.linkedTo ?? null,
         linkedType: payload.linkedType ?? null,
         notes: payload.notes ?? "",
@@ -80,6 +85,18 @@ async function handleItem(session: NonNullable<ReturnType<typeof getMobileSessio
 export async function POST(req: NextRequest) {
   const session = getMobileSession(req);
   if (!session?.farmId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  try {
+    await assertSubscriptionCanWrite(session.userId);
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Subscription upgrade required" },
+      { status: 403 },
+    );
+  }
+
+  const farm = await prisma.farm.findFirst({ where: { id: session.farmId, OR: [{ userId: session.userId }, { teamMembers: { some: { userId: session.userId, status: "active" } } }] } });
+  if (!farm) return NextResponse.json({ error: "Access denied" }, { status: 403 });
 
   const body = await req.json();
   const queue = Array.isArray(body.queue) ? body.queue : [];

@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireFarmPermission } from "@/lib/roleAccess";
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const access = await requireFarmPermission("fields", "write");
+    if (access.error) return access.error;
 
     const body = await req.json();
     const { name, totalArea, cultivatableArea, soilType, locationLat, locationLng, notes } = body;
+
+    const existing = await prisma.field.findFirst({
+        where: { id: params.id, farmId: access.farm.id },
+    });
+    if (!existing) return NextResponse.json({ error: "Field not found" }, { status: 404 });
 
     if (parseFloat(cultivatableArea) > parseFloat(totalArea)) {
         return NextResponse.json(
@@ -34,8 +38,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 }
 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const access = await requireFarmPermission("fields", "write");
+    if (access.error) return access.error;
+
+    const existing = await prisma.field.findFirst({
+        where: { id: params.id, farmId: access.farm.id },
+    });
+    if (!existing) return NextResponse.json({ error: "Field not found" }, { status: 404 });
 
     await prisma.field.delete({ where: { id: params.id } });
     return NextResponse.json({ success: true });
@@ -45,17 +54,11 @@ export async function GET(
     _: Request,
     { params }: { params: { id: string } }
 ) {
-    const session = await getServerSession(authOptions);
+    const access = await requireFarmPermission("fields");
+    if (access.error) return access.error;
 
-    if (!session?.user?.email) {
-        return NextResponse.json(
-            { error: "Unauthorized" },
-            { status: 401 }
-        );
-    }
-
-    const field = await prisma.field.findUnique({
-        where: { id: params.id },
+    const field = await prisma.field.findFirst({
+        where: { id: params.id, farmId: access.farm.id },
     });
 
     if (!field) {

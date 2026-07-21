@@ -546,7 +546,7 @@ model FarmDocument {
   farmId     String
   name       String
   type       String // deed, certificate, receipt, contract, other
-  url        String
+  url        String   @db.LongText
   size       Int?
   linkedTo   String? // activity ID, transaction ID, etc.
   linkedType String? // activity, transaction, crop

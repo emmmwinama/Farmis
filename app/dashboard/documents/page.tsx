@@ -30,6 +30,7 @@ const ALLOWED_FILE_TYPES = new Set([
   "image/png",
   "image/webp",
 ]);
+const MAX_DOCUMENT_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 function readFileAsDataUrl(file: File) {
   return new Promise<string>((resolve, reject) => {
@@ -69,6 +70,10 @@ export default function DocumentsPage() {
     if (!file) return;
     if (!ALLOWED_FILE_TYPES.has(file.type)) {
       setError("Only PDF, Word documents, JPG, PNG, and WebP images can be uploaded.");
+      return;
+    }
+    if (file.size > MAX_DOCUMENT_UPLOAD_BYTES) {
+      setError("Document uploads must be 10 MB or smaller.");
       return;
     }
     setError("");

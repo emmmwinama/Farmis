@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireMobilePermission } from "@/lib/mobileAuth";
-
-const TYPES = new Set(["receipt", "field_photo", "vet_record", "buyer_contract", "loan_document", "insurance_evidence", "certificate", "other"]);
+import { DOCUMENT_TYPES, validateDocumentInput } from "@/lib/documentValidation";
 
 export async function GET(req: NextRequest) {
   const access = await requireMobilePermission(req, "documents");
@@ -10,6 +9,9 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
+  if (type && !DOCUMENT_TYPES.has(type)) {
+    return NextResponse.json({ error: "Unsupported document type" }, { status: 400 });
+  }
 
   const documents = await prisma.farmDocument.findMany({
     where: {
@@ -27,25 +29,19 @@ export async function POST(req: NextRequest) {
   if (access.error) return access.error;
 
   const body = await req.json();
-  const { name, type, url, size, linkedTo, linkedType, notes } = body;
-
-  if (!name || !type || !url) {
-    return NextResponse.json({ error: "Name, type and file/link are required" }, { status: 400 });
-  }
-  if (!TYPES.has(type)) {
-    return NextResponse.json({ error: "Unsupported document type" }, { status: 400 });
-  }
+  const validated = validateDocumentInput(body);
+  if (!validated.ok) return NextResponse.json({ error: validated.error }, { status: 400 });
 
   const document = await prisma.farmDocument.create({
     data: {
       farmId: access.session.farmId!,
-      name: String(name).trim(),
-      type,
-      url,
-      size: size ? Number(size) : null,
-      linkedTo: linkedTo || null,
-      linkedType: linkedType || null,
-      notes: notes ?? "",
+      name: validated.name,
+      type: validated.type,
+      url: validated.url,
+      size: validated.size,
+      linkedTo: body.linkedTo || null,
+      linkedType: body.linkedType || null,
+      notes: body.notes ?? "",
     },
   });
 

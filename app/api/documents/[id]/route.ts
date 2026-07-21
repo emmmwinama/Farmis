@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFarmPermission } from "@/lib/roleAccess";
+import { DOCUMENT_TYPES } from "@/lib/documentValidation";
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const access = await requireFarmPermission("documents", "write");
@@ -12,6 +13,10 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (!existing) return NextResponse.json({ error: "Document not found" }, { status: 404 });
 
   const body = await req.json();
+  if (body.type !== undefined && !DOCUMENT_TYPES.has(String(body.type))) {
+    return NextResponse.json({ error: "Unsupported document type" }, { status: 400 });
+  }
+
   const document = await prisma.farmDocument.update({
     where: { id: params.id },
     data: {

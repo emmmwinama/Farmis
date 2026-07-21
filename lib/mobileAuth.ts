@@ -42,32 +42,33 @@ type MobilePermission =
     | "reports"
     | "team"
     | "documents"
-    | "equipment";
+    | "equipment"
+    | "livestock";
 
 const ROLE_PERMISSIONS: Record<string, Record<MobilePermission, boolean>> = {
     owner: {
         fields: true, crops: true, activities: true, finance: true, employees: true,
-        yields: true, reports: true, team: true, documents: true, equipment: true,
+        yields: true, reports: true, team: true, documents: true, equipment: true, livestock: true,
     },
     manager: {
         fields: true, crops: true, activities: true, finance: false, employees: true,
-        yields: true, reports: true, team: false, documents: true, equipment: true,
+        yields: true, reports: true, team: false, documents: true, equipment: true, livestock: true,
     },
     agronomist: {
         fields: true, crops: true, activities: true, finance: false, employees: false,
-        yields: true, reports: true, team: false, documents: true, equipment: false,
+        yields: true, reports: true, team: false, documents: true, equipment: false, livestock: true,
     },
     accountant: {
         fields: false, crops: false, activities: false, finance: true, employees: true,
-        yields: false, reports: true, team: false, documents: true, equipment: false,
+        yields: false, reports: true, team: false, documents: true, equipment: false, livestock: false,
     },
     field_worker: {
         fields: false, crops: false, activities: true, finance: false, employees: false,
-        yields: true, reports: false, team: false, documents: false, equipment: false,
+        yields: true, reports: false, team: false, documents: false, equipment: false, livestock: true,
     },
     viewer: {
         fields: true, crops: true, activities: false, finance: false, employees: false,
-        yields: true, reports: true, team: false, documents: true, equipment: false,
+        yields: true, reports: true, team: false, documents: true, equipment: false, livestock: true,
     },
 };
 

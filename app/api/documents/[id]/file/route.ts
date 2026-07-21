@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireFarmPermission } from "@/lib/roleAccess";
+import { parseDocumentDataUrl } from "@/lib/documentValidation";
 
 function contentDisposition(name: string) {
   const safeName = name.replace(/[^\w.\- ]+/g, "_").trim() || "agrivault-document";
@@ -29,22 +30,16 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     return NextResponse.json({ error: "Document URL is invalid" }, { status: 400 });
   }
 
-  const commaIndex = url.indexOf(",");
-  if (commaIndex === -1) {
-    return NextResponse.json({ error: "Uploaded document data is invalid" }, { status: 400 });
-  }
+  const parsed = parseDocumentDataUrl(url);
+  if (!parsed) return NextResponse.json({ error: "Uploaded document data is invalid" }, { status: 400 });
 
-  const meta = url.slice(5, commaIndex);
-  const payload = url.slice(commaIndex + 1);
-  const [contentType = "application/octet-stream"] = meta.split(";");
-  const isBase64 = meta.toLowerCase().split(";").includes("base64");
-  const bytes = isBase64
-    ? Buffer.from(payload, "base64")
-    : Buffer.from(decodeURIComponent(payload), "utf8");
+  const bytes = parsed.isBase64
+    ? Buffer.from(parsed.payload, "base64")
+    : Buffer.from(decodeURIComponent(parsed.payload), "utf8");
 
   return new NextResponse(bytes, {
     headers: {
-      "Content-Type": contentType,
+      "Content-Type": parsed.contentType,
       "Content-Disposition": contentDisposition(document.name),
       "Cache-Control": "private, max-age=300",
       "X-Content-Type-Options": "nosniff",
