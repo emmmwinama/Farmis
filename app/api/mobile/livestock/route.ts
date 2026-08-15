@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireMobilePermission } from "@/lib/mobileAuth";
 
 export async function GET(req: NextRequest) {
-  const access = await requireMobilePermission(req, "activities");
+  const access = await requireMobilePermission(req, "livestock");
   if (access.error) return access.error;
 
   const [types, animals] = await Promise.all([
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const access = await requireMobilePermission(req, "activities");
+  const access = await requireMobilePermission(req, "livestock");
   if (access.error) return access.error;
 
   const body = await req.json();

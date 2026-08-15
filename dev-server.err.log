@@ -1,0 +1,7 @@
+(node:16680) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack from C:\Users\emmanuel.mwinama\Code\Farmis\.next\cache\webpack\server-development.pack.gz failed: TypeError: Cannot read properties of undefined (reading 'hasStartTime')
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack from C:\Users\emmanuel.mwinama\Code\Farmis\.next\cache\webpack\client-development.pack.gz failed: TypeError: Cannot read properties of undefined (reading 'hasStartTime')
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack from C:\Users\emmanuel.mwinama\Code\Farmis\.next\cache\webpack\server-development.pack.gz failed: TypeError: Cannot read properties of undefined (reading 'hasStartTime')
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack from C:\Users\emmanuel.mwinama\Code\Farmis\.next\cache\webpack\client-development.pack.gz failed: TypeError: Cannot read properties of undefined (reading 'hasStartTime')
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack from C:\Users\emmanuel.mwinama\Code\Farmis\.next\cache\webpack\client-development.pack.gz failed: TypeError: Cannot read properties of undefined (reading 'hasStartTime')

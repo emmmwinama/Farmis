@@ -1,0 +1,343 @@
+
+> agrivault@0.1.0 dev
+> next dev -H 0.0.0.0
+
+  ▲ Next.js 14.2.29
+  - Local:        http://localhost:3000
+  - Network:      http://0.0.0.0:3000
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 3.3s
+ ○ Compiling / ...
+ ✓ Compiled / in 11.5s (589 modules)
+ ✓ Compiled /middleware in 447ms (74 modules)
+ ○ Compiling /api/mobile/dashboard ...
+ ✓ Compiled /api/mobile/dashboard in 1276ms (411 modules)
+ GET /api/mobile/dashboard 401 in 1491ms
+ GET /api/mobile/dashboard 401 in 1493ms
+ ○ Compiling /_not-found ...
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 6919ms
+ ✓ Compiled /_not-found in 8.7s (662 modules)
+ GET /api/mobile/profile 404 in 9140ms
+ ✓ Compiled /api/mobile/fields in 208ms (380 modules)
+ GET /api/mobile/fields 200 in 414ms
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 154ms
+ ✓ Compiled in 840ms (282 modules)
+ ✓ Compiled in 1707ms (356 modules)
+ ✓ Compiled in 620ms (282 modules)
+ ✓ Compiled in 785ms (342 modules)
+ ✓ Compiled in 720ms (282 modules)
+ ✓ Compiled in 1144ms (356 modules)
+ ○ Compiling /api/mobile/dashboard ...
+ ✓ Compiled /api/mobile/dashboard in 2.8s (648 modules)
+ GET /api/mobile/profile 404 in 3540ms
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 3728ms
+ GET /api/mobile/profile 404 in 176ms
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 134ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 7.5s (889 modules)
+ GET /api/mobile/profile 404 in 7758ms
+ GET /api/mobile/dashboard?period=This+year&status=active 404 in 8040ms
+ ✓ Compiled in 3.7s (589 modules)
+ ✓ Compiled /api/mobile/profile in 252ms (181 modules)
+ ✓ Compiled (192 modules)
+ GET /api/mobile/profile 401 in 972ms
+ GET /api/mobile/dashboard 401 in 986ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1472ms (895 modules)
+ GET /api/mobile/dashboard 404 in 2072ms
+ GET /api/mobile/profile 401 in 921ms
+ GET /api/mobile/dashboard?period=This%20year 401 in 26ms
+ GET /api/mobile/dashboard?period=This%20year 401 in 19ms
+ GET /api/mobile/dashboard 401 in 20ms
+ GET /api/mobile/profile 404 in 50ms
+ GET /api/mobile/dashboard 404 in 143ms
+ GET /api/mobile/profile 404 in 45ms
+ GET /api/mobile/dashboard 404 in 79ms
+ ✓ Compiled in 10.7s (895 modules)
+ GET /api/mobile/dashboard?period=This%20year 401 in 174ms
+ GET /api/mobile/dashboard 401 in 48ms
+ GET /api/mobile/dashboard?period=This%20year 401 in 70ms
+ GET /api/mobile/profile 401 in 84ms
+ GET /api/mobile/profile 401 in 25ms
+ GET /api/mobile/profile 200 in 132ms
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 185ms
+ ✓ Compiled in 6.5s (467 modules)
+ ✓ Compiled in 3.7s (467 modules)
+ ✓ Compiled in 8.5s (589 modules)
+ ✓ Compiled /api/mobile/dashboard in 210ms (181 modules)
+ GET /api/mobile/dashboard?probe=1 401 in 350ms
+ GET /api/mobile/dashboard 401 in 21ms
+ ✓ Compiled /api/mobile/profile in 180ms (192 modules)
+ GET /api/mobile/profile 401 in 276ms
+ ✓ Compiled /api/mobile/farm-context in 278ms (194 modules)
+ GET /api/mobile/farm-context 401 in 313ms
+ ✓ Compiled /api/mobile/fields in 278ms (196 modules)
+ GET /api/mobile/fields 401 in 324ms
+ ✓ Compiled /api/mobile/fields/[id] in 184ms (198 modules)
+ GET /api/mobile/fields/test-id 401 in 872ms
+ ✓ Compiled /api/mobile/crops in 298ms (201 modules)
+ GET /api/mobile/crops 401 in 358ms
+ ✓ Compiled /api/mobile/crops/[id] in 320ms (203 modules)
+ GET /api/mobile/crops/test-id 401 in 1006ms
+ ✓ Compiled /api/mobile/crop_types in 180ms (205 modules)
+ GET /api/mobile/crop_types 401 in 221ms
+ ✓ Compiled /api/mobile/crop-types in 252ms (207 modules)
+ GET /api/mobile/crop-types 401 in 286ms
+ ✓ Compiled /api/mobile/activities in 287ms (209 modules)
+ GET /api/mobile/activities 401 in 333ms
+ ✓ Compiled /api/mobile/activities/[id] in 337ms (211 modules)
+ GET /api/mobile/activities/test-id 401 in 863ms
+ ✓ Compiled /api/mobile/yields in 139ms (213 modules)
+ GET /api/mobile/yields 401 in 184ms
+ ✓ Compiled /api/mobile/yields/[id] in 211ms (215 modules)
+ GET /api/mobile/yields/test-id 405 in 646ms
+ ✓ Compiled /api/mobile/finance in 208ms (217 modules)
+ GET /api/mobile/finance 401 in 244ms
+ ✓ Compiled /api/mobile/finance/[id] in 313ms (219 modules)
+ GET /api/mobile/finance/test-id 405 in 827ms
+ ✓ Compiled /api/mobile/overhead in 311ms (221 modules)
+ GET /api/mobile/overhead 401 in 359ms
+ ✓ Compiled /api/mobile/overhead/[id] in 260ms (223 modules)
+ GET /api/mobile/overhead/test-id 405 in 929ms
+ ✓ Compiled /api/mobile/employees in 293ms (225 modules)
+ GET /api/mobile/employees 401 in 335ms
+ ○ Compiling /api/mobile/templates ...
+ ✓ Compiled /api/mobile/templates in 559ms (228 modules)
+ GET /api/mobile/templates 401 in 611ms
+ ✓ Compiled /api/mobile/inventory in 179ms (230 modules)
+ GET /api/mobile/inventory 401 in 217ms
+ ✓ Compiled /api/mobile/inventory/sales in 345ms (232 modules)
+ GET /api/mobile/inventory/sales 401 in 388ms
+ ✓ Compiled /api/mobile/livestock in 341ms (234 modules)
+ GET /api/mobile/livestock 401 in 383ms
+ ✓ Compiled /api/mobile/equipment in 246ms (236 modules)
+ GET /api/mobile/equipment 401 in 277ms
+ ✓ Compiled /api/mobile/notifications in 364ms (238 modules)
+ GET /api/mobile/notifications 401 in 412ms
+ ✓ Compiled /api/mobile/traceability in 260ms (240 modules)
+ GET /api/mobile/traceability 401 in 302ms
+ ✓ Compiled /api/mobile/funder-dashboard in 225ms (242 modules)
+ GET /api/mobile/funder-dashboard 401 in 262ms
+ ✓ Compiled /api/mobile/reports in 240ms (244 modules)
+ GET /api/mobile/reports 401 in 281ms
+ ○ Compiling /api/mobile/report-builder ...
+ ✓ Compiled /api/mobile/report-builder in 582ms (246 modules)
+ GET /api/mobile/report-builder 401 in 633ms
+ ○ Compiling /api/mobile/market ...
+ ✓ Compiled /api/mobile/market in 536ms (248 modules)
+ GET /api/mobile/market 401 in 614ms
+ ✓ Compiled /api/public/tiers in 452ms (250 modules)
+ GET /api/public/tiers 200 in 824ms
+ GET /api/mobile/market 401 in 50ms
+ GET /api/mobile/crop_types 401 in 27ms
+ GET /api/mobile/crop-types 401 in 36ms
+ GET /api/mobile/traceability 401 in 146ms
+ GET /api/mobile/dashboard 401 in 22ms
+ GET /api/mobile/profile 401 in 19ms
+ GET /api/mobile/farm-context 401 in 19ms
+ GET /api/mobile/fields 401 in 18ms
+ GET /api/mobile/crops 401 in 19ms
+ GET /api/mobile/crop_types 401 in 19ms
+ GET /api/mobile/crop-types 401 in 18ms
+ GET /api/mobile/activities 401 in 18ms
+ GET /api/mobile/yields 401 in 27ms
+ GET /api/mobile/finance 401 in 21ms
+ GET /api/mobile/overhead 401 in 20ms
+ GET /api/mobile/employees 401 in 18ms
+ GET /api/mobile/templates 401 in 18ms
+ GET /api/mobile/inventory 401 in 19ms
+ GET /api/mobile/inventory/sales 401 in 17ms
+ GET /api/mobile/livestock 401 in 22ms
+ GET /api/mobile/equipment 401 in 15ms
+ GET /api/mobile/notifications 401 in 18ms
+ GET /api/mobile/traceability 401 in 15ms
+ GET /api/mobile/funder-dashboard 401 in 17ms
+ GET /api/mobile/reports 401 in 24ms
+ GET /api/mobile/report-builder 401 in 23ms
+ GET /api/mobile/market 401 in 28ms
+ ✓ Compiled /api/mobile/reports/export in 297ms (239 modules)
+ GET /api/mobile/reports/export?format=pdf 401 in 373ms
+ ✓ Compiled /api/public/tiers in 161ms (241 modules)
+ GET /api/public/tiers 200 in 209ms
+ GET /api/mobile/dashboard 401 in 19ms
+ GET /api/mobile/profile 401 in 17ms
+ GET /api/mobile/traceability 401 in 16ms
+ GET /api/mobile/market 401 in 14ms
+ GET /api/mobile/crop_types 401 in 12ms
+ GET /api/mobile/reports/export?format=pdf 401 in 13ms
+ GET /api/public/tiers 200 in 17ms
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 623ms
+ GET /api/mobile/profile 200 in 256ms
+ GET /api/mobile/fields 200 in 241ms
+ ○ Compiling /api/mobile/fields/[id] ...
+ ✓ Compiled /api/mobile/fields/[id] in 2.8s (196 modules)
+ GET /api/mobile/fields/cmrrjierv0001qx1opr3d19o4 200 in 3788ms
+ GET /api/mobile/fields 200 in 245ms
+ GET /api/mobile/fields 200 in 247ms
+ ✓ Compiled /api/mobile/crops in 210ms (199 modules)
+ GET /api/mobile/crops 200 in 515ms
+ GET /api/mobile/profile 200 in 163ms
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 154ms
+ ✓ Compiled /api/mobile/reports in 437ms (181 modules)
+ GET /api/mobile/reports?period=This+year&status=active 200 in 787ms
+ GET /api/mobile/reports?period=This+year&status=active 200 in 334ms
+ ✓ Compiled /api/mobile/profile in 212ms (181 modules)
+ ✓ Compiled (192 modules)
+ GET /api/mobile/profile 200 in 707ms
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 757ms
+ ✓ Compiled /api/mobile/reports in 142ms (194 modules)
+ GET /api/mobile/reports?period=This+year&status=active 200 in 298ms
+ ○ Compiling /api/mobile/equipment ...
+ ✓ Compiled /api/mobile/equipment in 2s (181 modules)
+ GET /api/mobile/equipment 200 in 2869ms
+ ✓ Compiled /api/mobile/inventory in 477ms (183 modules)
+ GET /api/mobile/inventory 200 in 812ms
+ ○ Compiling /api/mobile/inventory/sales ...
+ ✓ Compiled /api/mobile/inventory/sales in 914ms (185 modules)
+ GET /api/mobile/inventory/sales 200 in 1414ms
+ ○ Compiling /api/mobile/employees ...
+ ✓ Compiled /api/mobile/employees in 2.3s (181 modules)
+ GET /api/mobile/employees 200 in 3236ms
+ ✓ Compiled /api/mobile/finance in 190ms (183 modules)
+ GET /api/mobile/finance 200 in 321ms
+ ✓ Compiled /api/mobile/overhead in 308ms (185 modules)
+ GET /api/mobile/overhead 200 in 587ms
+ GET /api/mobile/finance 200 in 158ms
+ GET /api/mobile/finance 200 in 182ms
+ GET /api/mobile/finance 200 in 36ms
+ ✓ Compiled /api/mobile/reports in 341ms (185 modules)
+ GET /api/mobile/reports?period=This+year&status=active 200 in 658ms
+ ○ Compiling /api/mobile/traceability ...
+ ✓ Compiled /api/mobile/traceability in 1201ms (181 modules)
+ GET /api/mobile/traceability 200 in 1900ms
+ ○ Compiling /api/mobile/notifications ...
+ ✓ Compiled /api/mobile/notifications in 770ms (183 modules)
+ GET /api/mobile/notifications 200 in 1219ms
+ ✓ Compiled /api/mobile/funder-dashboard in 337ms (185 modules)
+ GET /api/mobile/funder-dashboard 200 in 847ms
+ ✓ Compiled /api/mobile/finance in 66ms (183 modules)
+ GET /api/mobile/finance 200 in 190ms
+ ✓ Compiled /api/mobile/yields in 168ms (185 modules)
+ GET /api/mobile/yields 200 in 334ms
+ GET /api/mobile/finance 200 in 33ms
+ ✓ Compiled /api/mobile/overhead in 312ms (181 modules)
+ GET /api/mobile/overhead 200 in 394ms
+ ✓ Compiled /api/mobile/finance in 419ms (183 modules)
+ GET /api/mobile/finance 200 in 628ms
+ ○ Compiling /api/mobile/profile ...
+ ✓ Compiled /api/mobile/profile in 1142ms (181 modules)
+ ✓ Compiled (192 modules)
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 2033ms
+ GET /api/mobile/profile 200 in 1969ms
+ ○ Compiling /api/mobile/equipment ...
+ ✓ Compiled /api/mobile/equipment in 5.2s (194 modules)
+ GET /api/mobile/equipment 200 in 7010ms
+ GET /api/mobile/profile 200 in 201ms
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 247ms
+ ○ Compiling /api/mobile/yields ...
+ ✓ Compiled /api/mobile/yields in 516ms (181 modules)
+ GET /api/mobile/yields 200 in 811ms
+ ○ Compiling /api/mobile/reports ...
+ ✓ Compiled /api/mobile/reports in 3.4s (181 modules)
+ GET /api/mobile/reports 200 in 3953ms
+ ○ Compiling /api/mobile/market ...
+ ✓ Compiled /api/mobile/market in 3.3s (183 modules)
+ GET /api/mobile/market 200 in 4862ms
+ ✓ Compiled /api/mobile/dashboard in 290ms (181 modules)
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 575ms
+ ✓ Compiled in 2.9s (467 modules)
+ ✓ Compiled in 858ms (467 modules)
+ ✓ Compiled in 3.2s (589 modules)
+ ✓ Compiled in 1012ms (467 modules)
+ ✓ Compiled in 949ms (467 modules)
+ ✓ Compiled in 2.7s (575 modules)
+ ✓ Compiled in 3s (575 modules)
+ ✓ Compiled in 1391ms (575 modules)
+ ✓ Compiled in 1609ms (575 modules)
+ ✓ Compiled in 3.9s (575 modules)
+ ✓ Compiled in 1027ms (467 modules)
+ ✓ Compiled in 997ms (467 modules)
+ ✓ Compiled in 1000ms (467 modules)
+ ✓ Compiled in 976ms (467 modules)
+ ✓ Compiled in 1328ms (575 modules)
+ ✓ Compiled in 2.2s (589 modules)
+ ✓ Compiled in 1135ms (467 modules)
+ ✓ Compiled in 1096ms (467 modules)
+ ○ Compiling /api/mobile/profile ...
+ ✓ Compiled /api/mobile/profile in 1757ms (181 modules)
+ ✓ Compiled (192 modules)
+ GET /api/mobile/profile 200 in 2164ms
+ GET /api/mobile/dashboard?period=This+year&status=active 200 in 2226ms
+ ✓ Compiled /api/mobile/fields in 447ms (194 modules)
+ GET /api/mobile/fields 200 in 551ms
+ GET /api/mobile/fields 200 in 821ms
+ ○ Compiling /api/mobile/fields/[id] ...
+ ✓ Compiled /api/mobile/fields/[id] in 1317ms (196 modules)
+ GET /api/mobile/fields/cmrrjierv0001qx1opr3d19o4 200 in 2574ms
+ GET /api/mobile/fields 200 in 301ms
+ GET /api/mobile/fields 200 in 311ms
+ ○ Compiling /api/mobile/field-map ...
+ ✓ Compiled /api/mobile/field-map in 941ms (185 modules)
+ GET /api/mobile/field-map 200 in 2020ms
+ GET /api/mobile/fields 200 in 408ms
+ ✓ Compiled /api/mobile/crops in 274ms (188 modules)
+ GET /api/mobile/crops 200 in 560ms
+ ○ Compiling /api/mobile/crop_types ...
+ ✓ Compiled /api/mobile/crop_types in 1637ms (190 modules)
+ GET /api/mobile/crop_types 200 in 2672ms
+ GET /api/mobile/crops 200 in 266ms
+ GET /api/mobile/fields 200 in 164ms
+ ○ Compiling /api/mobile/activities ...
+ ✓ Compiled /api/mobile/activities in 641ms (188 modules)
+ GET /api/mobile/activities 200 in 821ms
+ GET /api/mobile/fields 200 in 692ms
+ GET /api/mobile/activities 200 in 464ms
+ GET /api/mobile/crops?archived=false 200 in 617ms
+ ○ Compiling /api/mobile/employees ...
+ ✓ Compiled /api/mobile/employees in 3.9s (188 modules)
+ GET /api/mobile/employees 200 in 4834ms
+ GET /api/mobile/activities 200 in 76ms
+ ○ Compiling /api/mobile/templates ...
+ ✓ Compiled /api/mobile/templates in 1837ms (189 modules)
+ GET /api/mobile/templates 200 in 2714ms
+ ○ Compiling /api/mobile/yields ...
+ ✓ Compiled /api/mobile/yields in 545ms (186 modules)
+ GET /api/mobile/yields 200 in 695ms
+ ✓ Compiled /api/mobile/crops in 282ms (186 modules)
+ ✓ Compiled (189 modules)
+ GET /api/mobile/crops 200 in 615ms
+ GET /api/mobile/fields 200 in 654ms
+ ○ Compiling /api/mobile/crop_types ...
+ ✓ Compiled /api/mobile/crop_types in 1506ms (186 modules)
+ GET /api/mobile/crop_types 200 in 2313ms
+ GET /api/mobile/crops 200 in 476ms
+ ○ Compiling /api/mobile/seasons ...
+ ✓ Compiled /api/mobile/seasons in 1228ms (188 modules)
+ GET /api/mobile/seasons 200 in 1712ms
+ ○ Compiling /api/mobile/seasons/compare ...
+ ✓ Compiled /api/mobile/seasons/compare in 960ms (190 modules)
+ GET /api/mobile/seasons/compare 400 in 1498ms
+ ○ Compiling /api/mobile/finance ...
+ ✓ Compiled /api/mobile/finance in 527ms (190 modules)
+ GET /api/mobile/finance 200 in 656ms
+ GET /api/mobile/finance 200 in 333ms
+ ✓ Compiled /api/mobile/overhead in 361ms (192 modules)
+ GET /api/mobile/overhead 200 in 675ms
+ GET /api/mobile/finance 200 in 275ms
+ ○ Compiling /api/mobile/employees ...
+ ✓ Compiled /api/mobile/employees in 3.1s (194 modules)
+ GET /api/mobile/employees 200 in 4052ms
+ ○ Compiling /api/mobile/team ...
+ ✓ Compiled /api/mobile/team in 2.8s (188 modules)
+ GET /api/mobile/team 200 in 3609ms
+ ○ Compiling /api/mobile/reports ...
+ ✓ Compiled /api/mobile/reports in 1017ms (190 modules)
+ GET /api/mobile/reports 200 in 1588ms
+ ○ Compiling /api/mobile/market ...
+ ✓ Compiled /api/mobile/market in 1609ms (192 modules)
+ GET /api/mobile/market 200 in 1787ms
+ ○ Compiling /api/mobile/profile ...
+ ✓ Compiled /api/mobile/profile in 2.3s (190 modules)
+ GET /api/mobile/profile 200 in 3237ms

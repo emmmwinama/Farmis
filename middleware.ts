@@ -9,6 +9,10 @@ export async function middleware(req: NextRequest) {
         return mobileCors(req);
     }
 
+    if (pathname.startsWith("/dashboard")) {
+        return withSecurityHeaders(NextResponse.next(), pathname);
+    }
+
     if (
         pathname === "/admin/login"  ||
         pathname === "/api/admin/login" ||
@@ -22,12 +26,18 @@ export async function middleware(req: NextRequest) {
 
     if (!valid) {
         if (pathname.startsWith("/api/")) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            return withSecurityHeaders(
+                NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+                pathname
+            );
         }
-        return NextResponse.redirect(new URL("/admin/login", req.url));
+        return withSecurityHeaders(
+            NextResponse.redirect(new URL("/admin/login", req.url)),
+            pathname
+        );
     }
 
-    return NextResponse.next();
+    return withSecurityHeaders(NextResponse.next(), pathname);
 }
 
 function mobileCors(req: NextRequest) {
@@ -45,14 +55,44 @@ function mobileCors(req: NextRequest) {
     headers.set("Access-Control-Allow-Headers", "Content-Type,Authorization");
 
     if (req.method === "OPTIONS") {
-        return new NextResponse(null, { status: 204, headers });
+        return withSecurityHeaders(
+            new NextResponse(null, { status: 204, headers }),
+            req.nextUrl.pathname
+        );
     }
 
     const response = NextResponse.next();
     headers.forEach((value, key) => response.headers.set(key, value));
+    return withSecurityHeaders(response, req.nextUrl.pathname);
+}
+
+function withSecurityHeaders(response: NextResponse, pathname: string) {
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    response.headers.set(
+        "Permissions-Policy",
+        "camera=(), microphone=(), geolocation=(), payment=()"
+    );
+
+    if (
+        pathname.startsWith("/admin") ||
+        pathname.startsWith("/dashboard") ||
+        pathname.startsWith("/api/")
+    ) {
+        response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+    }
+
+    if (process.env.NODE_ENV === "production") {
+        response.headers.set(
+            "Strict-Transport-Security",
+            "max-age=31536000; includeSubDomains; preload"
+        );
+    }
+
     return response;
 }
 
 export const config = {
-    matcher: ["/admin/:path*", "/api/admin/:path*", "/api/mobile/:path*"],
+    matcher: ["/admin/:path*", "/dashboard/:path*", "/api/admin/:path*", "/api/mobile/:path*"],
 };
