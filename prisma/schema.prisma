@@ -243,12 +243,20 @@ model HarvestYield {
 }
 
 model SubscriptionTier {
-  id           String   @id @default(cuid())
-  name         String // Free, Standard, Enterprise
-  description  String
-  priceMonthly Float
-  priceAnnual  Float?
-  audience     String?
+  id            String   @id @default(cuid())
+  name          String // Free, Standard, Enterprise
+  description   String
+  // Existing web-dashboard tiers are priced in MWK; mobile tiers (added for
+  // the Flutter app's PayPal checkout) are USD — currency disambiguates
+  // priceMonthly/priceAnnual/priceLifetime, since Payment.currency is
+  // per-transaction but a tier's list price needs its own fixed currency.
+  currency      String   @default("MWK")
+  priceMonthly  Float
+  priceAnnual   Float?
+  // One-time purchase price for a non-expiring plan (Subscription.billingCycle
+  // = "lifetime"). Null for every existing recurring-only tier.
+  priceLifetime Float?
+  audience      String?
   ctaLabel     String?
   ctaHref      String?
   offerItems   Json?
@@ -278,6 +286,10 @@ model SubscriptionTier {
   customReports         Boolean @default(false)
   apiAccess             Boolean @default(false)
   dataRetentionLifetime Boolean @default(true)
+  // Whether this tier's data is backed up/synced to the server at all — the
+  // free mobile tier is local-only-by-design (per the free-vs-paid product
+  // decision), not just missing some analytics feature.
+  syncEnabled           Boolean @default(false)
 
   subscriptions Subscription[]
 }
@@ -287,7 +299,7 @@ model Subscription {
   userId          String    @unique
   tierId          String
   status          String    @default("active") // active, expired, suspended, trial
-  billingCycle    String    @default("monthly") // monthly, annual
+  billingCycle    String    @default("monthly") // monthly, annual, lifetime
   startDate       DateTime  @default(now())
   endDate         DateTime?
   trialEndsAt     DateTime?
@@ -295,6 +307,14 @@ model Subscription {
   activationToken String?   @unique
   activatedAt     DateTime?
   notes           String?
+
+  // Gateway linkage — null for manually-recorded (admin) subscriptions.
+  // providerSubscriptionId is how PayPal webhooks look up which local
+  // Subscription a BILLING.SUBSCRIPTION.* event belongs to; only set for
+  // recurring (monthly) plans — a one-time "lifetime" purchase has no
+  // ongoing PayPal subscription object, just a Payment row.
+  provider               String? // "paypal" | null (manual)
+  providerSubscriptionId String? @unique
 
   user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   tier     SubscriptionTier @relation(fields: [tierId], references: [id])
@@ -307,12 +327,18 @@ model Payment {
   amount           Float
   currency         String    @default("MWK")
   status           String // paid, pending, failed, refunded
-  method           String // cash, mobile_money, bank_transfer, card
+  method           String // cash, mobile_money, bank_transfer, card, paypal
   reference        String?
   notes            String?
   paidAt           DateTime?
   createdAt        DateTime  @default(now())
   createdByAdminId String?
+
+  // PayPal's capture/sale id (order capture id for one-time, or the sale id
+  // from a PAYMENT.SALE.COMPLETED event for a subscription's renewal
+  // charge) — unique so a duplicate webhook delivery is a no-op insert
+  // rather than a double-counted payment.
+  providerTransactionId String? @unique
 
   subscription Subscription @relation(fields: [subscriptionId], references: [id])
 }
