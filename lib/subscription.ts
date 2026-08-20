@@ -116,6 +116,7 @@ export async function checkFeature(
         | "teamAccounts"
         | "customReports"
         | "apiAccess"
+        | "syncEnabled"
 ) {
     const sub = await getUserSubscription(userId);
     if (!sub || !isWritableSubscription(sub)) {
