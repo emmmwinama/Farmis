@@ -28,6 +28,11 @@ model User {
   teamMemberships TeamMember[]
   creditScores    FarmCreditScore[]
   notifications   Notification[]
+
+  // Mobile forgot-password: a short-lived emailed OTP, distinct from
+  // activationToken (which is a separate, non-expiring admin-issued flow).
+  resetToken          String?   @unique
+  resetTokenExpiresAt DateTime?
 }
 
 model Farm {
